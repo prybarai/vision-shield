@@ -1,0 +1,115 @@
+import { notFound } from 'next/navigation';
+import { supabaseAdmin } from '@/lib/supabase/admin';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { formatCurrencyRange } from '@/lib/utils';
+import Disclaimer from '@/components/ui/Disclaimer';
+import Badge from '@/components/ui/Badge';
+import { DISCLAIMERS } from '@/lib/disclaimers';
+import type { Project, Estimate } from '@/types';
+
+interface PageProps {
+  params: Promise<{ token: string }>;
+}
+
+export default async function SharePage({ params }: PageProps) {
+  const { token } = await params;
+
+  const { data: project } = await supabaseAdmin
+    .from('projects')
+    .select('*')
+    .eq('share_token', token)
+    .single();
+
+  if (!project) notFound();
+
+  const p = project as Project;
+
+  const { data: estimate } = await supabaseAdmin
+    .from('estimates')
+    .select('*')
+    .eq('project_id', p.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  const e = estimate as Estimate | null;
+
+  const categoryLabel = p.project_category.replace(/_/g, ' ');
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-10">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-1 text-xs text-slate-400 mb-4">
+          Shared via Prybar Vision
+        </div>
+        <div className="flex justify-center gap-2 mb-3">
+          <Badge variant="blue" className="capitalize">{p.quality_tier} tier</Badge>
+          <Badge variant="gray" className="capitalize">{categoryLabel}</Badge>
+        </div>
+        <h1 className="text-3xl font-bold text-slate-900 capitalize mb-2">{categoryLabel} Project</h1>
+        {p.zip_code && <p className="text-slate-500">ZIP: {p.zip_code}</p>}
+      </div>
+
+      {/* Images */}
+      {p.generated_image_urls?.length > 0 && (
+        <div className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {p.generated_image_urls.map((url: string, i: number) => (
+              <div key={i} className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100">
+                <Image
+                  src={url}
+                  alt={`Concept ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Estimate */}
+      {e && (
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Rough Cost Estimate</h2>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="text-center p-3 bg-slate-50 rounded-xl">
+              <div className="text-xs text-slate-500 mb-1">Low</div>
+              <div className="text-xl font-bold text-slate-700">${e.low_estimate.toLocaleString()}</div>
+            </div>
+            <div className="text-center p-3 bg-blue-50 rounded-xl border-2 border-blue-200">
+              <div className="text-xs text-blue-600 font-medium mb-1">Mid</div>
+              <div className="text-xl font-bold text-blue-700">${e.mid_estimate.toLocaleString()}</div>
+            </div>
+            <div className="text-center p-3 bg-slate-50 rounded-xl">
+              <div className="text-xs text-slate-500 mb-1">High</div>
+              <div className="text-xl font-bold text-slate-700">${e.high_estimate.toLocaleString()}</div>
+            </div>
+          </div>
+          <p className="text-center text-slate-600 font-medium">
+            {formatCurrencyRange(e.low_estimate, e.high_estimate)}
+          </p>
+        </div>
+      )}
+
+      <Disclaimer text={DISCLAIMERS.estimate} className="mb-6" />
+
+      {/* CTA */}
+      <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">
+        <h2 className="text-2xl font-bold mb-2">Plan your own project</h2>
+        <p className="text-blue-100 mb-6">Get AI design concepts and a cost estimate for your home project — free.</p>
+        <Link
+          href="/vision/start"
+          className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3 rounded-xl transition-colors"
+        >
+          Start my project
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    </div>
+  );
+}
