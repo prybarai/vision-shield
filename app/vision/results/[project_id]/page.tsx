@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowRight, Share2, ChevronDown, AlertCircle } from 'lucide-react';
+import { ArrowRight, AlertCircle } from 'lucide-react';
 import { DISCLAIMERS } from '@/lib/disclaimers';
 import { formatCurrencyRange, formatCurrency } from '@/lib/utils';
 import Disclaimer from '@/components/ui/Disclaimer';
@@ -59,57 +58,6 @@ export default async function VisionResultsPage({ params }: PageProps) {
         </div>
         <ShareButton shareUrl={shareUrl} />
       </div>
-
-      {/* Image Gallery */}
-      {project.generated_image_urls?.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">AI Design Concepts</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {project.generated_image_urls.map((url: string, i: number) => (
-              <div key={i} className="relative rounded-2xl overflow-hidden bg-slate-100 group">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={url}
-                  alt={`Design concept ${i + 1}`}
-                  className="w-full h-auto object-cover"
-                />
-                <div className="absolute top-2 left-2">
-                  <span className="bg-white/90 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full shadow">
-                    Option {i + 1}
-                  </span>
-                </div>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors"
-                >
-                  <span className="opacity-0 group-hover:opacity-100 bg-white text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-opacity">
-                    View full size
-                  </span>
-                </a>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {project.generated_image_urls?.length === 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-amber-800 text-sm">AI concepts are still generating. Refresh in a moment.</p>
-        </div>
-      )}
-
-      {/* Show disclaimer if only 1 generic concept (no reference photo) */}
-      {project.generated_image_urls?.length === 1 && !project.uploaded_image_urls?.length && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-blue-800 text-sm">
-            This is a generic concept — not your actual property. Upload a photo of your space or use an address to get a personalized AI transformation of your real home.
-          </p>
-        </div>
-      )}
 
       {/* Cost Estimate */}
       {estimate && (
@@ -204,6 +152,48 @@ export default async function VisionResultsPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* AI Design Concepts */}
+      <section className="mb-10">
+        <h2 className="text-xl font-bold text-slate-900 mb-4">AI Design Concepts</h2>
+
+        {project.generated_image_urls?.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {project.generated_image_urls.map((url: string, i: number) => (
+              <div key={i} className="relative rounded-2xl overflow-hidden bg-slate-100 group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={url}
+                  alt={`Design concept ${i + 1}`}
+                  className="w-full h-auto object-cover"
+                />
+                <div className="absolute top-2 left-2">
+                  <span className="bg-white/90 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full shadow">
+                    Option {i + 1}
+                  </span>
+                </div>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 bg-white text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-opacity">
+                    View full size
+                  </span>
+                </a>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+            <p className="text-blue-800 text-sm">
+              Your planning results are ready. Design concepts are still rendering in the background and may take a little longer.
+            </p>
+          </div>
+        )}
+      </section>
 
       {/* CTA */}
       <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">

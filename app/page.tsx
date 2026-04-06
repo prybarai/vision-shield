@@ -1,11 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, Camera, MapPin, Sparkles, DollarSign, ShieldCheck, Star } from 'lucide-react';
+import { ArrowRight, Camera, Sparkles, DollarSign, ShieldCheck, Star } from 'lucide-react';
 import { PROJECT_CATEGORIES } from '@/types';
 
 export default function HomePage() {
   return (
     <div className="flex flex-col">
-      {/* Hero */}
       <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <div className="max-w-3xl mx-auto text-center">
@@ -17,22 +16,15 @@ export default function HomePage() {
               See what your project could look like — and what it might cost.
             </h1>
             <p className="text-xl text-slate-300 mb-10 leading-relaxed">
-              Upload a photo or enter your address. AI designs your project and estimates the cost in minutes.
+              Upload a photo of your space. Prybar gives you a fast estimate, materials list, contractor brief, and optional AI design concepts.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex justify-center">
               <Link
                 href="/vision/start"
                 className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors"
               >
                 <Camera className="h-5 w-5" />
                 Upload a photo
-              </Link>
-              <Link
-                href="/vision/start"
-                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors"
-              >
-                <MapPin className="h-5 w-5" />
-                Enter your address
               </Link>
             </div>
             <p className="text-sm text-slate-400 mt-6">
@@ -42,7 +34,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -54,8 +45,8 @@ export default function HomePage() {
               {
                 step: '01',
                 icon: Camera,
-                title: 'Upload a photo or enter your address',
-                desc: 'Show us your space so we can understand what you\'re working with.',
+                title: 'Upload a photo of your space',
+                desc: 'Start with one clear photo so Prybar can build your estimate and planning outputs around the real project.',
               },
               {
                 step: '02',
@@ -66,8 +57,8 @@ export default function HomePage() {
               {
                 step: '03',
                 icon: DollarSign,
-                title: 'Get AI concepts + cost estimate + materials list',
-                desc: 'Receive realistic design concepts, a rough budget estimate, and a full materials breakdown.',
+                title: 'Get estimate + materials + brief',
+                desc: 'Get a rough budget estimate, a materials breakdown, a contractor-ready brief, and optional AI concepts.',
               },
             ].map((item) => (
               <div key={item.step} className="text-center">
@@ -83,7 +74,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Project Categories */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
@@ -106,7 +96,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust / Stats */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
@@ -145,7 +134,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Shield Promo */}
       <section className="py-20 bg-gradient-to-r from-slate-900 to-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <ShieldCheck className="h-16 w-16 text-blue-400 mx-auto mb-6" />

@@ -14,14 +14,14 @@ export default function VisionPage() {
           See your project before you commit
         </h1>
         <p className="text-xl text-slate-500 max-w-2xl mx-auto mb-8">
-          Upload a photo or enter your address. Our AI generates realistic design concepts, cost estimates, and a full materials list — free.
+          Upload a photo of your space. Prybar gives you a fast estimate, a full materials list, a contractor-ready brief, and optional AI design concepts.
         </p>
         <Link
           href="/vision/start"
           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors"
         >
           <Camera className="h-5 w-5" />
-          Start your project
+          Upload your photo
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
