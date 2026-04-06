@@ -17,46 +17,49 @@ export async function POST(req: NextRequest) {
     const { address } = schema.parse(body);
     const key = process.env.GOOGLE_MAPS_SERVER_KEY!;
 
-    // Step 1: Geocode to get precise lat/lng
-    const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${key}`;
-    const geocodeRes = await fetch(geocodeUrl);
-    const geocodeData = await geocodeRes.json() as { status: string; results: Array<{ geometry: { location: { lat: number; lng: number } } }> };
-
-    if (geocodeData.status !== 'OK' || !geocodeData.results[0]) {
-      return NextResponse.json({ available: false, message: 'Address not found. Please check the address and try again.' });
-    }
-
-    const { lat, lng } = geocodeData.results[0].geometry.location;
-
-    // Step 2: Get Street View metadata including links (for heading)
-    const metaUrl = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${lat},${lng}&key=${key}`;
+    // Step 1: Get Street View metadata — Street View API has its own geocoding built in
+    // No need for a separate Geocoding API call
+    const metaUrl = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${encodeURIComponent(address)}&key=${key}`;
     const metaRes = await fetch(metaUrl);
     const meta = await metaRes.json() as StreetViewMetadata;
 
-    // Step 3: Satellite overhead view (always available)
-    const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=20&size=640x640&maptype=satellite&key=${key}`;
+    // Step 2: Build satellite URL using the coordinates from metadata (or address directly)
+    let satelliteUrl: string;
+    let lat: number | undefined;
+    let lng: number | undefined;
+
+    if (meta.status === 'OK' && meta.location) {
+      lat = meta.location.lat;
+      lng = meta.location.lng;
+      satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=20&size=640x640&maptype=satellite&key=${key}`;
+    } else {
+      // Fallback: use address string for satellite
+      satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(address)}&zoom=19&size=640x640&maptype=satellite&key=${key}`;
+    }
 
     if (meta.status !== 'OK') {
-      // No Street View but we have satellite
+      // No Street View — return satellite only
       return NextResponse.json({
         available: true,
         image_url: null,
         satellite_url: satelliteUrl,
-        location: { lat, lng },
-        message: 'No Street View available for this address, but satellite view is shown.',
+        location: meta.location || null,
+        message: 'No Street View available for this address — showing satellite view.',
       });
     }
 
-    // Step 4: Compute heading facing the house from the street
-    // Street View links point away from the camera toward neighboring panos
-    // We use the first link heading + 180 to face the house
+    // Step 3: Compute heading to face the house from the street
+    // Street View metadata links point to neighboring panos along the road
+    // Adding 180° flips the direction to face the property
     let heading = 0;
     if (meta.links && meta.links.length > 0) {
-      // Average the links to find road direction, then face perpendicular toward property
       heading = (meta.links[0].heading + 180) % 360;
     }
 
-    // Step 5: Build tight Street View URL (FOV 65, slight downward pitch, high-res)
+    // Step 4: Build tight Street View URL
+    // FOV 65 (vs 90 default) = tighter crop, less neighbor bleed
+    // pitch -5 = slight downward tilt to show more of property
+    // size 800x600 = higher resolution
     const streetViewUrl = `https://maps.googleapis.com/maps/api/streetview?size=800x600&location=${lat},${lng}&fov=65&heading=${Math.round(heading)}&pitch=-5&key=${key}`;
 
     return NextResponse.json({
