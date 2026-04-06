@@ -138,6 +138,7 @@ export default function VisionStartFlow() {
           category,
           style,
           quality_tier: qualityTier,
+          notes: notes || undefined,
         }),
       });
 

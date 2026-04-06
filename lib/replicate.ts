@@ -24,33 +24,43 @@ const CATEGORY_PROMPTS: Record<string, string> = {
   interior_paint: 'interior design photograph of a room with fresh {style} paint colors and updated decor',
 };
 
-export function buildImagePrompt(category: string, style: string): string {
+export function buildImagePrompt(category: string, style: string, notes?: string): string {
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
   const basePrompt = (CATEGORY_PROMPTS[category] || 'beautiful {style} home improvement').replace('{style}', styleDesc);
-  return `${basePrompt}, professional photography, high quality, realistic, 8k, architectural digest style, photorealistic`;
+  const notesClause = notes ? `, ${notes}` : '';
+  return `${basePrompt}${notesClause}, professional photography, high quality, realistic, 8k, architectural digest style, photorealistic`;
 }
 
 export async function generateConceptImages(params: {
   category: string;
   style: string;
   qualityTier: string;
+  notes?: string;
   count?: number;
 }): Promise<string[]> {
   const replicate = getClient();
   const count = params.count ?? 3;
-  const basePrompt = buildImagePrompt(params.category, params.style);
+  const basePrompt = buildImagePrompt(params.category, params.style, params.notes);
   const variations = [
     basePrompt,
-    `${basePrompt}, bright natural lighting, daytime`,
-    `${basePrompt}, golden hour warm lighting`,
+    `${basePrompt}, bright natural daylight`,
+    `${basePrompt}, golden hour lighting, warm tones`,
   ].slice(0, count);
 
   // Generate sequentially to avoid rate limits / timeouts
   const results: PromiseSettledResult<string | null>[] = [];
   for (const prompt of variations) {
     results.push(await Promise.resolve().then(async () => {
-      const output = await replicate.run('black-forest-labs/flux-schnell', {
-        input: { prompt, num_outputs: 1, aspect_ratio: '4:3', output_format: 'webp', output_quality: 90 },
+      const output = await replicate.run('black-forest-labs/flux-dev', {
+        input: {
+          prompt,
+          num_outputs: 1,
+          aspect_ratio: '4:3',
+          output_format: 'webp',
+          output_quality: 90,
+          num_inference_steps: 28,
+          guidance: 3.5,
+        },
       }) as unknown[];
       // Replicate client v1+ returns FileOutput objects; String(item) gives the URL
       const item = output[0];
