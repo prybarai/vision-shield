@@ -83,16 +83,21 @@ export default async function VisionResultsPage({ params }: PageProps) {
               Range: {formatCurrencyRange(estimate.low_estimate, estimate.high_estimate)}
             </div>
 
-            {estimate.assumptions?.length > 0 && (
+            {(estimate.assumptions?.length > 0 || estimate.estimate_basis) && (
               <div className="mb-4">
                 <h4 className="text-sm font-semibold text-slate-700 mb-2">Assumptions</h4>
                 <ul className="space-y-1">
-                  {estimate.assumptions.map((a: string, i: number) => (
+                  {estimate.assumptions?.map((a: string, i: number) => (
                     <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
                       <span className="text-blue-400 mt-0.5">•</span>{a}
                     </li>
                   ))}
                 </ul>
+                {estimate.estimate_basis && (
+                  <p className="text-sm text-slate-500 mt-3">
+                    <span className="font-medium text-slate-700">Estimate basis:</span> {estimate.estimate_basis}
+                  </p>
+                )}
               </div>
             )}
 

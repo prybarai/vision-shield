@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
-import { Camera, CheckCircle, Loader2, Upload, ArrowLeft } from 'lucide-react';
+import { Camera, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { PROJECT_CATEGORIES, STYLE_OPTIONS, type ProjectCategory, type StylePreference, type QualityTier } from '@/types';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -11,8 +11,184 @@ import Input from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
 
-const STEPS = ['entry', 'category', 'style', 'quality', 'loading'] as const;
+const STEPS = ['entry', 'category', 'scope', 'style', 'quality', 'loading'] as const;
 type Step = typeof STEPS[number];
+
+type ScopeQuestion = {
+  key: string;
+  label: string;
+  helper?: string;
+  options: Array<{
+    value: string;
+    label: string;
+    description?: string;
+  }>;
+};
+
+const SCOPE_QUESTIONS: Partial<Record<ProjectCategory, ScopeQuestion[]>> = {
+  interior_paint: [
+    {
+      key: 'room_size',
+      label: 'Room size',
+      options: [
+        { value: 'small', label: 'Small', description: 'Small bedroom or office' },
+        { value: 'medium', label: 'Medium', description: 'Standard bedroom or dining room' },
+        { value: 'large', label: 'Large', description: 'Living room or open room' },
+      ],
+    },
+    {
+      key: 'paint_scope',
+      label: 'What are you painting?',
+      options: [
+        { value: 'walls_only', label: 'Walls only' },
+        { value: 'walls_and_ceiling', label: 'Walls + ceiling' },
+        { value: 'walls_ceiling_trim', label: 'Walls + ceiling + trim' },
+      ],
+    },
+    {
+      key: 'prep_level',
+      label: 'Prep needed',
+      options: [
+        { value: 'light', label: 'Light', description: 'Minor patching, clean walls' },
+        { value: 'medium', label: 'Medium', description: 'Some repairs and sanding' },
+        { value: 'heavy', label: 'Heavy', description: 'Significant repair or old damage' },
+      ],
+    },
+    {
+      key: 'window_coverage',
+      label: 'Window coverage',
+      options: [
+        { value: 'normal_windows', label: 'Normal windows' },
+        { value: 'many_windows', label: 'Many windows' },
+      ],
+    },
+  ],
+  flooring: [
+    {
+      key: 'room_size',
+      label: 'Room size',
+      options: [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' },
+      ],
+    },
+    {
+      key: 'material_type',
+      label: 'Material',
+      options: [
+        { value: 'lvp', label: 'LVP' },
+        { value: 'laminate', label: 'Laminate' },
+        { value: 'engineered_hardwood', label: 'Engineered hardwood' },
+        { value: 'tile', label: 'Tile' },
+      ],
+    },
+    {
+      key: 'demo_required',
+      label: 'Remove existing flooring?',
+      options: [
+        { value: 'yes', label: 'Yes' },
+        { value: 'no', label: 'No' },
+      ],
+    },
+  ],
+  bathroom: [
+    {
+      key: 'scope_level',
+      label: 'Project scope',
+      options: [
+        { value: 'cosmetic', label: 'Cosmetic' },
+        { value: 'mid_refresh', label: 'Mid refresh' },
+        { value: 'full_remodel', label: 'Full remodel' },
+      ],
+    },
+    {
+      key: 'bathroom_size',
+      label: 'Bathroom size',
+      options: [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' },
+      ],
+    },
+  ],
+  kitchen: [
+    {
+      key: 'scope_level',
+      label: 'Project scope',
+      options: [
+        { value: 'cosmetic', label: 'Cosmetic' },
+        { value: 'mid_refresh', label: 'Mid refresh' },
+        { value: 'full_remodel', label: 'Full remodel' },
+      ],
+    },
+    {
+      key: 'kitchen_size',
+      label: 'Kitchen size',
+      options: [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' },
+      ],
+    },
+  ],
+  deck_patio: [
+    {
+      key: 'deck_size',
+      label: 'Deck or patio size',
+      options: [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' },
+      ],
+    },
+    {
+      key: 'material_type',
+      label: 'Material',
+      options: [
+        { value: 'pressure_treated', label: 'Pressure treated' },
+        { value: 'composite', label: 'Composite' },
+        { value: 'cedar_redwood', label: 'Cedar / Redwood' },
+      ],
+    },
+    {
+      key: 'railing',
+      label: 'Include railing?',
+      options: [
+        { value: 'yes', label: 'Yes' },
+        { value: 'no', label: 'No' },
+      ],
+    },
+  ],
+  roofing: [
+    {
+      key: 'roof_size',
+      label: 'Roof size',
+      options: [
+        { value: 'small', label: 'Small' },
+        { value: 'medium', label: 'Medium' },
+        { value: 'large', label: 'Large' },
+      ],
+    },
+    {
+      key: 'material_type',
+      label: 'Material',
+      options: [
+        { value: 'asphalt', label: 'Asphalt' },
+        { value: 'architectural_shingle', label: 'Architectural shingle' },
+        { value: 'metal', label: 'Metal' },
+      ],
+    },
+    {
+      key: 'tear_off',
+      label: 'Tear-off required?',
+      options: [
+        { value: 'yes', label: 'Yes' },
+        { value: 'no', label: 'No' },
+      ],
+    },
+  ],
+};
 
 const QUALITY_TIERS = [
   {
@@ -54,6 +230,7 @@ export default function VisionStartFlow() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
   const [category, setCategory] = useState<ProjectCategory | null>(null);
+  const [scopeAnswers, setScopeAnswers] = useState<Record<string, string>>({});
   const [style, setStyle] = useState<StylePreference | null>(null);
   const [qualityTier, setQualityTier] = useState<QualityTier>('mid');
   const [notes, setNotes] = useState('');
@@ -75,6 +252,12 @@ export default function VisionStartFlow() {
     maxFiles: 1,
   });
 
+  const scopeQuestions = category ? SCOPE_QUESTIONS[category] ?? [] : [];
+  const hasScopeStep = scopeQuestions.length > 0;
+  const visibleSteps = ['entry', 'category', ...(hasScopeStep ? ['scope'] : []), 'style', 'quality'] as Step[];
+  const currentVisibleStepIndex = visibleSteps.indexOf(step);
+  const allScopeAnswered = scopeQuestions.every(question => Boolean(scopeAnswers[question.key]));
+
   const handleEntryNext = () => {
     if (!uploadedFile || !zipCode.trim()) return;
     setStep('category');
@@ -82,12 +265,35 @@ export default function VisionStartFlow() {
 
   const handleCategoryNext = () => {
     if (!category) return;
+    setStep(hasScopeStep ? 'scope' : 'style');
+  };
+
+  const handleScopeNext = () => {
+    if (!allScopeAnswered) return;
     setStep('style');
   };
 
   const handleStyleNext = () => {
     if (!style) return;
     setStep('quality');
+  };
+
+  const updateScopeAnswer = (key: string, value: string) => {
+    setScopeAnswers(prev => ({ ...prev, [key]: value }));
+  };
+
+  const buildNotesWithScope = (rawNotes: string, answers: Record<string, string>) => {
+    const baseNotes = rawNotes.trim();
+    const entries = Object.entries(answers).filter(([, value]) => Boolean(value));
+
+    if (entries.length === 0) {
+      return baseNotes || undefined;
+    }
+
+    const scopeLines = entries.map(([key, value]) => `- ${key.replace(/_/g, ' ')}: ${value.replace(/_/g, ' ')}`);
+    const scopeBlock = `Scope answers:\n${scopeLines.join('\n')}`;
+
+    return baseNotes ? `${baseNotes}\n\n${scopeBlock}` : scopeBlock;
   };
 
   const handleStart = async () => {
@@ -99,6 +305,7 @@ export default function VisionStartFlow() {
     setStep('loading');
     setError(null);
     const sessionId = uuidv4();
+    const notesWithScope = buildNotesWithScope(notes, scopeAnswers);
 
     try {
       setProgressStep(0);
@@ -111,7 +318,7 @@ export default function VisionStartFlow() {
           zip_code: zipCode.trim(),
           style_preference: style,
           quality_tier: qualityTier,
-          notes: notes || undefined,
+          notes: notesWithScope,
           session_id: sessionId,
         }),
       });
@@ -120,7 +327,6 @@ export default function VisionStartFlow() {
       const { project } = await projectRes.json() as { project: { id: string } };
       const projectId = project.id;
 
-      let referenceImageUrl: string | undefined;
       const formData = new FormData();
       formData.append('file', uploadedFile);
       formData.append('project_id', projectId);
@@ -131,8 +337,7 @@ export default function VisionStartFlow() {
       });
 
       if (!uploadRes.ok) throw new Error('Failed to upload image');
-      const { url } = await uploadRes.json() as { url: string };
-      referenceImageUrl = url;
+      await uploadRes.json() as { url: string };
 
       setProgressStep(1);
       const estimateRes = await fetch('/api/vision/estimate', {
@@ -145,7 +350,8 @@ export default function VisionStartFlow() {
           style,
           quality_tier: qualityTier,
           zip_code: zipCode.trim(),
-          notes: notes || undefined,
+          notes: notesWithScope,
+          scope_answers: scopeAnswers,
         }),
       });
 
@@ -178,7 +384,7 @@ export default function VisionStartFlow() {
           category,
           style,
           quality_tier: qualityTier,
-          notes: notes || undefined,
+          notes: notesWithScope,
           estimate_low: estimate?.low_estimate || 10000,
           estimate_high: estimate?.high_estimate || 20000,
         }),
@@ -201,21 +407,23 @@ export default function VisionStartFlow() {
     <div className="max-w-3xl mx-auto px-4">
       {step !== 'loading' && (
         <div className="flex items-center justify-center gap-2 mb-10">
-          {(['entry', 'category', 'style', 'quality'] as const).map((s, i) => (
+          {visibleSteps.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div
                 className={cn(
                   'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors',
-                  STEPS.indexOf(step) > i
+                  currentVisibleStepIndex > i
                     ? 'bg-blue-600 text-white'
-                    : STEPS.indexOf(step) === i
+                    : currentVisibleStepIndex === i
                     ? 'bg-blue-600 text-white ring-4 ring-blue-100'
                     : 'bg-slate-200 text-slate-500'
                 )}
               >
-                {STEPS.indexOf(step) > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                {currentVisibleStepIndex > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
               </div>
-              {i < 3 && <div className={cn('h-0.5 w-12', STEPS.indexOf(step) > i ? 'bg-blue-600' : 'bg-slate-200')} />}
+              {i < visibleSteps.length - 1 && (
+                <div className={cn('h-0.5 w-12', currentVisibleStepIndex > i ? 'bg-blue-600' : 'bg-slate-200')} />
+              )}
             </div>
           ))}
         </div>
@@ -280,7 +488,10 @@ export default function VisionStartFlow() {
                 key={key}
                 hover
                 selected={category === key}
-                onClick={() => setCategory(key)}
+                onClick={() => {
+                  setCategory(key);
+                  setScopeAnswers({});
+                }}
                 className="text-center cursor-pointer p-4"
               >
                 <div className="text-3xl mb-2">{cat.emoji}</div>
@@ -296,9 +507,48 @@ export default function VisionStartFlow() {
         </div>
       )}
 
-      {step === 'style' && (
+      {step === 'scope' && category && (
         <div>
           <button onClick={() => setStep('category')} className="flex items-center gap-1 text-slate-500 hover:text-slate-700 mb-6 text-sm">
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
+          <h1 className="text-3xl font-bold text-slate-900 text-center mb-2">A few quick scope details</h1>
+          <p className="text-slate-500 text-center mb-8">These answers make the estimate more grounded than a broad benchmark.</p>
+
+          <div className="space-y-6 mb-8">
+            {scopeQuestions.map((question) => (
+              <div key={question.key}>
+                <div className="mb-3">
+                  <h3 className="text-lg font-semibold text-slate-900">{question.label}</h3>
+                  {question.helper && <p className="text-sm text-slate-500 mt-1">{question.helper}</p>}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {question.options.map((option) => (
+                    <Card
+                      key={option.value}
+                      hover
+                      selected={scopeAnswers[question.key] === option.value}
+                      onClick={() => updateScopeAnswer(question.key, option.value)}
+                      className="cursor-pointer p-4"
+                    >
+                      <div className="font-semibold text-slate-900">{option.label}</div>
+                      {option.description && <div className="text-xs text-slate-500 mt-1">{option.description}</div>}
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Button className="w-full" size="lg" onClick={handleScopeNext} disabled={!allScopeAnswered}>
+            Continue
+          </Button>
+        </div>
+      )}
+
+      {step === 'style' && (
+        <div>
+          <button onClick={() => setStep(hasScopeStep ? 'scope' : 'category')} className="flex items-center gap-1 text-slate-500 hover:text-slate-700 mb-6 text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <h1 className="text-3xl font-bold text-slate-900 text-center mb-2">Choose your style</h1>
