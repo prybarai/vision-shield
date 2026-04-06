@@ -13,22 +13,33 @@ const STYLE_DESCRIPTORS: Record<string, string> = {
   budget_refresh: 'clean, refreshed, practical, cost-effective updates',
 };
 
-const CATEGORY_PROMPTS: Record<string, string> = {
-  roofing: 'architectural photograph of a beautiful home exterior with a newly installed {style} roof',
-  exterior_paint: 'architectural photograph of a beautifully painted home exterior in {style} colors',
-  deck_patio: 'beautiful backyard photograph with a newly constructed {style} wood deck and outdoor living space',
-  landscaping: 'beautiful landscaped backyard with {style} garden design, manicured lawn, and thoughtful plantings',
-  kitchen: 'interior design photograph of a beautiful {style} kitchen renovation with new cabinets and countertops',
-  bathroom: 'interior design photograph of a beautifully renovated {style} bathroom with new tile and fixtures',
-  flooring: 'interior design photograph of a room with beautiful new {style} flooring',
-  interior_paint: 'interior design photograph of a room with fresh {style} paint colors and updated decor',
+// Category-specific transformation instructions
+// Written as "what to change" — the model preserves everything else
+const CATEGORY_TRANSFORMS: Record<string, string> = {
+  roofing: 'replace the roof with a beautiful new {style} roof, same house structure',
+  exterior_paint: 'repaint the exterior of the house in {style} colors, same house structure',
+  deck_patio: 'add a beautiful new {style} deck and outdoor living space to the backyard',
+  landscaping: 'transform the yard with {style} landscaping, garden beds, and manicured lawn',
+  kitchen: 'renovate the kitchen with {style} cabinets, countertops, and fixtures, same room layout',
+  bathroom: 'renovate the bathroom with {style} tile, vanity, and fixtures, same room layout',
+  flooring: 'replace the flooring with beautiful new {style} flooring, same room',
+  interior_paint: 'repaint the walls in fresh {style} colors, same room and furniture',
 };
 
 export function buildImagePrompt(category: string, style: string, notes?: string): string {
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
-  const basePrompt = (CATEGORY_PROMPTS[category] || 'beautiful {style} home improvement').replace('{style}', styleDesc);
+  const transform = (CATEGORY_TRANSFORMS[category] || 'renovate with {style} finishes')
+    .replace('{style}', styleDesc);
   const notesClause = notes ? `, ${notes}` : '';
-  return `${basePrompt}${notesClause}, professional photography, high quality, realistic, 8k, architectural digest style, photorealistic`;
+  return `${transform}${notesClause}, professional architectural photography, photorealistic, high quality, 8k`;
+}
+
+function extractUrl(item: unknown): string | null {
+  if (!item) return null;
+  if (typeof item === 'string') return item.startsWith('http') ? item : null;
+  // Replicate FileOutput object — String() returns the URL
+  const str = String(item);
+  return str.startsWith('http') ? str : null;
 }
 
 export async function generateConceptImages(params: {
@@ -36,42 +47,71 @@ export async function generateConceptImages(params: {
   style: string;
   qualityTier: string;
   notes?: string;
+  referenceImageUrl?: string; // User's uploaded photo — enables img2img
   count?: number;
 }): Promise<string[]> {
   const replicate = getClient();
   const count = params.count ?? 3;
   const basePrompt = buildImagePrompt(params.category, params.style, params.notes);
-  const variations = [
+
+  // Slight prompt variations for each concept
+  const promptVariations = [
     basePrompt,
-    `${basePrompt}, bright natural daylight`,
-    `${basePrompt}, golden hour lighting, warm tones`,
+    `${basePrompt}, daytime natural lighting`,
+    `${basePrompt}, golden hour warm lighting`,
   ].slice(0, count);
 
-  // Generate sequentially to avoid rate limits / timeouts
-  const results: PromiseSettledResult<string | null>[] = [];
-  for (const prompt of variations) {
-    results.push(await Promise.resolve().then(async () => {
-      const output = await replicate.run('black-forest-labs/flux-dev', {
-        input: {
-          prompt,
-          num_outputs: 1,
-          aspect_ratio: '4:3',
-          output_format: 'webp',
-          output_quality: 90,
-          num_inference_steps: 28,
-          guidance: 3.5,
-        },
-      }) as unknown[];
-      // Replicate client v1+ returns FileOutput objects; String(item) gives the URL
-      const item = output[0];
-      if (!item) return null;
-      if (typeof item === 'string') return item;
-      const str = String(item);
-      return str.startsWith('http') ? str : null;
-    }).then(v => ({ status: 'fulfilled' as const, value: v })).catch(e => ({ status: 'rejected' as const, reason: e })));
+  const results: Array<{ status: 'fulfilled'; value: string } | { status: 'rejected'; reason: unknown }> = [];
+
+  for (const prompt of promptVariations) {
+    try {
+      let output: unknown[];
+
+      if (params.referenceImageUrl) {
+        // IMG2IMG MODE: Transform the user's actual photo
+        // flux-dev with image_prompt keeps the real property structure intact
+        // prompt_strength 0.65 = preserve ~35% of original, transform ~65%
+        output = await replicate.run('black-forest-labs/flux-dev', {
+          input: {
+            prompt,
+            image: params.referenceImageUrl,
+            prompt_strength: 0.70,   // Higher = more transformation, lower = closer to original
+            num_outputs: 1,
+            aspect_ratio: '4:3',
+            output_format: 'webp',
+            output_quality: 90,
+            num_inference_steps: 28,
+            guidance: 3.5,
+          },
+        }) as unknown[];
+      } else {
+        // TEXT-TO-IMAGE fallback (no photo uploaded — address entry mode)
+        output = await replicate.run('black-forest-labs/flux-dev', {
+          input: {
+            prompt,
+            num_outputs: 1,
+            aspect_ratio: '4:3',
+            output_format: 'webp',
+            output_quality: 90,
+            num_inference_steps: 28,
+            guidance: 3.5,
+          },
+        }) as unknown[];
+      }
+
+      const url = extractUrl(output[0]);
+      if (url) {
+        results.push({ status: 'fulfilled', value: url });
+      } else {
+        results.push({ status: 'rejected', reason: 'No URL returned' });
+      }
+    } catch (err) {
+      console.error('Image generation error:', err);
+      results.push({ status: 'rejected', reason: err });
+    }
   }
 
   return results
-    .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled' && typeof r.value === 'string' && (r.value as string).startsWith('http'))
-    .map((r) => r.value as string);
+    .filter((r): r is { status: 'fulfilled'; value: string } => r.status === 'fulfilled')
+    .map((r) => r.value);
 }

@@ -128,7 +128,23 @@ export default function VisionStartFlow() {
       const { project } = await projectRes.json();
       const projectId = project.id;
 
-      // Step 2: Generate concepts
+      // Step 1b: Upload reference photo if provided
+      let referenceImageUrl: string | undefined;
+      if (uploadedFile) {
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        formData.append('project_id', projectId);
+        const uploadRes = await fetch('/api/projects/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+        if (uploadRes.ok) {
+          const { url } = await uploadRes.json();
+          referenceImageUrl = url;
+        }
+      }
+
+      // Step 2: Generate concepts (img2img if photo was uploaded)
       setProgressStep(1);
       await fetch('/api/vision/generate-concepts', {
         method: 'POST',
@@ -139,6 +155,7 @@ export default function VisionStartFlow() {
           style,
           quality_tier: qualityTier,
           notes: notes || undefined,
+          reference_image_url: referenceImageUrl,
         }),
       });
 

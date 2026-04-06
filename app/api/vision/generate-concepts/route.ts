@@ -9,9 +9,10 @@ const schema = z.object({
   style: z.string(),
   quality_tier: z.string(),
   notes: z.string().optional(),
+  reference_image_url: z.string().url().optional(), // User's uploaded photo
 });
 
-export const maxDuration = 300; // 5 min — flux-dev takes ~35s per image × 3 = ~2min total
+export const maxDuration = 300; // 5 min — flux-dev img2img takes ~40s per image × 3
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
       style: params.style,
       qualityTier: params.quality_tier,
       notes: params.notes,
+      referenceImageUrl: params.reference_image_url,
       count: 3,
     });
 
