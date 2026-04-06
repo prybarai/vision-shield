@@ -35,17 +35,49 @@ Include 5-7 site questions.`;
 }
 
 export function buildQuoteScanPrompt(rawText: string) {
-  return `Analyze this contractor quote/contract for red flags and missing terms:\n\n${rawText}\n\nOutput JSON: {"risk_score":number(0-100),"risk_level":"low"|"medium"|"high","red_flags":[{"flag":string,"explanation":string,"severity":"high"|"medium"|"low"}],"missing_terms":[{"term":string,"why_important":string}],"questions_to_ask":string[],"plain_english_summary":string,"payment_structure_analysis":string}`;
+  return `Review this contractor quote or contract for a homeowner. Stay calm, practical, and specific.
+
+Document text:
+${rawText}
+
+Return ONLY valid JSON with this shape:
+{
+  "risk_score": number,
+  "risk_level": "low" | "medium" | "high",
+  "plain_english_summary": string,
+  "payment_structure_analysis": string,
+  "red_flags": [{"flag": string, "explanation": string, "severity": "high" | "medium" | "low"}],
+  "missing_terms": [{"term": string, "why_important": string}],
+  "questions_to_ask": string[]
+}
+
+Focus on payment structure, missing scope details, warranties, permits, schedule clarity, change-order process, insurance, lien waivers, and dispute terms.`;
 }
 
 export function buildDisputePrompt(params: { situation: string; contractorInfo: Record<string, string>; amountPaid: number; state: string; whatHappened: string }) {
-  return `Generate a dispute package for a homeowner:
-- Situation: ${params.situation}
-- Amount paid: $${params.amountPaid}
-- State: ${params.state}
-- What happened: ${params.whatHappened}
-- Contractor: ${JSON.stringify(params.contractorInfo)}
+  return `You are helping a homeowner organize a contractor dispute in a clear, factual, non-defamatory way.
 
-Output JSON: {"letter_demand":string,"letter_ag_complaint":string,"letter_bbb":string,"letter_ftc":string,"documentation_checklist":string[]}
-Make each document complete and ready to use.`;
+Situation summary: ${params.situation}
+Amount paid: $${params.amountPaid}
+State: ${params.state}
+What happened: ${params.whatHappened}
+Contractor details: ${JSON.stringify(params.contractorInfo)}
+
+Return ONLY valid JSON with this shape:
+{
+  "demand_letter": string,
+  "ag_complaint": string,
+  "bbb_complaint": string,
+  "ftc_guidance": string,
+  "documentation_checklist": string[],
+  "small_claims_note": string
+}
+
+Requirements:
+- Keep everything factual, professional, and homeowner-friendly.
+- Do not invent laws or case citations.
+- The demand letter should be ready to copy and personalize.
+- The AG and BBB complaint drafts should be concise but useful.
+- FTC guidance should explain appropriate reporting/documentation steps.
+- The small_claims_note should explain when small claims might be worth considering and what to verify locally.`;
 }
