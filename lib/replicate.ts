@@ -4,35 +4,52 @@ function getClient() {
   return new Replicate({ auth: process.env.REPLICATE_API_TOKEN || 'placeholder' });
 }
 
+const INTERIOR_CATEGORIES = new Set(['kitchen', 'bathroom', 'flooring', 'interior_paint']);
+
+// Interior design instructions (for adirik/interior-design model)
+const INTERIOR_INSTRUCTIONS: Record<string, string> = {
+  kitchen: 'renovate the kitchen with new {style} cabinets, countertops, and modern appliances, keeping the same room layout and dimensions',
+  bathroom: 'renovate the bathroom with {style} tile, a new vanity, and updated fixtures, keeping the same room layout',
+  flooring: 'replace the flooring with beautiful new {style} flooring throughout the room, keeping all furniture and walls',
+  interior_paint: 'repaint the walls in fresh {style} colors with updated trim, keeping all furniture and fixtures',
+};
+
+// Exterior transformation prompts for flux-dev img2img
+const EXTERIOR_PROMPTS: Record<string, string> = {
+  roofing: 'the same house with a beautiful new {style} roof installed, same house structure and surroundings',
+  exterior_paint: 'the same house repainted in {style} exterior colors, same structure and landscaping',
+  deck_patio: 'the same backyard with a beautiful new {style} deck and outdoor living area added, same house and yard',
+  landscaping: 'the same yard with {style} professional landscaping, garden beds, and manicured lawn, same house',
+};
+
+// Prompt strength per exterior category — lower = more original preserved
+const PROMPT_STRENGTH: Record<string, number> = {
+  roofing: 0.55,
+  exterior_paint: 0.50,
+  deck_patio: 0.45,
+  landscaping: 0.45,
+};
+
 const STYLE_DESCRIPTORS: Record<string, string> = {
-  modern: 'modern, clean lines, contemporary materials, minimalist aesthetic',
-  traditional: 'traditional, classic craftsmanship, timeless design, warm tones',
-  minimal: 'minimalist, simple, uncluttered, neutral palette',
-  luxury: 'luxury, high-end materials, premium finishes, elegant details',
-  warm_natural: 'warm, natural materials, wood tones, organic textures, cozy',
-  budget_refresh: 'clean, refreshed, practical, cost-effective updates',
+  modern: 'modern, clean lines, contemporary',
+  traditional: 'traditional, classic, timeless',
+  minimal: 'minimalist, simple, neutral',
+  luxury: 'luxury, high-end, premium',
+  warm_natural: 'warm natural wood tones, organic',
+  budget_refresh: 'clean, refreshed, practical',
 };
 
-// Category-specific transformation instructions
-// Written as "what to change" — the model preserves everything else
-const CATEGORY_TRANSFORMS: Record<string, string> = {
-  roofing: 'replace the roof with a beautiful new {style} roof, same house structure',
-  exterior_paint: 'repaint the exterior of the house in {style} colors, same house structure',
-  deck_patio: 'add a beautiful new {style} deck and outdoor living space to the backyard',
-  landscaping: 'transform the yard with {style} landscaping, garden beds, and manicured lawn',
-  kitchen: 'renovate the kitchen with {style} cabinets, countertops, and fixtures, same room layout',
-  bathroom: 'renovate the bathroom with {style} tile, vanity, and fixtures, same room layout',
-  flooring: 'replace the flooring with beautiful new {style} flooring, same room',
-  interior_paint: 'repaint the walls in fresh {style} colors, same room and furniture',
+// Text-to-image prompts for when no reference photo exists
+const TEXT_TO_IMAGE_PROMPTS: Record<string, string> = {
+  roofing: 'beautiful suburban home exterior with a new {style} architectural shingle roof, professional real estate photography, photorealistic',
+  exterior_paint: 'beautiful home exterior freshly painted in {style} colors, curb appeal, professional real estate photography, photorealistic',
+  deck_patio: 'beautiful backyard with a new {style} wood deck and outdoor seating area, professional real estate photography, photorealistic',
+  landscaping: 'beautiful backyard with {style} professional landscaping, manicured lawn and garden beds, professional photography, photorealistic',
+  kitchen: 'beautiful {style} kitchen renovation with new cabinets and countertops, interior design photography, photorealistic',
+  bathroom: 'beautiful {style} bathroom renovation with new tile and vanity, interior design photography, photorealistic',
+  flooring: 'beautiful room with new {style} hardwood flooring, interior design photography, photorealistic',
+  interior_paint: 'beautiful room with fresh {style} paint and updated trim, interior design photography, photorealistic',
 };
-
-export function buildImagePrompt(category: string, style: string, notes?: string): string {
-  const styleDesc = STYLE_DESCRIPTORS[style] || style;
-  const transform = (CATEGORY_TRANSFORMS[category] || 'renovate with {style} finishes')
-    .replace('{style}', styleDesc);
-  const notesClause = notes ? `, ${notes}` : '';
-  return `${transform}${notesClause}, professional architectural photography, photorealistic, high quality, 8k`;
-}
 
 function extractUrl(item: unknown): string | null {
   if (!item) return null;
@@ -42,76 +59,163 @@ function extractUrl(item: unknown): string | null {
   return str.startsWith('http') ? str : null;
 }
 
+async function generateInteriorConcept(
+  replicate: Replicate,
+  referenceImageUrl: string,
+  category: string,
+  style: string,
+  notes?: string
+): Promise<string | null> {
+  const styleDesc = STYLE_DESCRIPTORS[style] || style;
+  const instruction = (INTERIOR_INSTRUCTIONS[category] || 'renovate the room with {style} finishes')
+    .replace('{style}', styleDesc);
+  const prompt = notes ? `${instruction}, ${notes}` : instruction;
+
+  try {
+    const output = await replicate.run('adirik/interior-design', {
+      input: {
+        image: referenceImageUrl,
+        prompt,
+        negative_prompt: 'lowres, watermark, banner, logo, text, deformed, blurry, blur, out of focus, surreal, ugly, unrealistic',
+        num_inference_steps: 50,
+        guidance_scale: 15,
+        prompt_strength: 0.8,
+        num_outputs: 1,
+      },
+    }) as unknown[];
+    return extractUrl(output[0]);
+  } catch (err) {
+    console.error('Interior design model error:', err);
+    return null;
+  }
+}
+
+async function generateExteriorConcept(
+  replicate: Replicate,
+  referenceImageUrl: string,
+  category: string,
+  style: string,
+  notes?: string
+): Promise<string | null> {
+  const styleDesc = STYLE_DESCRIPTORS[style] || style;
+  const basePrompt = (EXTERIOR_PROMPTS[category] || 'the same property renovated with {style} finishes')
+    .replace('{style}', styleDesc);
+  const prompt = notes
+    ? `${basePrompt}, ${notes}, photorealistic, professional photography`
+    : `${basePrompt}, photorealistic, professional photography`;
+  const promptStrength = PROMPT_STRENGTH[category] ?? 0.50;
+
+  try {
+    const output = await replicate.run('black-forest-labs/flux-dev', {
+      input: {
+        prompt,
+        image: referenceImageUrl,
+        prompt_strength: promptStrength,
+        num_outputs: 1,
+        aspect_ratio: '4:3',
+        output_format: 'webp',
+        output_quality: 90,
+        num_inference_steps: 28,
+        guidance: 3.5,
+      },
+    }) as unknown[];
+    return extractUrl(output[0]);
+  } catch (err) {
+    console.error('Exterior concept error:', err);
+    return null;
+  }
+}
+
+async function generateTextToImageConcept(
+  replicate: Replicate,
+  category: string,
+  style: string,
+  notes?: string
+): Promise<string | null> {
+  const styleDesc = STYLE_DESCRIPTORS[style] || style;
+  const basePrompt = (TEXT_TO_IMAGE_PROMPTS[category] || 'beautiful {style} home renovation')
+    .replace('{style}', styleDesc);
+  const prompt = notes ? `${basePrompt}, ${notes}` : basePrompt;
+
+  try {
+    const output = await replicate.run('black-forest-labs/flux-dev', {
+      input: {
+        prompt,
+        num_outputs: 1,
+        aspect_ratio: '4:3',
+        output_format: 'webp',
+        output_quality: 90,
+        num_inference_steps: 28,
+        guidance: 3.5,
+      },
+    }) as unknown[];
+    return extractUrl(output[0]);
+  } catch (err) {
+    console.error('Text-to-image error:', err);
+    return null;
+  }
+}
+
 export async function generateConceptImages(params: {
   category: string;
   style: string;
   qualityTier: string;
   notes?: string;
-  referenceImageUrl?: string; // User's uploaded photo — enables img2img
+  referenceImageUrl?: string;
   count?: number;
 }): Promise<string[]> {
   const replicate = getClient();
+  const isInterior = INTERIOR_CATEGORIES.has(params.category);
   const count = params.count ?? 3;
-  const basePrompt = buildImagePrompt(params.category, params.style, params.notes);
 
-  // Slight prompt variations for each concept
-  const promptVariations = [
-    basePrompt,
-    `${basePrompt}, daytime natural lighting`,
-    `${basePrompt}, golden hour warm lighting`,
-  ].slice(0, count);
-
-  const results: Array<{ status: 'fulfilled'; value: string } | { status: 'rejected'; reason: unknown }> = [];
-
-  for (const prompt of promptVariations) {
-    try {
-      let output: unknown[];
-
-      if (params.referenceImageUrl) {
-        // IMG2IMG MODE: Transform the user's actual photo
-        // flux-dev with image_prompt keeps the real property structure intact
-        // prompt_strength 0.65 = preserve ~35% of original, transform ~65%
-        output = await replicate.run('black-forest-labs/flux-dev', {
-          input: {
-            prompt,
-            image: params.referenceImageUrl,
-            prompt_strength: 0.70,   // Higher = more transformation, lower = closer to original
-            num_outputs: 1,
-            aspect_ratio: '4:3',
-            output_format: 'webp',
-            output_quality: 90,
-            num_inference_steps: 28,
-            guidance: 3.5,
-          },
-        }) as unknown[];
-      } else {
-        // TEXT-TO-IMAGE fallback (no photo uploaded — address entry mode)
-        output = await replicate.run('black-forest-labs/flux-dev', {
-          input: {
-            prompt,
-            num_outputs: 1,
-            aspect_ratio: '4:3',
-            output_format: 'webp',
-            output_quality: 90,
-            num_inference_steps: 28,
-            guidance: 3.5,
-          },
-        }) as unknown[];
-      }
-
-      const url = extractUrl(output[0]);
-      if (url) {
-        results.push({ status: 'fulfilled', value: url });
-      } else {
-        results.push({ status: 'rejected', reason: 'No URL returned' });
-      }
-    } catch (err) {
-      console.error('Image generation error:', err);
-      results.push({ status: 'rejected', reason: err });
-    }
+  if (!params.referenceImageUrl) {
+    // No photo — generate 1 generic concept with a clear disclaimer
+    console.log('No reference image — generating generic concept');
+    const url = await generateTextToImageConcept(replicate, params.category, params.style, params.notes);
+    return url ? [url] : [];
   }
 
-  return results
-    .filter((r): r is { status: 'fulfilled'; value: string } => r.status === 'fulfilled')
-    .map((r) => r.value);
+  if (isInterior) {
+    // Interior: use the specialized interior design model
+    // Generate count variations with slight prompt differences
+    const styleVariations = [
+      params.notes,
+      params.notes ? `${params.notes}, bright natural lighting` : 'bright natural lighting, airy feel',
+      params.notes ? `${params.notes}, warm ambient lighting` : 'warm ambient lighting, cozy atmosphere',
+    ].slice(0, count);
+
+    const results: string[] = [];
+    for (const variation of styleVariations) {
+      const url = await generateInteriorConcept(
+        replicate,
+        params.referenceImageUrl,
+        params.category,
+        params.style,
+        variation
+      );
+      if (url) results.push(url);
+    }
+    return results;
+  } else {
+    // Exterior: use flux-dev img2img with low prompt_strength
+    const lightingVariations = [
+      '',
+      'daytime natural lighting',
+      'golden hour warm lighting',
+    ].slice(0, count);
+
+    const results: string[] = [];
+    for (const lighting of lightingVariations) {
+      const notesWithLighting = [params.notes, lighting].filter(Boolean).join(', ');
+      const url = await generateExteriorConcept(
+        replicate,
+        params.referenceImageUrl,
+        params.category,
+        params.style,
+        notesWithLighting || undefined
+      );
+      if (url) results.push(url);
+    }
+    return results;
+  }
 }

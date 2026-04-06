@@ -92,6 +92,16 @@ export default async function VisionResultsPage({ params }: PageProps) {
         </div>
       )}
 
+      {/* Show disclaimer if only 1 generic concept (no reference photo) */}
+      {project.generated_image_urls?.length === 1 && !project.uploaded_image_urls?.length && (
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <p className="text-blue-800 text-sm">
+            This is a generic concept — not your actual property. Upload a photo of your space or use an address to get a personalized AI transformation of your real home.
+          </p>
+        </div>
+      )}
+
       {/* Cost Estimate */}
       {estimate && (
         <section className="mb-10">
