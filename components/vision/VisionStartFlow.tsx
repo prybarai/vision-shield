@@ -58,6 +58,7 @@ export default function VisionStartFlow() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
   const [streetViewUrl, setStreetViewUrl] = useState<string | null>(null);
+  const [satelliteUrl, setSatelliteUrl] = useState<string | null>(null);
   const [streetViewLoading, setStreetViewLoading] = useState(false);
   const [streetViewError, setStreetViewError] = useState<string | null>(null);
   const [category, setCategory] = useState<ProjectCategory | null>(null);
@@ -87,20 +88,23 @@ export default function VisionStartFlow() {
     setStreetViewLoading(true);
     setStreetViewError(null);
     setStreetViewUrl(null);
+    setSatelliteUrl(null);
     try {
       const res = await fetch('/api/projects/street-view', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ address: addr }),
       });
-      const data = await res.json() as { available: boolean; image_url?: string; message?: string };
-      if (data.available && data.image_url) {
-        setStreetViewUrl(data.image_url);
+      const data = await res.json() as { available: boolean; image_url?: string | null; satellite_url?: string; message?: string };
+      if (data.available) {
+        if (data.image_url) setStreetViewUrl(data.image_url);
+        if (data.satellite_url) setSatelliteUrl(data.satellite_url);
+        if (!data.image_url && data.message) setStreetViewError(data.message);
       } else {
-        setStreetViewError(data.message || 'No Street View available for this address.');
+        setStreetViewError(data.message || 'No imagery available for this address.');
       }
     } catch {
-      setStreetViewError('Could not fetch Street View. You can still continue.');
+      setStreetViewError('Could not fetch property images. You can still continue.');
     } finally {
       setStreetViewLoading(false);
     }
@@ -188,7 +192,7 @@ export default function VisionStartFlow() {
 
       // Step 2: Generate concepts (img2img if photo was uploaded)
       setProgressStep(1);
-      await fetch('/api/vision/generate-concepts', {
+      const conceptsRes = await fetch('/api/vision/generate-concepts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -198,8 +202,11 @@ export default function VisionStartFlow() {
           quality_tier: qualityTier,
           notes: notes || undefined,
           reference_image_url: referenceImageUrl,
+          satellite_url: satelliteUrl || undefined,
         }),
       });
+      const conceptsData = await conceptsRes.json() as { image_urls?: string[] };
+      const firstConceptUrl = conceptsData.image_urls?.[0];
 
       // Step 3: Estimate
       setProgressStep(2);
@@ -218,7 +225,7 @@ export default function VisionStartFlow() {
       });
       const { estimate } = await estimateRes.json();
 
-      // Step 4: Materials
+      // Step 4: Materials — pass the generated image for visual matching
       setProgressStep(3);
       await fetch('/api/vision/materials', {
         method: 'POST',
@@ -229,6 +236,7 @@ export default function VisionStartFlow() {
           style,
           quality_tier: qualityTier,
           estimate_mid: estimate?.mid_estimate || 15000,
+          generated_image_url: firstConceptUrl,
         }),
       });
 
@@ -384,13 +392,29 @@ export default function VisionStartFlow() {
                   )}
                 </button>
 
-                {streetViewUrl && (
-                  <div className="rounded-xl overflow-hidden border border-slate-200">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={streetViewUrl} alt="Street View of your property" className="w-full" />
-                    <div className="bg-green-50 border-t border-green-100 px-3 py-2 flex items-center gap-2">
+                {(streetViewUrl || satelliteUrl) && (
+                  <div className="space-y-3">
+                    {streetViewUrl && (
+                      <div className="rounded-xl overflow-hidden border border-slate-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={streetViewUrl} alt="Street view of your property" className="w-full" />
+                        <div className="bg-slate-50 border-t border-slate-100 px-3 py-1.5">
+                          <span className="text-xs text-slate-500 font-medium">📸 Street view</span>
+                        </div>
+                      </div>
+                    )}
+                    {satelliteUrl && (
+                      <div className="rounded-xl overflow-hidden border border-slate-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={satelliteUrl} alt="Satellite view of your property" className="w-full" />
+                        <div className="bg-slate-50 border-t border-slate-100 px-3 py-1.5">
+                          <span className="text-xs text-slate-500 font-medium">🛰️ Overhead / satellite view</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="bg-green-50 border border-green-100 rounded-xl px-3 py-2 flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span className="text-xs text-green-700 font-medium">Got it — we&apos;ll use this photo for your AI design concepts</span>
+                      <span className="text-xs text-green-700 font-medium">Property confirmed — AI will use these photos for your design concepts</span>
                     </div>
                   </div>
                 )}

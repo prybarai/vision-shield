@@ -32,17 +32,45 @@ const STYLE_DESCRIPTORS: Record<string, string> = {
 // Highly specific edit instructions per category
 // These are crafted to produce accurate, contractor-realistic results
 const EDIT_INSTRUCTIONS: Record<string, string> = {
-  // INTERIOR
-  kitchen: 'Renovate this kitchen. Replace the cabinets, countertops, and backsplash with {style}. Keep the exact same room dimensions, window positions, ceiling height, and appliance locations. The result should look like a real contractor renovation photo.',
-  bathroom: 'Renovate this bathroom. Replace the tile, vanity, toilet, and fixtures with {style}. Keep the exact room dimensions, window positions, and plumbing locations. The result should look like a real contractor renovation photo.',
-  flooring: 'Replace only the flooring in this room with {style} hardwood flooring. Keep all furniture, walls, windows, trim, and ceiling completely unchanged. The result should look like a professional flooring installation photo.',
-  interior_paint: 'Repaint only the walls and trim in this room with {style} colors. Keep all furniture, flooring, windows, and fixtures completely unchanged. The result should look like a professional interior painting job.',
+  kitchen: `You are a professional kitchen designer creating a photorealistic renovation rendering.
+CHANGE: Replace the cabinets, countertops, backsplash, and hardware with {style}.
+DO NOT CHANGE: The room dimensions, ceiling height, window size and position, floor area, appliance locations, walls, or structural elements.
+The result must look like a real contractor's "after" photo taken from the same angle and position as the original photo.`,
 
-  // EXTERIOR
-  roofing: 'Replace only the roof on this house with a new {style} architectural shingle roof. Keep the house structure, siding, windows, doors, landscaping, and surroundings completely unchanged. The result should look like a real roofing contractor before/after photo.',
-  exterior_paint: 'Repaint only the exterior siding and trim of this house with {style} colors. Keep the roof, windows, doors, landscaping, driveway, and surroundings completely unchanged. The result should look like a professional exterior painting job.',
-  deck_patio: 'Add a new {style} wood deck or patio to this backyard. Keep the house structure, fence, existing trees, and surroundings intact. Only add the deck/patio structure. The result should look like a real contractor installation photo.',
-  landscaping: 'Professionally landscape this yard with {style} garden design including manicured lawn, garden beds, and appropriate plantings. Keep the house, fence, driveway, and hardscape completely unchanged. The result should look like a professional landscaping project photo.',
+  bathroom: `You are a professional bathroom designer creating a photorealistic renovation rendering.
+CHANGE: Replace the tile (floor and wall), vanity, toilet, and fixtures with {style}.
+DO NOT CHANGE: The room dimensions, ceiling height, window size and position, door location, or structural elements.
+The result must look like a real contractor's "after" photo taken from the same angle and position as the original photo.`,
+
+  flooring: `You are a professional flooring installer creating a photorealistic installation rendering.
+CHANGE: Replace only the floor surface with {style} flooring.
+DO NOT CHANGE: Every single other element — all furniture, all walls, all trim, all windows, all doors, all ceiling elements, all rugs, all lighting fixtures.
+The result must look like a real before/after flooring installation photo taken from the exact same angle.`,
+
+  interior_paint: `You are a professional painter creating a photorealistic painting rendering.
+CHANGE: Repaint only the walls and trim with {style} colors.
+DO NOT CHANGE: Every single other element — all furniture, flooring, windows, curtains, artwork, lighting, and ceiling.
+The result must look like a real before/after painting photo taken from the exact same angle.`,
+
+  roofing: `You are a professional roofing contractor creating a photorealistic replacement rendering.
+CHANGE: Replace only the roof surface and materials with a new {style} roof.
+DO NOT CHANGE: The house silhouette, all siding, all windows, all doors, the driveway, all trees, all landscaping, all neighboring structures, the sky, and all surroundings.
+The result must look like a real roofing contractor's "after" photo of the exact same house.`,
+
+  exterior_paint: `You are a professional exterior painter creating a photorealistic painting rendering.
+CHANGE: Repaint only the siding and exterior trim with {style} colors.
+DO NOT CHANGE: The roof color and material, all windows, all doors, all landscaping, the driveway, all neighboring structures, and all surroundings.
+The result must look like a real exterior painting contractor's "after" photo of the exact same house.`,
+
+  deck_patio: `You are a professional deck builder creating a photorealistic installation rendering.
+CHANGE: Add a new {style} wood deck structure to the indicated backyard area. The deck should look structurally sound with proper posts, beams, decking boards, and railings.
+DO NOT CHANGE: The house structure, siding, windows, doors, roof, existing fence lines, existing mature trees, and the overall yard dimensions.
+The result must look like a real deck contractor's "after" photo.`,
+
+  landscaping: `You are a professional landscape architect creating a photorealistic design rendering.
+CHANGE: Transform the lawn and garden areas with {style} professional landscaping including graded lawn, defined garden beds, appropriate shrubs and plantings.
+DO NOT CHANGE: The house structure, driveway, hardscape elements, fence lines, mature trees, and neighboring properties.
+The result must look like a real landscaping contractor's "after" photo.`,
 };
 
 // Text-to-image prompts when no reference photo is available
@@ -181,15 +209,11 @@ export async function generateConceptImages(params: {
   const results: string[] = [];
 
   if (params.referenceImageUrl) {
-    // Generate variations with slightly different lighting/angle instructions
+    // Generate variations with useful framing differences
     const variations = [
-      params.notes,
-      params.notes
-        ? `${params.notes}. Show the result in bright natural daytime lighting.`
-        : 'Show the result in bright natural daytime lighting.',
-      params.notes
-        ? `${params.notes}. Show the result from a slightly wider angle to capture more context.`
-        : 'Show the result from a slightly wider angle to capture more context.',
+      undefined,  // clean instruction, no additions
+      'Focus on showing the finished result clearly with good lighting that shows material quality and craftsmanship.',
+      'Show the result with a slightly wider view to show how the renovation fits within the overall space.',
     ].slice(0, count);
 
     for (const variation of variations) {
