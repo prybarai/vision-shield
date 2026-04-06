@@ -41,11 +41,11 @@ const QUALITY_TIERS = [
 ];
 
 const PROGRESS_STEPS = [
-  'Creating your project...',
-  'Generating design concepts...',
+  'Setting up your project...',
+  'Generating AI design concepts... (this takes ~2 min)',
   'Calculating cost estimate...',
   'Building materials list...',
-  'Writing project brief...',
+  'Writing contractor brief...',
   'Almost done...',
 ];
 
@@ -57,6 +57,9 @@ export default function VisionStartFlow() {
   const [zipCode, setZipCode] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
+  const [streetViewUrl, setStreetViewUrl] = useState<string | null>(null);
+  const [streetViewLoading, setStreetViewLoading] = useState(false);
+  const [streetViewError, setStreetViewError] = useState<string | null>(null);
   const [category, setCategory] = useState<ProjectCategory | null>(null);
   const [style, setStyle] = useState<StylePreference | null>(null);
   const [qualityTier, setQualityTier] = useState<QualityTier>('mid');
@@ -78,6 +81,30 @@ export default function VisionStartFlow() {
     accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
     maxFiles: 1,
   });
+
+  const fetchStreetView = async (addr: string) => {
+    if (!addr.trim()) return;
+    setStreetViewLoading(true);
+    setStreetViewError(null);
+    setStreetViewUrl(null);
+    try {
+      const res = await fetch('/api/projects/street-view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: addr }),
+      });
+      const data = await res.json() as { available: boolean; image_url?: string; message?: string };
+      if (data.available && data.image_url) {
+        setStreetViewUrl(data.image_url);
+      } else {
+        setStreetViewError(data.message || 'No Street View available for this address.');
+      }
+    } catch {
+      setStreetViewError('Could not fetch Street View. You can still continue.');
+    } finally {
+      setStreetViewLoading(false);
+    }
+  };
 
   const handleEntryNext = () => {
     if (entryMode === 'upload' && !uploadedFile) return;
@@ -128,9 +155,10 @@ export default function VisionStartFlow() {
       const { project } = await projectRes.json();
       const projectId = project.id;
 
-      // Step 1b: Upload reference photo if provided
+      // Step 1b: Get reference image — uploaded photo OR Street View
       let referenceImageUrl: string | undefined;
       if (uploadedFile) {
+        // User uploaded a photo — store it in Supabase
         const formData = new FormData();
         formData.append('file', uploadedFile);
         formData.append('project_id', projectId);
@@ -139,9 +167,18 @@ export default function VisionStartFlow() {
           body: formData,
         });
         if (uploadRes.ok) {
-          const { url } = await uploadRes.json();
+          const { url } = await uploadRes.json() as { url: string };
           referenceImageUrl = url;
         }
+      } else if (streetViewUrl) {
+        // Use Street View image directly as reference
+        referenceImageUrl = streetViewUrl;
+        // Save it to the project record too
+        await fetch('/api/projects/create', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ project_id: projectId, uploaded_image_urls: [streetViewUrl] }),
+        }).catch(() => {}); // best-effort
       }
 
       // Step 2: Generate concepts (img2img if photo was uploaded)
@@ -324,6 +361,35 @@ export default function VisionStartFlow() {
                   onChange={e => setZipCode(e.target.value)}
                   required
                 />
+                <button
+                  type="button"
+                  onClick={() => fetchStreetView(`${address} ${zipCode}`)}
+                  disabled={!address || !zipCode || streetViewLoading}
+                  className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  {streetViewLoading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Looking up your property...</>
+                  ) : (
+                    <><MapPin className="h-4 w-4" /> Preview my property</>  
+                  )}
+                </button>
+
+                {streetViewUrl && (
+                  <div className="rounded-xl overflow-hidden border border-slate-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={streetViewUrl} alt="Street View of your property" className="w-full" />
+                    <div className="bg-green-50 border-t border-green-100 px-3 py-2 flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                      <span className="text-xs text-green-700 font-medium">Got it — we&apos;ll use this photo for your AI design concepts</span>
+                    </div>
+                  </div>
+                )}
+
+                {streetViewError && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-700">
+                    {streetViewError} You can still continue — we&apos;ll generate a concept based on your project type.
+                  </div>
+                )}
               </div>
             </Card>
           )}
