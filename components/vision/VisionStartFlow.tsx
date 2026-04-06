@@ -108,8 +108,13 @@ export default function VisionStartFlow() {
 
   const handleEntryNext = () => {
     if (entryMode === 'upload' && !uploadedFile) return;
-    if (entryMode === 'address' && (!address || !zipCode)) return;
+    if (entryMode === 'address' && !address) return;
     if (!entryMode) return;
+    // Auto-extract ZIP from address if not manually entered
+    if (entryMode === 'address' && !zipCode) {
+      const zipMatch = address.match(/\b(\d{5})\b/);
+      if (zipMatch) setZipCode(zipMatch[1]);
+    }
     setStep('category');
   };
 
@@ -363,14 +368,19 @@ export default function VisionStartFlow() {
                 />
                 <button
                   type="button"
-                  onClick={() => fetchStreetView(`${address} ${zipCode}`)}
-                  disabled={!address || !zipCode || streetViewLoading}
+                  onClick={() => {
+                    const fullAddress = zipCode ? `${address}, ${zipCode}` : address;
+                    fetchStreetView(fullAddress);
+                  }}
+                  disabled={!address || streetViewLoading}
                   className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   {streetViewLoading ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Looking up your property...</>
+                  ) : streetViewUrl ? (
+                    <><CheckCircle className="h-4 w-4" /> Property found — click to refresh</>
                   ) : (
-                    <><MapPin className="h-4 w-4" /> Preview my property</>  
+                    <><MapPin className="h-4 w-4" /> Preview my property</>
                   )}
                 </button>
 
@@ -398,7 +408,7 @@ export default function VisionStartFlow() {
             className="w-full"
             size="lg"
             onClick={handleEntryNext}
-            disabled={!entryMode || (entryMode === 'upload' && !uploadFile(uploadedFile, zipCode)) || (entryMode === 'address' && (!address || !zipCode))}
+            disabled={!entryMode || (entryMode === 'upload' && !uploadFile(uploadedFile, zipCode)) || (entryMode === 'address' && !address)}
           >
             Continue
           </Button>
