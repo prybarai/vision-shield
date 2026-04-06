@@ -8,6 +8,7 @@ import Disclaimer from '@/components/ui/Disclaimer';
 import Badge from '@/components/ui/Badge';
 import ShareButton from '@/components/vision/ShareButton';
 import MaterialsAccordion from '@/components/vision/MaterialsAccordion';
+import ConceptsLoader from '@/components/vision/ConceptsLoader';
 import type { Estimate, MaterialList, ProjectBrief, Project } from '@/types';
 
 interface PageProps {
@@ -186,12 +187,15 @@ export default async function VisionResultsPage({ params }: PageProps) {
             ))}
           </div>
         ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <p className="text-blue-800 text-sm">
-              Your planning results are ready. Design concepts are still rendering in the background and may take a little longer.
-            </p>
-          </div>
+          <ConceptsLoader
+            projectId={project_id}
+            category={project.project_category}
+            style={project.style_preference || 'modern'}
+            qualityTier={project.quality_tier}
+            notes={project.notes || undefined}
+            referenceImageUrl={project.uploaded_image_urls?.[0]}
+            hasImages={false}
+          />
         )}
       </section>
 

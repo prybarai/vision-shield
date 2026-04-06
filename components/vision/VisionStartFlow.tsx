@@ -43,7 +43,7 @@ const PROGRESS_STEPS = [
   'Calculating cost estimate...',
   'Building materials list...',
   'Writing contractor brief...',
-  'Generating AI design concepts...',
+  'Preparing your results page...',
   'Almost done...',
 ];
 
@@ -187,42 +187,6 @@ export default function VisionStartFlow() {
       if (!briefRes.ok) throw new Error('Failed to generate project brief');
 
       setProgressStep(4);
-      try {
-        const conceptsRes = await fetch('/api/vision/generate-concepts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            project_id: projectId,
-            category,
-            style,
-            quality_tier: qualityTier,
-            notes: notes || undefined,
-            reference_image_url: referenceImageUrl,
-          }),
-        });
-
-        if (conceptsRes.ok) {
-          const conceptsData = await conceptsRes.json() as { image_urls?: string[] };
-          const firstConceptUrl = conceptsData.image_urls?.[0];
-          if (firstConceptUrl) {
-            await fetch('/api/vision/materials', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                project_id: projectId,
-                category,
-                style,
-                quality_tier: qualityTier,
-                estimate_mid: estimate?.mid_estimate || 15000,
-                generated_image_url: firstConceptUrl,
-              }),
-            }).catch(() => {});
-          }
-        }
-      } catch (conceptError) {
-        console.error('Concept generation failed', conceptError);
-      }
-
       setProgressStep(5);
       await new Promise(r => setTimeout(r, 800));
       router.push(`/vision/results/${projectId}`);
