@@ -45,16 +45,23 @@ export async function generateConceptImages(params: {
     `${basePrompt}, golden hour warm lighting`,
   ].slice(0, count);
 
-  const results = await Promise.allSettled(
-    variations.map(async (prompt) => {
+  // Generate sequentially to avoid rate limits / timeouts
+  const results: PromiseSettledResult<string | null>[] = [];
+  for (const prompt of variations) {
+    results.push(await Promise.resolve().then(async () => {
       const output = await replicate.run('black-forest-labs/flux-schnell', {
         input: { prompt, num_outputs: 1, aspect_ratio: '4:3', output_format: 'webp', output_quality: 90 },
-      }) as string[];
-      return output[0];
-    })
-  );
+      }) as unknown[];
+      // Replicate client v1+ returns FileOutput objects; String(item) gives the URL
+      const item = output[0];
+      if (!item) return null;
+      if (typeof item === 'string') return item;
+      const str = String(item);
+      return str.startsWith('http') ? str : null;
+    }).then(v => ({ status: 'fulfilled' as const, value: v })).catch(e => ({ status: 'rejected' as const, reason: e })));
+  }
 
   return results
-    .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled' && !!r.value)
-    .map((r) => r.value);
+    .filter((r): r is PromiseFulfilledResult<string> => r.status === 'fulfilled' && typeof r.value === 'string' && (r.value as string).startsWith('http'))
+    .map((r) => r.value as string);
 }

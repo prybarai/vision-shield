@@ -10,6 +10,8 @@ const schema = z.object({
   quality_tier: z.string(),
 });
 
+export const maxDuration = 120; // 2 min — image generation takes ~20s per image
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
