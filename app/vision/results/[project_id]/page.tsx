@@ -66,19 +66,28 @@ export default async function VisionResultsPage({ params }: PageProps) {
           <h2 className="text-xl font-bold text-slate-900 mb-4">AI Design Concepts</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {project.generated_image_urls.map((url: string, i: number) => (
-              <div key={i} className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100">
-                <Image
+              <div key={i} className="relative rounded-2xl overflow-hidden bg-slate-100 group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={url}
-                  alt={`Concept ${i + 1}`}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, 33vw"
+                  alt={`Design concept ${i + 1}`}
+                  className="w-full h-auto object-cover"
                 />
                 <div className="absolute top-2 left-2">
-                  <span className="bg-white/90 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full">
+                  <span className="bg-white/90 text-slate-700 text-xs font-semibold px-2 py-1 rounded-full shadow">
                     Option {i + 1}
                   </span>
                 </div>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 bg-white text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-opacity">
+                    View full size
+                  </span>
+                </a>
               </div>
             ))}
           </div>
