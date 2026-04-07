@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import Link from 'next/link';
-import { ArrowRight, AlertCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { DISCLAIMERS } from '@/lib/disclaimers';
+import { extractDesignConstraints } from '@/lib/designConstraints';
 import { formatCurrencyRange, formatCurrency } from '@/lib/utils';
 import Disclaimer from '@/components/ui/Disclaimer';
 import Badge from '@/components/ui/Badge';
@@ -13,6 +14,36 @@ import type { Estimate, MaterialList, ProjectBrief, Project } from '@/types';
 
 interface PageProps {
   params: Promise<{ project_id: string }>;
+}
+
+function buildRequestedDesignDirection(notes?: string): string | null {
+  if (!notes) return null;
+
+  const constraints = extractDesignConstraints(notes);
+
+  if (constraints.bodyColor && constraints.accentColor && constraints.trimColor === constraints.accentColor) {
+    return `${constraints.bodyColor} exterior with ${constraints.accentColor} accents`;
+  }
+
+  if (constraints.bodyColor && constraints.trimColor) {
+    return `${constraints.bodyColor} exterior with ${constraints.trimColor} trim`;
+  }
+
+  if (constraints.deckMaterial) {
+    return `${constraints.deckMaterial} deck material`;
+  }
+
+  if (constraints.flooringMaterial) {
+    return `${constraints.flooringMaterial} flooring`;
+  }
+
+  if (constraints.cabinetColor || constraints.countertopMaterial || constraints.tileStyle) {
+    return [constraints.cabinetColor ? `${constraints.cabinetColor} cabinetry` : null, constraints.countertopMaterial ? `${constraints.countertopMaterial} countertops` : null, constraints.tileStyle ? `${constraints.tileStyle} tile` : null]
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  return null;
 }
 
 export async function generateMetadata({ params }: PageProps) {
@@ -45,6 +76,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
   const categoryLabel = project.project_category.replace(/_/g, ' ');
   const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${project.share_token}`;
   const analysisSummary = project.notes?.split('AI analysis:')[1]?.trim();
+  const requestedDirection = project.generated_image_urls?.length > 0 ? buildRequestedDesignDirection(project.notes) : null;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -172,6 +204,13 @@ export default async function VisionResultsPage({ params }: PageProps) {
       {/* AI Design Concepts */}
       <section className="mb-10">
         <h2 className="text-xl font-bold text-slate-900 mb-4">AI Design Concepts</h2>
+
+        {requestedDirection && (
+          <div className="mb-4 bg-slate-50 border border-slate-200 rounded-2xl p-4">
+            <h3 className="text-sm font-semibold text-slate-900 mb-1">Requested design direction</h3>
+            <p className="text-sm text-slate-700 capitalize">{requestedDirection}</p>
+          </div>
+        )}
 
         {project.generated_image_urls?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

@@ -284,17 +284,16 @@ export default function VisionStartFlow() {
   };
 
   const buildNotesWithScope = (rawNotes: string, answers: Record<string, string>) => {
-    const baseNotes = rawNotes.trim();
     const entries = Object.entries(answers).filter(([, value]) => Boolean(value));
 
     if (entries.length === 0) {
-      return baseNotes || undefined;
+      return rawNotes.length > 0 ? rawNotes : undefined;
     }
 
     const scopeLines = entries.map(([key, value]) => `- ${key.replace(/_/g, ' ')}: ${value.replace(/_/g, ' ')}`);
     const scopeBlock = `Scope answers:\n${scopeLines.join('\n')}`;
 
-    return baseNotes ? `${baseNotes}\n\n${scopeBlock}` : scopeBlock;
+    return rawNotes.length > 0 ? `${rawNotes}\n\n${scopeBlock}` : scopeBlock;
   };
 
   const handleStart = async () => {

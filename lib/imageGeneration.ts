@@ -14,6 +14,7 @@
 
 import OpenAI, { toFile } from 'openai';
 import { type VisionAnalysis } from '@/lib/visionAnalysis';
+import { extractDesignConstraints, type DesignConstraints } from '@/lib/designConstraints';
 
 function getClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -32,55 +33,55 @@ const STYLE_DESCRIPTORS: Record<string, string> = {
 
 const EDIT_INSTRUCTIONS: Record<string, string> = {
   kitchen: `You are a professional kitchen designer creating a photorealistic renovation rendering.
-CHANGE: Replace the cabinets, countertops, backsplash, and hardware with {style}.
+CHANGE: Replace the cabinets, countertops, backsplash, and hardware.
 DO NOT CHANGE: The room dimensions, ceiling height, window size and position, floor area, appliance locations, walls, or structural elements.
 The result must look like a real contractor's "after" photo taken from the same angle and position as the original photo.`,
 
   bathroom: `You are a professional bathroom designer creating a photorealistic renovation rendering.
-CHANGE: Replace the tile (floor and wall), vanity, toilet, and fixtures with {style}.
+CHANGE: Replace the tile (floor and wall), vanity, toilet, and fixtures.
 DO NOT CHANGE: The room dimensions, ceiling height, window size and position, door location, or structural elements.
 The result must look like a real contractor's "after" photo taken from the same angle and position as the original photo.`,
 
   flooring: `You are a professional flooring installer creating a photorealistic installation rendering.
-CHANGE: Replace only the floor surface with {style} flooring.
+CHANGE: Replace only the floor surface.
 DO NOT CHANGE: Every single other element — all furniture, all walls, all trim, all windows, all doors, all ceiling elements, all rugs, all lighting fixtures.
 The result must look like a real before/after flooring installation photo taken from the exact same angle.`,
 
   interior_paint: `You are a professional painter creating a photorealistic painting rendering.
-CHANGE: Repaint only the walls and trim with {style} colors.
+CHANGE: Repaint only the walls and trim.
 DO NOT CHANGE: Every single other element — all furniture, flooring, windows, curtains, artwork, lighting, and ceiling.
 The result must look like a real before/after painting photo taken from the exact same angle.`,
 
   roofing: `You are a professional roofing contractor creating a photorealistic replacement rendering.
-CHANGE: Replace only the roof surface and materials with a new {style} roof.
+CHANGE: Replace only the roof surface and materials.
 DO NOT CHANGE: The house silhouette, all siding, all windows, all doors, the driveway, all trees, all landscaping, all neighboring structures, the sky, and all surroundings.
 The result must look like a real roofing contractor's "after" photo of the exact same house.`,
 
-  exterior_paint: `You are a professional exterior painter creating a photorealistic painting rendering.
-CHANGE: Repaint only the siding and exterior trim with {style} colors.
-DO NOT CHANGE: The roof color and material, all windows, all doors, all landscaping, the driveway, all neighboring structures, and all surroundings.
-The result must look like a real exterior painting contractor's "after" photo of the exact same house.`,
+  exterior_paint: `You are a professional exterior design visualizer creating a photorealistic repaint rendering.
+CHANGE: Repaint only the siding and exterior trim.
+DO NOT CHANGE: The roof shape, roof material, windows, doors, landscaping, driveway, neighboring homes, or house structure.
+The final result must follow the requested colors exactly and look like a real contractor's after photo of the same house.`,
 
   deck_patio: `You are a professional deck builder creating a photorealistic installation rendering.
-CHANGE: Add a new {style} wood deck structure to the indicated backyard area. The deck should look structurally sound with proper posts, beams, decking boards, and railings.
+CHANGE: Add a new deck or patio structure only in the indicated backyard area.
 DO NOT CHANGE: The house structure, siding, windows, doors, roof, existing fence lines, existing mature trees, and the overall yard dimensions.
 The result must look like a real deck contractor's "after" photo.`,
 
   landscaping: `You are a professional landscape architect creating a photorealistic design rendering.
-CHANGE: Transform the lawn and garden areas with {style} professional landscaping including graded lawn, defined garden beds, appropriate shrubs and plantings.
+CHANGE: Transform the lawn and garden areas with professional landscaping including graded lawn, defined garden beds, appropriate shrubs and plantings.
 DO NOT CHANGE: The house structure, driveway, hardscape elements, fence lines, mature trees, and neighboring properties.
 The result must look like a real landscaping contractor's "after" photo.`,
 };
 
 const TEXT_PROMPTS: Record<string, string> = {
-  kitchen: 'Professional real estate photograph of a beautifully renovated {style} kitchen. High-end photography, photorealistic, no watermarks.',
-  bathroom: 'Professional real estate photograph of a beautifully renovated {style} bathroom. High-end photography, photorealistic, no watermarks.',
-  flooring: 'Professional interior design photograph of a bright living room with brand new {style} hardwood flooring. Photorealistic, no watermarks.',
-  interior_paint: 'Professional interior design photograph of a bright living room freshly painted in {style} colors with updated trim. Photorealistic, no watermarks.',
-  roofing: 'Professional real estate photograph of a beautiful suburban home with a brand new {style} roof. Photorealistic, no watermarks.',
-  exterior_paint: 'Professional real estate photograph of a beautiful home freshly repainted in {style} colors with great curb appeal. Photorealistic, no watermarks.',
-  deck_patio: 'Professional real estate photograph of a beautiful backyard with a brand new {style} wood deck and outdoor living area. Photorealistic, no watermarks.',
-  landscaping: 'Professional real estate photograph of a home with beautifully {style} professional landscaping and manicured lawn. Photorealistic, no watermarks.',
+  kitchen: 'Professional real estate photograph of a beautifully renovated kitchen. High-end photography, photorealistic, no watermarks.',
+  bathroom: 'Professional real estate photograph of a beautifully renovated bathroom. High-end photography, photorealistic, no watermarks.',
+  flooring: 'Professional interior design photograph of a bright living room with brand new flooring. Photorealistic, no watermarks.',
+  interior_paint: 'Professional interior design photograph of a bright living room freshly painted with updated trim. Photorealistic, no watermarks.',
+  roofing: 'Professional real estate photograph of a beautiful suburban home with a brand new roof. Photorealistic, no watermarks.',
+  exterior_paint: 'Professional real estate photograph of a beautiful home freshly repainted with great curb appeal. Photorealistic, no watermarks.',
+  deck_patio: 'Professional real estate photograph of a beautiful backyard with a brand new deck and outdoor living area. Photorealistic, no watermarks.',
+  landscaping: 'Professional real estate photograph of a home with beautifully landscaped grounds and manicured lawn. Photorealistic, no watermarks.',
 };
 
 function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis): string {
@@ -113,21 +114,123 @@ function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis)
   return facts.slice(0, 4).join(' ');
 }
 
-function buildInstruction(category: string, style: string, notes?: string, analysis?: VisionAnalysis): string {
-  const styleDesc = STYLE_DESCRIPTORS[style] || style;
-  const template = EDIT_INSTRUCTIONS[category] || 'Renovate this property with {style} finishes. Keep structural elements intact.';
-  const instruction = template.replace('{style}', styleDesc);
-  const analysisContext = buildAnalysisPromptContext(category, analysis);
-  const extra = [analysisContext, notes ? `Additional requirements: ${notes}.` : ''].filter(Boolean).join(' ');
-  return extra ? `${instruction} ${extra}` : instruction;
+export function buildConstraintText(category: string, constraints: DesignConstraints, notes?: string): string {
+  const lines: string[] = [];
+
+  if (category === 'exterior_paint') {
+    if (constraints.bodyColor) {
+      lines.push(`Use ${constraints.bodyColor} as the main body/siding color.`);
+      if (constraints.bodyColor === 'cream white') {
+        lines.push('Do not use brown or tan as the dominant exterior color.');
+      }
+    }
+    if (constraints.trimColor && constraints.accentColor && constraints.trimColor === constraints.accentColor) {
+      lines.push(`Use ${constraints.trimColor} for trim and accent details.`);
+    } else {
+      if (constraints.trimColor) lines.push(`Use ${constraints.trimColor} trim. This is required.`);
+      if (constraints.accentColor) lines.push(`Use ${constraints.accentColor} accent details. This is required.`);
+    }
+    if (constraints.accentColor === 'black' || constraints.trimColor === 'black') {
+      lines.push('Do not use wood-tone or bronze accents instead of black.');
+    }
+    if (constraints.roofColor && /\broof\b/i.test(notes || '')) {
+      lines.push(`Use ${constraints.roofColor} for the roof color only if the request explicitly includes changing the roof.`);
+    }
+    if (lines.length > 0) {
+      lines.push('These user-specified colors are mandatory and must override generic style suggestions.');
+    }
+  }
+
+  if (category === 'deck_patio' && constraints.deckMaterial) {
+    lines.push(`Use ${constraints.deckMaterial} deck boards. This material selection is required.`);
+  }
+
+  if (category === 'flooring' && constraints.flooringMaterial) {
+    lines.push(`Use ${constraints.flooringMaterial} flooring. This material selection is required.`);
+  }
+
+  if ((category === 'kitchen' || category === 'bathroom') && constraints.cabinetColor) {
+    lines.push(`Use ${constraints.cabinetColor} cabinets or vanity cabinetry. This color choice is required.`);
+  }
+  if ((category === 'kitchen' || category === 'bathroom') && constraints.countertopMaterial) {
+    lines.push(`Use ${constraints.countertopMaterial} countertops. This material selection is required.`);
+  }
+  if ((category === 'kitchen' || category === 'bathroom') && constraints.tileStyle) {
+    lines.push(`Use ${constraints.tileStyle} tile where tile is shown. This style choice is required.`);
+  }
+
+  if (category === 'roofing' && constraints.roofColor) {
+    lines.push(`Use ${constraints.roofColor} for the roof color. This is required.`);
+  }
+
+  if (category === 'interior_paint') {
+    if (constraints.bodyColor) lines.push(`Use ${constraints.bodyColor} as the primary wall color. This is required.`);
+    if (constraints.trimColor) lines.push(`Use ${constraints.trimColor} trim. This is required.`);
+  }
+
+  if (lines.length === 0 && notes) {
+    return `Honor the user's notes exactly where they specify materials, finishes, or colors: ${notes}`;
+  }
+
+  if (constraints.explicitRequirements.length > 0) {
+    lines.push(`Original user note: ${constraints.explicitRequirements[0]}`);
+  }
+
+  return lines.join(' ');
 }
 
-function buildTextPrompt(category: string, style: string, notes?: string, analysis?: VisionAnalysis): string {
+function buildInstruction(
+  category: string,
+  style: string,
+  notes?: string,
+  analysis?: VisionAnalysis,
+  extraGuidance?: string
+): string {
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
-  const template = TEXT_PROMPTS[category] || 'Professional photograph of a {style} home renovation.';
-  const prompt = template.replace('{style}', styleDesc);
+  const baseInstruction = EDIT_INSTRUCTIONS[category] || 'Renovate this property while keeping structural elements intact.';
   const analysisContext = buildAnalysisPromptContext(category, analysis);
-  return [prompt, analysisContext, notes ? `${notes}.` : ''].filter(Boolean).join(' ');
+  const constraints = extractDesignConstraints(notes);
+  const constraintText = buildConstraintText(category, constraints, notes);
+  const categoryInstruction = category === 'exterior_paint'
+    ? 'Category-specific direction: Repaint only the existing siding and trim on this exact house. Match the requested color placement faithfully.'
+    : category === 'deck_patio'
+    ? 'Category-specific direction: Add the requested deck or patio design without changing the house itself.'
+    : category === 'flooring'
+    ? 'Category-specific direction: Replace only the visible flooring surface.'
+    : category === 'kitchen' || category === 'bathroom'
+    ? 'Category-specific direction: Apply the requested materials to the intended renovation surfaces while preserving room geometry.'
+    : `Category-specific direction: Apply a ${styleDesc} renovation for the ${category.replace(/_/g, ' ')} project.`;
+
+  return [
+    baseInstruction,
+    analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
+    constraintText ? `MANDATORY DESIGN REQUIREMENTS: ${constraintText}` : '',
+    categoryInstruction,
+    `Style guidance: ${styleDesc}.`,
+    extraGuidance ? `Presentation guidance: ${extraGuidance}` : '',
+  ].filter(Boolean).join(' ');
+}
+
+function buildTextPrompt(
+  category: string,
+  style: string,
+  notes?: string,
+  analysis?: VisionAnalysis,
+  extraGuidance?: string
+): string {
+  const styleDesc = STYLE_DESCRIPTORS[style] || style;
+  const basePrompt = TEXT_PROMPTS[category] || 'Professional photograph of a home renovation.';
+  const analysisContext = buildAnalysisPromptContext(category, analysis);
+  const constraints = extractDesignConstraints(notes);
+  const constraintText = buildConstraintText(category, constraints, notes);
+
+  return [
+    basePrompt,
+    analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
+    constraintText ? `Mandatory user constraints: ${constraintText}` : '',
+    `Category direction: ${category.replace(/_/g, ' ')} rendered in a ${styleDesc} direction.`,
+    extraGuidance ? `Presentation guidance: ${extraGuidance}` : '',
+  ].filter(Boolean).join(' ');
 }
 
 async function fetchImageAsBuffer(url: string): Promise<Buffer> {
@@ -143,12 +246,13 @@ async function generateWithEdit(
   category: string,
   style: string,
   notes?: string,
-  analysis?: VisionAnalysis
+  analysis?: VisionAnalysis,
+  extraGuidance?: string
 ): Promise<string | null> {
   try {
-    const instruction = buildInstruction(category, style, notes, analysis);
+    const instruction = buildInstruction(category, style, notes, analysis, extraGuidance);
     console.log(`[OpenAI edit] category=${category} style=${style}`);
-    console.log(`[OpenAI edit] instruction=${instruction.substring(0, 100)}...`);
+    console.log(`[OpenAI edit] instruction=${instruction.substring(0, 180)}...`);
 
     const imageBuffer = await fetchImageAsBuffer(referenceImageUrl);
     const imageFile = await toFile(imageBuffer, 'reference.jpg', { type: 'image/jpeg' });
@@ -183,11 +287,12 @@ async function generateTextToImage(
   category: string,
   style: string,
   notes?: string,
-  analysis?: VisionAnalysis
+  analysis?: VisionAnalysis,
+  extraGuidance?: string
 ): Promise<string | null> {
   try {
-    const prompt = buildTextPrompt(category, style, notes, analysis);
-    console.log(`[OpenAI generate] interior=${INTERIOR_CATEGORIES.has(category)} prompt=${prompt.substring(0, 100)}...`);
+    const prompt = buildTextPrompt(category, style, notes, analysis, extraGuidance);
+    console.log(`[OpenAI generate] interior=${INTERIOR_CATEGORIES.has(category)} prompt=${prompt.substring(0, 180)}...`);
 
     const response = await client.images.generate({
       model: 'gpt-image-1',
@@ -252,8 +357,9 @@ export async function generateConceptImages(params: {
         params.referenceImageUrl,
         params.category,
         params.style,
-        variation,
-        params.analysis
+        params.notes,
+        params.analysis,
+        variation
       );
       if (result) {
         try {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { generateConceptImages } from '@/lib/imageGeneration';
+import { extractDesignConstraints } from '@/lib/designConstraints';
 import { type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
@@ -26,6 +27,26 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const params = schema.parse(body);
+    const constraints = extractDesignConstraints(params.notes);
+    const constraintSummary = {
+      bodyColor: constraints.bodyColor,
+      accentColor: constraints.accentColor,
+      trimColor: constraints.trimColor,
+      roofColor: constraints.roofColor,
+      deckMaterial: constraints.deckMaterial,
+      flooringMaterial: constraints.flooringMaterial,
+      cabinetColor: constraints.cabinetColor,
+      countertopMaterial: constraints.countertopMaterial,
+      tileStyle: constraints.tileStyle,
+      explicitRequirementCount: constraints.explicitRequirements.length,
+    };
+
+    console.log('[vision.generate-concepts] request', {
+      category: params.category,
+      style: params.style,
+      hasNotes: Boolean(params.notes),
+      constraintSummary,
+    });
 
     const imageUrls = await generateConceptImages({
       category: params.category,
