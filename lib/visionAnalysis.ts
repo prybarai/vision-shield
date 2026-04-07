@@ -21,6 +21,9 @@ export type VisionSizeBucket = 'small' | 'medium' | 'large';
 export type VisionComplexity = 'low' | 'medium' | 'high';
 export type VisionAccessDifficulty = 'easy' | 'moderate' | 'difficult';
 export type VisionCeilingHeight = 'standard' | 'tall' | 'vaulted';
+export type VisionSuggestedTrade = 'paint' | 'flooring' | 'roofing' | 'deck' | 'landscaping' | 'bathroom' | 'kitchen' | 'mixed_finish' | 'general_remodel' | 'repair' | 'unknown';
+export type VisionSuggestedLocationType = 'interior' | 'exterior' | 'unknown';
+export type VisionProjectComplexity = 'simple' | 'moderate' | 'complex';
 
 export interface VisionAnalysis {
   property_type: VisionPropertyType;
@@ -39,6 +42,9 @@ export interface VisionAnalysis {
   };
   estimation_notes: string[];
   materials_signals: string[];
+  suggested_trade?: VisionSuggestedTrade;
+  suggested_location_type?: VisionSuggestedLocationType;
+  complexity?: VisionProjectComplexity;
 }
 
 export const FALLBACK_VISION_ANALYSIS: VisionAnalysis = {
@@ -58,6 +64,9 @@ export const FALLBACK_VISION_ANALYSIS: VisionAnalysis = {
   },
   estimation_notes: ['Photo analysis unavailable; continue with scope-based planning assumptions.'],
   materials_signals: [],
+  suggested_trade: 'unknown',
+  suggested_location_type: 'unknown',
+  complexity: 'moderate',
 };
 
 function humanize(value: string | null | undefined) {
@@ -74,6 +83,9 @@ export function buildAnalysisSummary(analysis?: VisionAnalysis | null): string |
   if (typeof analysis.scope_signals.window_count_visible === 'number') parts.push(`${analysis.scope_signals.window_count_visible} visible windows`);
   if (analysis.scope_signals.access_difficulty) parts.push(`${analysis.scope_signals.access_difficulty} access`);
   if (analysis.scope_signals.room_size) parts.push(`${analysis.scope_signals.room_size} room`);
+  if (analysis.suggested_trade && analysis.suggested_trade !== 'unknown') parts.push(`${humanize(analysis.suggested_trade)} scope`);
+  if (analysis.suggested_location_type && analysis.suggested_location_type !== 'unknown') parts.push(`${analysis.suggested_location_type} project`);
+  if (analysis.complexity) parts.push(`${analysis.complexity} complexity`);
   if (parts.length === 0) return null;
 
   return `AI analysis: ${parts.slice(0, 4).join('; ')}`;
@@ -91,5 +103,8 @@ export function describeAnalysisFacts(analysis?: VisionAnalysis | null): string[
   if (analysis.scope_signals.paint_complexity) facts.push(`${analysis.scope_signals.paint_complexity} paint complexity`);
   if (analysis.scope_signals.access_difficulty) facts.push(`${analysis.scope_signals.access_difficulty} access`);
   if (typeof analysis.scope_signals.window_count_visible === 'number') facts.push(`${analysis.scope_signals.window_count_visible} visible windows`);
+  if (analysis.suggested_trade && analysis.suggested_trade !== 'unknown') facts.push(`${humanize(analysis.suggested_trade)} scope`);
+  if (analysis.suggested_location_type && analysis.suggested_location_type !== 'unknown') facts.push(`${analysis.suggested_location_type} project`);
+  if (analysis.complexity) facts.push(`${analysis.complexity} complexity`);
   return facts;
 }

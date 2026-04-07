@@ -296,9 +296,16 @@ export default function VisionStartFlow() {
     return rawNotes.length > 0 ? `${rawNotes}\n\n${scopeBlock}` : scopeBlock;
   };
 
+  const isCustomProject = category === 'custom_project';
+
   const handleStart = async () => {
     if (!category || !style || !zipCode.trim() || !uploadedFile) {
       setError('Please upload a photo and complete all required fields.');
+      return;
+    }
+
+    if (isCustomProject && !notes.trim()) {
+      setError('Please describe what you want to change before continuing.');
       return;
     }
 
@@ -361,13 +368,17 @@ export default function VisionStartFlow() {
       }
 
       setProgressStep(1);
+
+      const inferredLocationType = category === 'custom_project' && analysis.suggested_location_type === 'exterior'
+        ? 'exterior'
+        : PROJECT_CATEGORIES[category].type;
       const estimateRes = await fetch('/api/vision/estimate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           project_id: projectId,
           category,
-          location_type: PROJECT_CATEGORIES[category].type,
+          location_type: inferredLocationType,
           style,
           quality_tier: qualityTier,
           zip_code: zipCode.trim(),
@@ -393,6 +404,7 @@ export default function VisionStartFlow() {
           quality_tier: qualityTier,
           estimate_mid: estimate?.mid_estimate || 15000,
           analysis,
+          notes: notesWithScope,
         }),
       });
 
@@ -523,7 +535,7 @@ export default function VisionStartFlow() {
           <h1 className="text-3xl font-bold text-slate-900 text-center mb-2">What&apos;s your project?</h1>
           <p className="text-slate-500 text-center mb-8">Choose the project type you&apos;re planning.</p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
             {(Object.entries(PROJECT_CATEGORIES) as [ProjectCategory, typeof PROJECT_CATEGORIES[ProjectCategory]][]).map(([key, cat]) => (
               <Card
                 key={key}
@@ -644,12 +656,18 @@ export default function VisionStartFlow() {
 
           <Card className="mb-6">
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              Any specific notes? <span className="text-slate-400">(optional)</span>
+              {isCustomProject ? 'Describe what you want to change' : 'Any specific notes?'}{' '}
+              {!isCustomProject && <span className="text-slate-400">(optional)</span>}
             </label>
+            {isCustomProject && (
+              <p className="text-sm text-slate-500 mb-2">
+                Tell Prybar what you&apos;re hoping to update, repair, redesign, or add. The more specific you are, the better the estimate and contractor brief will be.
+              </p>
+            )}
             <textarea
               className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              rows={3}
-              placeholder="e.g. We have a dog, need to avoid hardwood. Current counters are laminate."
+              rows={isCustomProject ? 4 : 3}
+              placeholder={isCustomProject ? 'e.g. Replace the old pergola with a covered outdoor kitchen and add better lighting near the patio.' : 'e.g. We have a dog, need to avoid hardwood. Current counters are laminate.'}
               value={notes}
               onChange={e => setNotes(e.target.value)}
             />
@@ -657,7 +675,7 @@ export default function VisionStartFlow() {
 
           {error && <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm mb-4">{error}</div>}
 
-          <Button className="w-full" size="lg" onClick={handleStart}>
+          <Button className="w-full" size="lg" onClick={handleStart} disabled={isCustomProject && !notes.trim()}>
             Generate my project ✨
           </Button>
         </div>

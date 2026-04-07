@@ -73,7 +73,9 @@ export default async function VisionResultsPage({ params }: PageProps) {
   const materials = materialsRes.data as MaterialList | null;
   const brief = briefRes.data as ProjectBrief | null;
 
-  const categoryLabel = project.project_category.replace(/_/g, ' ');
+  const categoryLabel = project.project_category === 'custom_project'
+    ? 'Custom Project'
+    : project.project_category.replace(/_/g, ' ');
   const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${project.share_token}`;
   const analysisSummary = project.notes?.split('AI analysis:')[1]?.trim();
   const requestedDirection = project.generated_image_urls?.length > 0 ? buildRequestedDesignDirection(project.notes) : null;
@@ -107,6 +109,11 @@ export default async function VisionResultsPage({ params }: PageProps) {
         <section className="mb-10">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Cost Estimate</h2>
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            {project.project_category === 'custom_project' && (
+              <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                This is a planning-grade estimate for a custom scope. A contractor site visit will narrow pricing.
+              </div>
+            )}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-slate-50 rounded-xl">
                 <div className="text-sm text-slate-500 mb-1">Low</div>
@@ -173,6 +180,11 @@ export default async function VisionResultsPage({ params }: PageProps) {
         <section className="mb-10">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Project Brief</h2>
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+            {project.project_category === 'custom_project' && (
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                This is a planning-grade estimate for a custom scope. A contractor site visit will narrow pricing.
+              </div>
+            )}
             <div>
               <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Summary</h4>
               <p className="text-slate-700">{brief.summary}</p>

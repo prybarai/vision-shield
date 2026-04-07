@@ -373,6 +373,68 @@ function estimateExteriorPaint(_scopeAnswers: ScopeAnswers, qualityTier: string,
   };
 }
 
+function estimateCustomProject(category: string, qualityTier: string, zip: string, analysis?: VisionAnalysis, notes?: string): EstimateResult | null {
+  if (category !== 'custom_project') return null;
+
+  const zipMultiplier = getZipMultiplier(zip);
+  const trade = analysis?.suggested_trade ?? 'unknown';
+  const locationType = analysis?.suggested_location_type ?? 'unknown';
+  const sizeBucket = analysis?.estimated_size_bucket ?? 'medium';
+  const complexity = analysis?.complexity ?? 'moderate';
+
+  const mappedCategory = trade === 'paint'
+    ? locationType === 'exterior' ? 'exterior_paint' : 'interior_paint'
+    : trade === 'flooring' ? 'flooring'
+    : trade === 'roofing' ? 'roofing'
+    : trade === 'deck' ? 'deck_patio'
+    : trade === 'landscaping' ? 'landscaping'
+    : trade === 'bathroom' ? 'bathroom'
+    : trade === 'kitchen' ? 'kitchen'
+    : null;
+
+  if (mappedCategory) {
+    const mapped = fallbackEstimate(mappedCategory, qualityTier, zip, notes);
+    return {
+      ...mapped,
+      assumptions: [
+        `Custom project scope inferred as ${mappedCategory.replace(/_/g, ' ')} from uploaded photo analysis and homeowner notes`,
+        ...mapped.assumptions,
+        'Estimate remains planning-grade until the exact onsite scope is defined',
+      ],
+      risk_notes: [
+        'Custom-project pricing may change once hidden scope, measurements, and sequencing are confirmed onsite',
+        ...mapped.risk_notes,
+      ],
+      estimate_basis: `Custom project estimate inferred as ${mappedCategory.replace(/_/g, ' ')} from photo and homeowner notes.`,
+      regional_notes: getRegionalNotes(zip, zipMultiplier),
+    };
+  }
+
+  const baseMidBySize: Record<string, number> = { small: 3500, medium: 9000, large: 18000 };
+  const complexityMultiplier: Record<string, number> = { simple: 1.0, moderate: 1.25, complex: 1.6 };
+  const qualityMultiplier = getQualityMultiplier(qualityTier);
+  const mid = (baseMidBySize[sizeBucket] ?? 9000) * (complexityMultiplier[complexity] ?? 1.25) * qualityMultiplier * zipMultiplier;
+  const range = buildRange(mid, 0.22);
+
+  return {
+    ...range,
+    assumptions: [
+      'This is a mixed-scope planning estimate for a custom project',
+      'Estimate is based on uploaded photo analysis and homeowner description',
+      `${sizeBucket} size bucket and ${complexity} complexity assumptions were used`,
+      'Exact pricing depends on onsite scope definition and verified quantities',
+    ],
+    risk_notes: [
+      'Custom-project scope gaps, trade overlap, and hidden conditions can move pricing materially',
+      'A contractor site visit is needed to narrow demolition, framing, finish, and permit assumptions',
+    ],
+    estimate_basis: trade && trade !== 'unknown'
+      ? `Custom project estimate based on mixed-scope remodel assumptions with an inferred ${trade.replace(/_/g, ' ')} trade from uploaded image analysis.`
+      : 'Custom project estimate based on mixed-scope remodel assumptions from uploaded image analysis.',
+    regional_notes: getRegionalNotes(zip, zipMultiplier),
+  };
+}
+
 function fallbackEstimate(category: string, qualityTier: string, zip: string, notes?: string): EstimateResult {
   const baseMid: Record<string, number> = {
     roofing: 16000,
@@ -383,6 +445,7 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
     bathroom: 18000,
     flooring: 8000,
     interior_paint: 4500,
+    custom_project: 9000,
   };
 
   let mid = baseMid[category] ?? 15000;
@@ -411,7 +474,11 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
   };
 }
 
-function estimateDeterministically(category: string, scopeAnswers: ScopeAnswers | undefined, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
+function estimateDeterministically(category: string, scopeAnswers: ScopeAnswers | undefined, qualityTier: string, zip: string, analysis?: VisionAnalysis, notes?: string): EstimateResult | null {
+  if (category === 'custom_project') {
+    return estimateCustomProject(category, qualityTier, zip, analysis, notes);
+  }
+
   if (category === 'exterior_paint' && analysis) {
     return estimateExteriorPaint(scopeAnswers || {}, qualityTier, zip, analysis);
   }
@@ -437,7 +504,7 @@ export async function POST(req: NextRequest) {
     const params = schema.parse(body);
     const analysis = getAnalysis(params.analysis);
 
-    let result = estimateDeterministically(params.category, params.scope_answers, params.quality_tier, params.zip_code, analysis);
+    let result = estimateDeterministically(params.category, params.scope_answers, params.quality_tier, params.zip_code, analysis, params.notes);
 
     if (!result) {
       try {

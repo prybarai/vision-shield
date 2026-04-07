@@ -1,4 +1,4 @@
-export type ProjectCategory = 'roofing' | 'exterior_paint' | 'deck_patio' | 'landscaping' | 'kitchen' | 'bathroom' | 'flooring' | 'interior_paint';
+export type ProjectCategory = 'roofing' | 'exterior_paint' | 'deck_patio' | 'landscaping' | 'kitchen' | 'bathroom' | 'flooring' | 'interior_paint' | 'custom_project';
 export type StylePreference = 'modern' | 'traditional' | 'minimal' | 'luxury' | 'warm_natural' | 'budget_refresh';
 export type QualityTier = 'budget' | 'mid' | 'premium';
 export type LocationType = 'interior' | 'exterior';
@@ -117,6 +117,7 @@ export const PROJECT_CATEGORIES: Record<ProjectCategory, { label: string; emoji:
   bathroom: { label: 'Bathroom Refresh', emoji: '🚿', description: 'Tile, vanity, fixtures', type: 'interior' },
   flooring: { label: 'Flooring', emoji: '▪️', description: 'Hardwood, tile, or LVP', type: 'interior' },
   interior_paint: { label: 'Interior Paint', emoji: '🖌️', description: 'Walls, trim & ceilings', type: 'interior' },
+  custom_project: { label: 'Custom Project', emoji: '🛠️', description: 'Something more unique? Tell us what you want to change.', type: 'interior' },
 };
 
 export const STYLE_OPTIONS: Record<StylePreference, { label: string; description: string; color: string }> = {

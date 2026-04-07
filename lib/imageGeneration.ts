@@ -20,7 +20,7 @@ function getClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 }
 
-const INTERIOR_CATEGORIES = new Set(['kitchen', 'bathroom', 'flooring', 'interior_paint']);
+const INTERIOR_CATEGORIES = new Set(['kitchen', 'bathroom', 'flooring', 'interior_paint', 'custom_project']);
 
 const STYLE_DESCRIPTORS: Record<string, string> = {
   modern: 'modern style with clean lines, flat-panel cabinets, quartz surfaces, and matte black or brushed nickel hardware',
@@ -71,6 +71,11 @@ The result must look like a real deck contractor's "after" photo.`,
 CHANGE: Transform the lawn and garden areas with professional landscaping including graded lawn, defined garden beds, appropriate shrubs and plantings.
 DO NOT CHANGE: The house structure, driveway, hardscape elements, fence lines, mature trees, and neighboring properties.
 The result must look like a real landscaping contractor's "after" photo.`,
+
+  custom_project: `You are a professional renovation visualizer creating a photorealistic custom project rendering.
+CHANGE: Apply the requested design/update described by the homeowner while preserving the property structure and unchanged areas exactly.
+DO NOT CHANGE: Structural layout, room geometry, building envelope, and any visible elements not requested by the homeowner.
+The result must look like a real contractor's realistic planning rendering from the same viewpoint as the original photo.`,
 };
 
 const TEXT_PROMPTS: Record<string, string> = {
@@ -82,6 +87,7 @@ const TEXT_PROMPTS: Record<string, string> = {
   exterior_paint: 'Professional real estate photograph of a beautiful home freshly repainted with great curb appeal. Photorealistic, no watermarks.',
   deck_patio: 'Professional real estate photograph of a beautiful backyard with a brand new deck and outdoor living area. Photorealistic, no watermarks.',
   landscaping: 'Professional real estate photograph of a home with beautifully landscaped grounds and manicured lawn. Photorealistic, no watermarks.',
+  custom_project: 'Professional real estate style photograph of a realistic custom home improvement update, photorealistic, no watermarks.',
 };
 
 function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis): string {
@@ -179,6 +185,23 @@ export function buildConstraintText(category: string, constraints: DesignConstra
   return lines.join(' ');
 }
 
+function resolveCustomProjectCategory(category: string, analysis?: VisionAnalysis): string {
+  if (category !== 'custom_project') return category;
+
+  const trade = analysis?.suggested_trade;
+  const locationType = analysis?.suggested_location_type;
+
+  if (trade === 'paint') return locationType === 'exterior' ? 'exterior_paint' : 'interior_paint';
+  if (trade === 'flooring') return 'flooring';
+  if (trade === 'roofing') return 'roofing';
+  if (trade === 'deck') return 'deck_patio';
+  if (trade === 'landscaping') return 'landscaping';
+  if (trade === 'bathroom') return 'bathroom';
+  if (trade === 'kitchen') return 'kitchen';
+
+  return 'custom_project';
+}
+
 function buildInstruction(
   category: string,
   style: string,
@@ -186,20 +209,25 @@ function buildInstruction(
   analysis?: VisionAnalysis,
   extraGuidance?: string
 ): string {
+  const resolvedCategory = resolveCustomProjectCategory(category, analysis);
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
-  const baseInstruction = EDIT_INSTRUCTIONS[category] || 'Renovate this property while keeping structural elements intact.';
-  const analysisContext = buildAnalysisPromptContext(category, analysis);
+  const baseInstruction = EDIT_INSTRUCTIONS[resolvedCategory] || EDIT_INSTRUCTIONS[category] || 'Renovate this property while keeping structural elements intact.';
+  const analysisContext = buildAnalysisPromptContext(resolvedCategory, analysis);
   const constraints = extractDesignConstraints(notes);
-  const constraintText = buildConstraintText(category, constraints, notes);
-  const categoryInstruction = category === 'exterior_paint'
+  const constraintText = buildConstraintText(resolvedCategory, constraints, notes);
+  const categoryInstruction = category === 'custom_project'
+    ? resolvedCategory === 'custom_project'
+      ? 'Category-specific direction: Apply the requested custom design/update described by the homeowner while preserving the property structure and unchanged areas exactly.'
+      : `Category-specific direction: Treat this custom project like a ${resolvedCategory.replace(/_/g, ' ')} scope while preserving all unchanged areas exactly.`
+    : resolvedCategory === 'exterior_paint'
     ? 'Category-specific direction: Repaint only the existing siding and trim on this exact house. Match the requested color placement faithfully.'
-    : category === 'deck_patio'
+    : resolvedCategory === 'deck_patio'
     ? 'Category-specific direction: Add the requested deck or patio design without changing the house itself.'
-    : category === 'flooring'
+    : resolvedCategory === 'flooring'
     ? 'Category-specific direction: Replace only the visible flooring surface.'
-    : category === 'kitchen' || category === 'bathroom'
+    : resolvedCategory === 'kitchen' || resolvedCategory === 'bathroom'
     ? 'Category-specific direction: Apply the requested materials to the intended renovation surfaces while preserving room geometry.'
-    : `Category-specific direction: Apply a ${styleDesc} renovation for the ${category.replace(/_/g, ' ')} project.`;
+    : `Category-specific direction: Apply a ${styleDesc} renovation for the ${resolvedCategory.replace(/_/g, ' ')} project.`;
 
   return [
     baseInstruction,
@@ -218,17 +246,18 @@ function buildTextPrompt(
   analysis?: VisionAnalysis,
   extraGuidance?: string
 ): string {
+  const resolvedCategory = resolveCustomProjectCategory(category, analysis);
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
-  const basePrompt = TEXT_PROMPTS[category] || 'Professional photograph of a home renovation.';
-  const analysisContext = buildAnalysisPromptContext(category, analysis);
+  const basePrompt = TEXT_PROMPTS[resolvedCategory] || TEXT_PROMPTS[category] || 'Professional photograph of a home renovation.';
+  const analysisContext = buildAnalysisPromptContext(resolvedCategory, analysis);
   const constraints = extractDesignConstraints(notes);
-  const constraintText = buildConstraintText(category, constraints, notes);
+  const constraintText = buildConstraintText(resolvedCategory, constraints, notes);
 
   return [
     basePrompt,
     analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
     constraintText ? `Mandatory user constraints: ${constraintText}` : '',
-    `Category direction: ${category.replace(/_/g, ' ')} rendered in a ${styleDesc} direction.`,
+    `Category direction: ${category === 'custom_project' ? 'custom project' : resolvedCategory.replace(/_/g, ' ')} rendered in a ${styleDesc} direction. User notes are mandatory constraints.`,
     extraGuidance ? `Presentation guidance: ${extraGuidance}` : '',
   ].filter(Boolean).join(' ');
 }

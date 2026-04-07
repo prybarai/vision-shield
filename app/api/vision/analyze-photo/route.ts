@@ -33,10 +33,13 @@ Return exactly this JSON shape and nothing else:
     "access_difficulty": "easy" | "moderate" | "difficult" | null
   },
   "estimation_notes": ["..."],
-  "materials_signals": ["..."]
+  "materials_signals": ["..."],
+  "suggested_trade": "paint" | "flooring" | "roofing" | "deck" | "landscaping" | "bathroom" | "kitchen" | "mixed_finish" | "general_remodel" | "repair" | "unknown",
+  "suggested_location_type": "interior" | "exterior" | "unknown",
+  "complexity": "simple" | "moderate" | "complex"
 }
 
-Use null for unknown numeric or enum fields. Keep visible_features, estimation_notes, and materials_signals concise and specific.`;
+Use null for unknown numeric or enum fields. Keep visible_features, estimation_notes, and materials_signals concise and specific. When the category is custom_project, infer likely trade, whether the job appears interior or exterior, overall complexity, size bucket, and major visible elements from the photo and homeowner notes.`;
 
 function sanitizeAnalysis(input: Partial<VisionAnalysis> | null | undefined): VisionAnalysis {
   return {
