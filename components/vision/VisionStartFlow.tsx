@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
+import { FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const STEPS = ['entry', 'category', 'scope', 'style', 'quality', 'loading'] as const;
 type Step = typeof STEPS[number];
@@ -337,7 +338,28 @@ export default function VisionStartFlow() {
       });
 
       if (!uploadRes.ok) throw new Error('Failed to upload image');
-      await uploadRes.json() as { url: string };
+      const { url: referenceImageUrl } = await uploadRes.json() as { url: string };
+
+      let analysis: VisionAnalysis = FALLBACK_VISION_ANALYSIS;
+      try {
+        const analysisRes = await fetch('/api/vision/analyze-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: referenceImageUrl,
+            category,
+            zip_code: zipCode.trim(),
+            notes: notesWithScope,
+          }),
+        });
+
+        if (analysisRes.ok) {
+          const data = await analysisRes.json() as { analysis?: VisionAnalysis };
+          analysis = data.analysis || FALLBACK_VISION_ANALYSIS;
+        }
+      } catch (analysisError) {
+        console.error('photo analysis failed:', analysisError);
+      }
 
       setProgressStep(1);
       const estimateRes = await fetch('/api/vision/estimate', {
@@ -352,6 +374,7 @@ export default function VisionStartFlow() {
           zip_code: zipCode.trim(),
           notes: notesWithScope,
           scope_answers: scopeAnswers,
+          analysis,
         }),
       });
 
@@ -370,6 +393,7 @@ export default function VisionStartFlow() {
           style,
           quality_tier: qualityTier,
           estimate_mid: estimate?.mid_estimate || 15000,
+          analysis,
         }),
       });
 
@@ -387,12 +411,30 @@ export default function VisionStartFlow() {
           notes: notesWithScope,
           estimate_low: estimate?.low_estimate || 10000,
           estimate_high: estimate?.high_estimate || 20000,
+          analysis,
         }),
       });
 
       if (!briefRes.ok) throw new Error('Failed to generate project brief');
 
       setProgressStep(4);
+      await fetch('/api/vision/generate-concepts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: projectId,
+          category,
+          style,
+          quality_tier: qualityTier,
+          notes: notesWithScope,
+          reference_image_url: referenceImageUrl,
+          analysis,
+          count: 1,
+        }),
+      }).catch((conceptError) => {
+        console.error('concept generation failed:', conceptError);
+      });
+
       setProgressStep(5);
       await new Promise(r => setTimeout(r, 800));
       router.push(`/vision/results/${projectId}`);

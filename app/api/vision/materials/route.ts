@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import Anthropic from '@anthropic-ai/sdk';
+import { type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
   project_id: z.string().uuid(),
@@ -10,9 +11,15 @@ const schema = z.object({
   quality_tier: z.enum(['budget', 'mid', 'premium']),
   estimate_mid: z.number(),
   generated_image_url: z.string().optional(),
+  analysis: z.unknown().optional(),
 });
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
+
+function getAnalysis(input: unknown): VisionAnalysis | undefined {
+  if (!input || typeof input !== 'object') return undefined;
+  return input as VisionAnalysis;
+}
 
 function fallbackMaterials(category: string, style: string, qualityTier: string, estimateMid: number) {
   const common = {
@@ -67,6 +74,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const params = schema.parse(body);
+    const analysis = getAnalysis(params.analysis);
 
     let visualDescription = '';
     if (params.generated_image_url && !params.generated_image_url.startsWith('data:')) {
@@ -93,8 +101,14 @@ export async function POST(req: NextRequest) {
     try {
       const prompt = `Generate a detailed, accurate materials list for a ${params.quality_tier}-tier ${params.category} renovation in ${params.style} style with an estimated budget of $${params.estimate_mid.toLocaleString()}.
 
+${analysis ? `Uploaded photo analysis context:
+- Visible features: ${analysis.visible_features.join(', ') || 'none noted'}
+- Materials signals: ${analysis.materials_signals.join(', ') || 'none noted'}
+- Estimation notes: ${analysis.estimation_notes.join(', ') || 'none noted'}
+- Scope signals: ${JSON.stringify(analysis.scope_signals)}` : ''}
+
 ${visualDescription ? `The design concept shows: ${visualDescription}
-The materials list should roughly match what is visible.` : ''}
+The materials list should roughly match what is visible.` : analysis ? 'No generated concept image is available yet, so use the uploaded photo analysis as the main visual context.' : ''}
 
 Output ONLY valid JSON:
 {

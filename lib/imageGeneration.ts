@@ -13,6 +13,7 @@
  */
 
 import OpenAI, { toFile } from 'openai';
+import { type VisionAnalysis } from '@/lib/visionAnalysis';
 
 function getClient() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
@@ -29,8 +30,6 @@ const STYLE_DESCRIPTORS: Record<string, string> = {
   budget_refresh: 'budget-friendly refresh with painted cabinets, laminate countertops, updated hardware, and fresh paint',
 };
 
-// Highly specific edit instructions per category
-// These are crafted to produce accurate, contractor-realistic results
 const EDIT_INSTRUCTIONS: Record<string, string> = {
   kitchen: `You are a professional kitchen designer creating a photorealistic renovation rendering.
 CHANGE: Replace the cabinets, countertops, backsplash, and hardware with {style}.
@@ -73,7 +72,6 @@ DO NOT CHANGE: The house structure, driveway, hardscape elements, fence lines, m
 The result must look like a real landscaping contractor's "after" photo.`,
 };
 
-// Text-to-image prompts when no reference photo is available
 const TEXT_PROMPTS: Record<string, string> = {
   kitchen: 'Professional real estate photograph of a beautifully renovated {style} kitchen. High-end photography, photorealistic, no watermarks.',
   bathroom: 'Professional real estate photograph of a beautifully renovated {style} bathroom. High-end photography, photorealistic, no watermarks.',
@@ -85,18 +83,51 @@ const TEXT_PROMPTS: Record<string, string> = {
   landscaping: 'Professional real estate photograph of a home with beautifully {style} professional landscaping and manicured lawn. Photorealistic, no watermarks.',
 };
 
-function buildInstruction(category: string, style: string, notes?: string): string {
+function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis): string {
+  if (!analysis) return '';
+
+  const facts: string[] = [];
+
+  if (category === 'exterior_paint') {
+    if (analysis.scope_signals.stories) facts.push(`This is a ${analysis.scope_signals.stories}-story house.`);
+    if ((analysis.scope_signals.window_count_visible ?? 0) >= 6) facts.push('There are many front-facing windows. Preserve the house structure and visible windows exactly.');
+    if (analysis.scope_signals.paint_complexity) facts.push(`The exterior has ${analysis.scope_signals.paint_complexity} paint complexity.`);
+  } else if (category === 'roofing') {
+    if (analysis.scope_signals.stories) facts.push(`This appears to be a ${analysis.scope_signals.stories}-story house.`);
+    if (analysis.scope_signals.roof_complexity) facts.push(`The roof appears ${analysis.scope_signals.roof_complexity} complexity.`);
+    facts.push('Keep the roofline and any dormers structurally consistent.');
+  } else if (category === 'interior_paint') {
+    if (analysis.scope_signals.room_size) facts.push(`This appears to be a ${analysis.scope_signals.room_size} room.`);
+    if ((analysis.scope_signals.window_count_visible ?? 0) >= 4) facts.push('There are many windows. Only change wall and trim colors; preserve furniture and windows.');
+    if (analysis.scope_signals.ceiling_height) facts.push(`Ceiling height appears ${analysis.scope_signals.ceiling_height}.`);
+  } else if (category === 'deck_patio') {
+    if (analysis.scope_signals.yard_size) facts.push(`The yard appears ${analysis.scope_signals.yard_size}.`);
+    if (analysis.scope_signals.access_difficulty) facts.push(`Access appears ${analysis.scope_signals.access_difficulty}. Keep the house structure and fence lines unchanged.`);
+  }
+
+  if (!facts.length) {
+    if (analysis.property_type !== 'unknown') facts.push(`Existing property type appears to be ${analysis.property_type.replace(/_/g, ' ')}.`);
+    if (analysis.visible_features.length) facts.push(`Preserve visible elements like ${analysis.visible_features.slice(0, 3).join(', ')}.`);
+  }
+
+  return facts.slice(0, 4).join(' ');
+}
+
+function buildInstruction(category: string, style: string, notes?: string, analysis?: VisionAnalysis): string {
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
   const template = EDIT_INSTRUCTIONS[category] || 'Renovate this property with {style} finishes. Keep structural elements intact.';
   const instruction = template.replace('{style}', styleDesc);
-  return notes ? `${instruction} Additional requirements: ${notes}.` : instruction;
+  const analysisContext = buildAnalysisPromptContext(category, analysis);
+  const extra = [analysisContext, notes ? `Additional requirements: ${notes}.` : ''].filter(Boolean).join(' ');
+  return extra ? `${instruction} ${extra}` : instruction;
 }
 
-function buildTextPrompt(category: string, style: string, notes?: string): string {
+function buildTextPrompt(category: string, style: string, notes?: string, analysis?: VisionAnalysis): string {
   const styleDesc = STYLE_DESCRIPTORS[style] || style;
   const template = TEXT_PROMPTS[category] || 'Professional photograph of a {style} home renovation.';
   const prompt = template.replace('{style}', styleDesc);
-  return notes ? `${prompt} ${notes}.` : prompt;
+  const analysisContext = buildAnalysisPromptContext(category, analysis);
+  return [prompt, analysisContext, notes ? `${notes}.` : ''].filter(Boolean).join(' ');
 }
 
 async function fetchImageAsBuffer(url: string): Promise<Buffer> {
@@ -111,14 +142,14 @@ async function generateWithEdit(
   referenceImageUrl: string,
   category: string,
   style: string,
-  notes?: string
+  notes?: string,
+  analysis?: VisionAnalysis
 ): Promise<string | null> {
   try {
-    const instruction = buildInstruction(category, style, notes);
+    const instruction = buildInstruction(category, style, notes, analysis);
     console.log(`[OpenAI edit] category=${category} style=${style}`);
     console.log(`[OpenAI edit] instruction=${instruction.substring(0, 100)}...`);
 
-    // Fetch the reference image
     const imageBuffer = await fetchImageAsBuffer(referenceImageUrl);
     const imageFile = await toFile(imageBuffer, 'reference.jpg', { type: 'image/jpeg' });
 
@@ -134,7 +165,6 @@ async function generateWithEdit(
     const imageData = response.data?.[0];
     if (!imageData) return null;
 
-    // gpt-image-1 returns base64 by default
     if (imageData.b64_json) {
       return `data:image/png;base64,${imageData.b64_json}`;
     }
@@ -152,11 +182,12 @@ async function generateTextToImage(
   client: OpenAI,
   category: string,
   style: string,
-  notes?: string
+  notes?: string,
+  analysis?: VisionAnalysis
 ): Promise<string | null> {
   try {
-    const prompt = buildTextPrompt(category, style, notes);
-    console.log(`[OpenAI generate] prompt=${prompt.substring(0, 100)}...`);
+    const prompt = buildTextPrompt(category, style, notes, analysis);
+    console.log(`[OpenAI generate] interior=${INTERIOR_CATEGORIES.has(category)} prompt=${prompt.substring(0, 100)}...`);
 
     const response = await client.images.generate({
       model: 'gpt-image-1',
@@ -178,7 +209,6 @@ async function generateTextToImage(
 }
 
 async function saveBase64ToSupabase(base64: string, projectId: string): Promise<string> {
-  // Upload base64 image to Supabase Storage so it has a permanent URL
   const { supabaseAdmin } = await import('./supabase/admin');
   const { v4: uuidv4 } = await import('uuid');
 
@@ -201,6 +231,7 @@ export async function generateConceptImages(params: {
   qualityTier: string;
   notes?: string;
   referenceImageUrl?: string;
+  analysis?: VisionAnalysis;
   projectId: string;
   count?: number;
 }): Promise<string[]> {
@@ -209,9 +240,8 @@ export async function generateConceptImages(params: {
   const results: string[] = [];
 
   if (params.referenceImageUrl) {
-    // Generate variations with useful framing differences
     const variations = [
-      undefined,  // clean instruction, no additions
+      undefined,
       'Focus on showing the finished result clearly with good lighting that shows material quality and craftsmanship.',
       'Show the result with a slightly wider view to show how the renovation fits within the overall space.',
     ].slice(0, count);
@@ -222,23 +252,22 @@ export async function generateConceptImages(params: {
         params.referenceImageUrl,
         params.category,
         params.style,
-        variation
+        variation,
+        params.analysis
       );
       if (result) {
-        // Save base64 to Supabase for permanent storage
         try {
           const url = result.startsWith('data:')
             ? await saveBase64ToSupabase(result, params.projectId)
             : result;
           results.push(url);
         } catch {
-          results.push(result); // fallback: keep as base64 if storage fails
+          results.push(result);
         }
       }
     }
   } else {
-    // No reference photo — generate 1 high-quality generic concept
-    const result = await generateTextToImage(client, params.category, params.style, params.notes);
+    const result = await generateTextToImage(client, params.category, params.style, params.notes, params.analysis);
     if (result) {
       try {
         const url = result.startsWith('data:')

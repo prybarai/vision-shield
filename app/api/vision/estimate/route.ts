@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { parseClaudeJSON } from '@/lib/anthropic';
 import { buildEstimationPrompt } from '@/lib/prompts';
+import { buildAnalysisSummary, describeAnalysisFacts, FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
   project_id: z.string().uuid(),
@@ -13,6 +14,7 @@ const schema = z.object({
   zip_code: z.string(),
   notes: z.string().optional(),
   scope_answers: z.record(z.string(), z.string()).optional(),
+  analysis: z.unknown().optional(),
 });
 
 interface EstimateResult {
@@ -26,7 +28,6 @@ interface EstimateResult {
 }
 
 type ScopeAnswers = Record<string, string>;
-
 type QualityTier = 'budget' | 'mid' | 'premium';
 
 function roundToHundred(value: number) {
@@ -76,11 +77,34 @@ function getQualityMultiplier(qualityTier: string) {
   return multipliers[qualityTier] ?? 1.0;
 }
 
-function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string): EstimateResult | null {
-  const roomSize = scopeAnswers.room_size;
+function getAnalysis(input: unknown): VisionAnalysis | undefined {
+  if (!input || typeof input !== 'object') return undefined;
+
+  const partial = input as Partial<VisionAnalysis>;
+  return {
+    ...FALLBACK_VISION_ANALYSIS,
+    ...partial,
+    visible_features: Array.isArray(partial.visible_features) ? partial.visible_features : [],
+    estimation_notes: Array.isArray(partial.estimation_notes) ? partial.estimation_notes : [],
+    materials_signals: Array.isArray(partial.materials_signals) ? partial.materials_signals : [],
+    scope_signals: {
+      ...FALLBACK_VISION_ANALYSIS.scope_signals,
+      ...(partial.scope_signals || {}),
+    },
+  };
+}
+
+function withAnalysisBasis(defaultBasis: string, analysis?: VisionAnalysis, maxFacts = 3) {
+  const facts = describeAnalysisFacts(analysis).slice(0, maxFacts);
+  if (facts.length === 0) return defaultBasis;
+  return `Scope-based planning estimate using uploaded photo analysis (${facts.join(', ')}), project category assumptions, and ZIP-based labor adjustment.`;
+}
+
+function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
+  const roomSize = scopeAnswers.room_size || analysis?.scope_signals.room_size || undefined;
   const paintScope = scopeAnswers.paint_scope;
   const prepLevel = scopeAnswers.prep_level;
-  const windowCoverage = scopeAnswers.window_coverage;
+  const windowCoverage = scopeAnswers.window_coverage || ((analysis?.scope_signals.window_count_visible ?? 0) >= 4 ? 'many_windows' : undefined);
 
   if (!roomSize || !paintScope || !prepLevel || !windowCoverage) return null;
 
@@ -97,7 +121,8 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
   const floorArea = floorAreaBySize[roomSize];
   const wallArea = wallAreaBySize[roomSize];
   const scopeMultiplier = scopeMultiplierByScope[paintScope];
-  const prepMultiplier = prepMultiplierByLevel[prepLevel];
+  const tallCeilingMultiplier = analysis?.scope_signals.ceiling_height === 'tall' ? 1.12 : 1;
+  const prepMultiplier = prepMultiplierByLevel[prepLevel] * tallCeilingMultiplier;
   const baseRate = rateByQuality[qualityTier];
 
   if (!floorArea || !wallArea || !scopeMultiplier || !prepMultiplier || !baseRate) return null;
@@ -115,13 +140,14 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
       `${roomSize.replace(/_/g, ' ')} room using ~${floorArea} floor sq ft and ~${wallArea} wall sq ft assumptions`,
       windowCoverage === 'many_windows' ? 'Paintable wall area reduced by 20% for high window coverage' : 'Normal window coverage assumed',
       `${paintScope.replace(/_/g, ' ')} scope with ${prepLevel} prep`,
+      analysis?.scope_signals.ceiling_height === 'tall' ? 'Tall ceiling signal added a 12% prep/area multiplier' : 'Standard ceiling-height assumption used',
       `${qualityTier} paint/labor rate of about $${baseRate.toFixed(2)}/paintable sq ft before adjustments`,
     ],
     risk_notes: [
       'Wall repairs, stain blocking, lead-safe work, or furniture moving can raise final painter pricing',
       'Ceiling height, trim detail, and exact measured wall area may shift the contractor bid',
     ],
-    estimate_basis: 'Scope-based planning estimate using room-size wall area assumptions, selected paint scope, prep level, and ZIP multiplier.',
+    estimate_basis: withAnalysisBasis('Scope-based planning estimate using room-size wall area assumptions, selected paint scope, prep level, and ZIP multiplier.', analysis),
     regional_notes: getRegionalNotes(zip, zipMultiplier),
   };
 }
@@ -264,7 +290,7 @@ function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: stri
   };
 }
 
-function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string): EstimateResult | null {
+function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
   const roofSize = scopeAnswers.roof_size;
   const materialType = scopeAnswers.material_type;
   const tearOff = scopeAnswers.tear_off;
@@ -285,7 +311,11 @@ function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
 
   const tearOffRate = tearOff === 'yes' ? 1.25 : 0;
   const zipMultiplier = getZipMultiplier(zip);
-  const mid = (area * (rate + tearOffRate)) * zipMultiplier;
+  let multiplier = 1;
+  if (analysis?.scope_signals.stories === 2) multiplier *= 1.15;
+  if (analysis?.scope_signals.roof_complexity === 'high') multiplier *= 1.18;
+  if (analysis?.scope_signals.access_difficulty === 'difficult') multiplier *= 1.12;
+  const mid = (area * (rate + tearOffRate)) * zipMultiplier * multiplier;
   const range = buildRange(mid, 0.14);
 
   return {
@@ -294,12 +324,51 @@ function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
       `${roofSize} roof using ~${area} roofing sq ft`,
       `${materialType.replace(/_/g, ' ')} installed at about $${rate.toFixed(2)}/sq ft for ${qualityTier} tier`,
       tearOff === 'yes' ? 'Included tear-off at about $1.25/sq ft' : 'Overlay/no tear-off assumed',
+      analysis?.scope_signals.stories === 2 ? 'Two-story access multiplier applied (+15%)' : 'No two-story access multiplier applied',
+      analysis?.scope_signals.roof_complexity === 'high' ? 'High roof complexity multiplier applied (+18%)' : 'No high-complexity roof multiplier applied',
+      analysis?.scope_signals.access_difficulty === 'difficult' ? 'Difficult access multiplier applied (+12%)' : 'No difficult-access multiplier applied',
     ],
     risk_notes: [
       'Roof pitch, decking replacement, flashing detail, and ventilation upgrades can increase cost',
       'Insurance scope, permit requirements, and steep-access labor can shift final pricing',
     ],
-    estimate_basis: 'Scope-based planning estimate using assumed roof area, selected material, tear-off scope, and ZIP multiplier.',
+    estimate_basis: withAnalysisBasis('Scope-based planning estimate using assumed roof area, selected material, tear-off scope, and ZIP multiplier.', analysis),
+    regional_notes: getRegionalNotes(zip, zipMultiplier),
+  };
+}
+
+function estimateExteriorPaint(_scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
+  if (!analysis) return null;
+
+  const baseMidBySize: Record<string, number> = { small: 4500, medium: 8500, large: 14000 };
+  const qualityMultiplier: Record<QualityTier, number> = { budget: 0.85, mid: 1.0, premium: 1.3 };
+  const zipMultiplier = getZipMultiplier(zip);
+
+  let mid = baseMidBySize[analysis.estimated_size_bucket];
+  if (!mid) return null;
+
+  if (analysis.scope_signals.stories === 2) mid *= 1.18;
+  if (analysis.scope_signals.stories === 3) mid *= 1.35;
+  if (analysis.scope_signals.paint_complexity === 'high') mid *= 1.15;
+  if ((analysis.scope_signals.window_count_visible ?? 0) >= 10) mid *= 1.1;
+  mid *= qualityMultiplier[(qualityTier as QualityTier)] ?? 1.0;
+  mid *= zipMultiplier;
+
+  const range = buildRange(mid, 0.16);
+  return {
+    ...range,
+    assumptions: [
+      `${analysis.estimated_size_bucket} property-size bucket from uploaded photo analysis`,
+      analysis.scope_signals.stories ? `${analysis.scope_signals.stories}-story structure assumption applied` : 'Story count not confidently visible',
+      analysis.scope_signals.paint_complexity ? `${analysis.scope_signals.paint_complexity} paint complexity signal applied` : 'Standard paint complexity assumed',
+      (analysis.scope_signals.window_count_visible ?? 0) >= 10 ? 'High visible window count multiplier applied (+10%)' : 'No high window-count multiplier applied',
+      `${qualityTier} quality multiplier and ZIP labor/material multiplier applied`,
+    ],
+    risk_notes: [
+      'Hidden siding repairs, peeling remediation, and lead-safe prep can materially increase exterior paint cost',
+      'Exact elevation count, trim detail, shutters, and access equipment needs should be confirmed onsite',
+    ],
+    estimate_basis: withAnalysisBasis('Scope-based planning estimate using exterior size assumptions, finish tier, and ZIP multiplier.', analysis, 4),
     regional_notes: getRegionalNotes(zip, zipMultiplier),
   };
 }
@@ -342,28 +411,33 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
   };
 }
 
-function estimateDeterministically(category: string, scopeAnswers: ScopeAnswers | undefined, qualityTier: string, zip: string): EstimateResult | null {
-  if (!scopeAnswers || Object.keys(scopeAnswers).length === 0) return null;
+function estimateDeterministically(category: string, scopeAnswers: ScopeAnswers | undefined, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
+  if (category === 'exterior_paint' && analysis) {
+    return estimateExteriorPaint(scopeAnswers || {}, qualityTier, zip, analysis);
+  }
 
-  const estimators: Record<string, (answers: ScopeAnswers, tier: string, zipCode: string) => EstimateResult | null> = {
+  if ((!scopeAnswers || Object.keys(scopeAnswers).length === 0) && !analysis) return null;
+
+  const estimators: Record<string, (answers: ScopeAnswers, tier: string, zipCode: string, analysis?: VisionAnalysis) => EstimateResult | null> = {
     interior_paint: estimateInteriorPaint,
-    flooring: estimateFlooring,
-    bathroom: estimateBathroom,
-    kitchen: estimateKitchen,
-    deck_patio: estimateDeck,
+    flooring: (answers, tier, zipCode) => estimateFlooring(answers, tier, zipCode),
+    bathroom: (answers, tier, zipCode) => estimateBathroom(answers, tier, zipCode),
+    kitchen: (answers, tier, zipCode) => estimateKitchen(answers, tier, zipCode),
+    deck_patio: (answers, tier, zipCode) => estimateDeck(answers, tier, zipCode),
     roofing: estimateRoofing,
   };
 
   const estimator = estimators[category];
-  return estimator ? estimator(scopeAnswers, qualityTier, zip) : null;
+  return estimator ? estimator(scopeAnswers || {}, qualityTier, zip, analysis) : null;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const params = schema.parse(body);
+    const analysis = getAnalysis(params.analysis);
 
-    let result = estimateDeterministically(params.category, params.scope_answers, params.quality_tier, params.zip_code);
+    let result = estimateDeterministically(params.category, params.scope_answers, params.quality_tier, params.zip_code, analysis);
 
     if (!result) {
       try {
@@ -382,6 +456,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (analysis) {
+      result.estimate_basis = withAnalysisBasis(result.estimate_basis, analysis, 4);
+    }
+
     const { data, error } = await supabaseAdmin
       .from('estimates')
       .insert({
@@ -398,7 +476,12 @@ export async function POST(req: NextRequest) {
 
     if (error) throw error;
 
-    await supabaseAdmin.from('projects').update({ status: 'estimated' }).eq('id', params.project_id);
+    const analysisSummary = buildAnalysisSummary(analysis);
+    const nextNotes = analysisSummary
+      ? `${params.notes?.trim() ? `${params.notes.trim()}\n\n` : ''}${analysisSummary}`
+      : params.notes;
+
+    await supabaseAdmin.from('projects').update({ status: 'estimated', notes: nextNotes }).eq('id', params.project_id);
 
     return NextResponse.json({ estimate: { ...data, regional_notes: result.regional_notes } });
   } catch (error) {

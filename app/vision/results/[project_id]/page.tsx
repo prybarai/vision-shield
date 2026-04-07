@@ -44,6 +44,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
 
   const categoryLabel = project.project_category.replace(/_/g, ' ');
   const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${project.share_token}`;
+  const analysisSummary = project.notes?.split('AI analysis:')[1]?.trim();
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -61,6 +62,15 @@ export default async function VisionResultsPage({ params }: PageProps) {
       </div>
 
       {/* Cost Estimate */}
+      {analysisSummary && (
+        <section className="mb-6">
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
+            <h2 className="text-sm font-semibold text-blue-900 mb-1">What Prybar saw in your photo</h2>
+            <p className="text-sm text-blue-800">{analysisSummary}</p>
+          </div>
+        </section>
+      )}
+
       {estimate && (
         <section className="mb-10">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Cost Estimate</h2>

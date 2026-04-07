@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { parseClaudeJSON } from '@/lib/anthropic';
 import { buildBriefPrompt } from '@/lib/prompts';
+import { describeAnalysisFacts, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
   project_id: z.string().uuid(),
@@ -12,6 +13,7 @@ const schema = z.object({
   notes: z.string().optional(),
   estimate_low: z.number(),
   estimate_high: z.number(),
+  analysis: z.unknown().optional(),
 });
 
 interface BriefResult {
@@ -21,12 +23,19 @@ interface BriefResult {
   site_verification_questions: string[];
 }
 
-function fallbackBrief(params: z.infer<typeof schema>): BriefResult {
+function getAnalysis(input: unknown): VisionAnalysis | undefined {
+  if (!input || typeof input !== 'object') return undefined;
+  return input as VisionAnalysis;
+}
+
+function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis): BriefResult {
   const category = params.category.replace(/_/g, ' ');
+  const facts = describeAnalysisFacts(analysis).slice(0, 3).join(', ');
+
   return {
-    summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.`,
+    summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
     homeowner_goals: params.notes || `Wants a clean, practical ${category} upgrade that feels cohesive and ready for contractor pricing.`,
-    contractor_notes: `Confirm measurements, existing conditions, code requirements, lead times, demolition scope, and finish selections before final quote.`,
+    contractor_notes: `Confirm measurements, existing conditions, code requirements, lead times, demolition scope, and finish selections before final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
     site_verification_questions: [
       'What existing conditions or hidden issues could affect the final scope?',
       'What measurements need to be confirmed onsite before pricing?',
@@ -42,17 +51,18 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const params = schema.parse(body);
+    const analysis = getAnalysis(params.analysis);
 
     let result: BriefResult;
     try {
-      const prompt = buildBriefPrompt({
+      const prompt = `${buildBriefPrompt({
         category: params.category,
         style: params.style,
         qualityTier: params.quality_tier,
         notes: params.notes,
         estimateLow: params.estimate_low,
         estimateHigh: params.estimate_high,
-      });
+      })}${analysis ? `\n- Uploaded photo analysis facts: ${describeAnalysisFacts(analysis).join(', ')}\n- Visible features: ${analysis.visible_features.join(', ')}\n- Estimation notes: ${analysis.estimation_notes.join(', ')}` : ''}`;
 
       result = await parseClaudeJSON<BriefResult>(
         'You are a construction project manager creating contractor-ready briefs. Output ONLY valid JSON.',
@@ -60,7 +70,7 @@ export async function POST(req: NextRequest) {
       );
     } catch (aiError) {
       console.error('brief ai fallback:', aiError);
-      result = fallbackBrief(params);
+      result = fallbackBrief(params, analysis);
     }
 
     const { data, error } = await supabaseAdmin
