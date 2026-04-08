@@ -81,6 +81,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
   const requestedDirection = project.generated_image_urls?.length > 0 ? buildRequestedDesignDirection(project.notes) : null;
   const likelyTrades = Array.isArray(brief?.likely_trades) ? brief.likely_trades : [];
   const unknownsToVerify = Array.isArray(brief?.unknowns_to_verify) ? brief.unknowns_to_verify : [];
+  const suggestedSiteMeasurements = Array.isArray(brief?.suggested_site_measurements) ? brief.suggested_site_measurements : [];
   const sizeDrivenAssumptions = Array.isArray(estimate?.assumptions)
     ? estimate.assumptions.filter((item: string) => /photo|visible|wall area|floor area|roof area|yard area|width|depth|confidence|story|window/i.test(item))
     : [];
@@ -116,11 +117,21 @@ export default async function VisionResultsPage({ params }: PageProps) {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             {project.project_category === 'custom_project' && (
               <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                This is a planning-grade estimate for a custom scope. A contractor site visit will narrow pricing.
+                Planning-grade range for a custom scope. A field visit should tighten final quantities, trade splits, and pricing.
               </div>
             )}
-            <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-              Prybar used uploaded photo analysis to estimate visible size and complexity.
+            <div className="mb-4 grid grid-cols-1 lg:grid-cols-[1.35fr_1fr] gap-3">
+              <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                Prybar used uploaded photo analysis to estimate visible size and complexity.
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <h4 className="text-sm font-semibold text-slate-800 mb-2">What Prybar used</h4>
+                <ul className="space-y-1.5 text-sm text-slate-600">
+                  <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">•</span>Uploaded photo analysis and visible scope cues</li>
+                  <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">•</span>Project answers for category, style, and quality tier</li>
+                  <li className="flex items-start gap-2"><span className="text-blue-500 mt-0.5">•</span>ZIP-based regional pricing multiplier{estimate?.region_multiplier ? ` (${estimate.region_multiplier.toFixed(2)}x)` : ''}</li>
+                </ul>
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-slate-50 rounded-xl">
@@ -141,11 +152,11 @@ export default async function VisionResultsPage({ params }: PageProps) {
             </div>
 
             {(estimate.assumptions?.length > 0 || estimate.estimate_basis || estimate.estimate_breakdown) && (
-              <div className="mb-4 space-y-3">
+              <div className="mb-4 space-y-4">
                 {estimate.estimate_basis && (
-                  <div>
-                    <h4 className="text-sm font-semibold text-slate-700 mb-1">Estimate basis</h4>
-                    <p className="text-sm text-slate-500">{estimate.estimate_basis}</p>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <h4 className="text-sm font-semibold text-slate-800 mb-1">Estimate basis</h4>
+                    <p className="text-sm text-slate-600">{estimate.estimate_basis}</p>
                   </div>
                 )}
                 {estimate.estimate_breakdown && (
@@ -154,15 +165,17 @@ export default async function VisionResultsPage({ params }: PageProps) {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                         <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Labor</div>
-                        <div className="text-sm font-medium text-slate-800">
+                        <div className="text-sm font-medium text-slate-800 mb-1">
                           {formatCurrencyRange(estimate.estimate_breakdown.labor_low, estimate.estimate_breakdown.labor_high)}
                         </div>
+                        <div className="text-xs text-slate-500">Mid: {formatCurrency(estimate.estimate_breakdown.labor_mid)}</div>
                       </div>
                       <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
                         <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Materials</div>
-                        <div className="text-sm font-medium text-slate-800">
+                        <div className="text-sm font-medium text-slate-800 mb-1">
                           {formatCurrencyRange(estimate.estimate_breakdown.materials_low, estimate.estimate_breakdown.materials_high)}
                         </div>
+                        <div className="text-xs text-slate-500">Mid: {formatCurrency(estimate.estimate_breakdown.materials_mid)}</div>
                       </div>
                     </div>
                   </div>
@@ -226,7 +239,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
             {project.project_category === 'custom_project' && (
               <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                This is a planning-grade estimate for a custom scope. A contractor site visit will narrow pricing.
+                Planning-grade brief for a custom scope. Use it to guide the walk-through, then tighten scope, trade splits, and measurements onsite.
               </div>
             )}
             <div>
@@ -251,16 +264,32 @@ export default async function VisionResultsPage({ params }: PageProps) {
                 </div>
               </div>
             )}
-            {unknownsToVerify.length > 0 && (
-              <div>
-                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Unknowns to Verify Onsite</h4>
-                <ul className="space-y-2">
-                  {unknownsToVerify.map((item: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                      <span className="text-amber-500 font-bold flex-shrink-0">•</span>{item}
-                    </li>
-                  ))}
-                </ul>
+            {(unknownsToVerify.length > 0 || suggestedSiteMeasurements.length > 0) && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {unknownsToVerify.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Unknowns to Verify Onsite</h4>
+                    <ul className="space-y-2">
+                      {unknownsToVerify.map((item: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <span className="text-amber-500 font-bold flex-shrink-0">•</span>{item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {suggestedSiteMeasurements.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Suggested Site Measurements</h4>
+                    <ul className="space-y-2">
+                      {suggestedSiteMeasurements.map((item: string, i: number) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <span className="text-emerald-500 font-bold flex-shrink-0">•</span>{item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
             {brief.site_verification_questions?.length > 0 && (

@@ -74,6 +74,7 @@ export interface ProjectBrief {
   site_verification_questions: string[];
   likely_trades?: string[];
   unknowns_to_verify?: string[];
+  suggested_site_measurements?: string[];
   created_at: string;
 }
 

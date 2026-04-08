@@ -118,7 +118,7 @@ export default function ShieldRescuePage() {
 
         {result.documentation_checklist?.length > 0 && (
           <Card className="mb-6">
-            <h3 className="font-bold text-slate-900 mb-3">📋 Documentation checklist</h3>
+            <h3 className="font-bold text-slate-900 mb-3">Documentation checklist</h3>
             <ul className="space-y-2">
               {result.documentation_checklist.map((item, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
@@ -158,8 +158,8 @@ export default function ShieldRescuePage() {
         </Card>
 
         <Card className="mb-4 bg-slate-900 text-white">
-          <h3 className="font-bold text-lg mb-2">Need a cleaner path after this?</h3>
-          <p className="text-sm text-slate-300 mb-4">If you want to move forward with a new contractor instead, keep your documentation and start fresh with a vetted connection.</p>
+          <h3 className="font-bold text-lg mb-2">After you send this</h3>
+          <p className="text-sm text-slate-300 mb-4">If you decide to move forward with someone new, keep your documentation and start fresh with a vetted contractor connection.</p>
           <a href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
             Find vetted contractors
           </a>
@@ -173,7 +173,7 @@ export default function ShieldRescuePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">🆘 Get help</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Get help</h1>
         <p className="text-slate-500">Describe what happened and generate a calmer, more organized contractor dispute package. This is best for documenting the issue and preparing next steps, not replacing a lawyer.</p>
       </div>
 

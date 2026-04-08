@@ -82,7 +82,10 @@ export default function ShieldScanPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold text-slate-900">📄 Quote analysis</h1>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Shield quote review</p>
+            <h1 className="text-2xl font-bold text-slate-900">Quote analysis</h1>
+          </div>
           <button onClick={reset} className="text-sm text-slate-500 hover:text-slate-700">Scan another</button>
         </div>
 
@@ -104,13 +107,13 @@ export default function ShieldScanPage() {
         </Card>
 
         <Card>
-          <h3 className="font-bold text-slate-900 mb-2">💳 Payment structure analysis</h3>
+          <h3 className="font-bold text-slate-900 mb-2">Payment structure analysis</h3>
           <p className="text-slate-700 text-sm leading-relaxed">{result.payment_structure_analysis}</p>
         </Card>
 
         {result.red_flags?.length > 0 && (
           <Card>
-            <h3 className="font-bold text-slate-900 mb-3">🚩 Red flags</h3>
+            <h3 className="font-bold text-slate-900 mb-3">Red flags</h3>
             <div className="space-y-3">
               {result.red_flags.map((flag, i) => (
                 <div key={i} className={cn('flex items-start gap-3 p-3 rounded-xl', flag.severity === 'high' ? 'bg-red-50' : flag.severity === 'medium' ? 'bg-amber-50' : 'bg-slate-50')}>
@@ -127,7 +130,7 @@ export default function ShieldScanPage() {
 
         {result.missing_terms?.length > 0 && (
           <Card>
-            <h3 className="font-bold text-slate-900 mb-3">📋 Missing terms</h3>
+            <h3 className="font-bold text-slate-900 mb-3">Missing terms</h3>
             <div className="space-y-2">
               {result.missing_terms.map((term, i) => (
                 <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl">
@@ -144,7 +147,7 @@ export default function ShieldScanPage() {
 
         {result.questions_to_ask?.length > 0 && (
           <Card>
-            <h3 className="font-bold text-slate-900 mb-3">❓ Questions to ask</h3>
+            <h3 className="font-bold text-slate-900 mb-3">Questions to ask</h3>
             <ul className="space-y-2">
               {result.questions_to_ask.map((q, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
@@ -156,14 +159,14 @@ export default function ShieldScanPage() {
         )}
 
         <Card className="bg-slate-900 text-white">
-          <h3 className="font-bold text-lg mb-2">Want a cleaner second opinion?</h3>
-          <p className="text-sm text-slate-300 mb-4">If this quote feels shaky, compare it against a vetted contractor path instead of guessing.</p>
+          <h3 className="font-bold text-lg mb-2">Recommended next step</h3>
+          <p className="text-sm text-slate-300 mb-4">If this quote still feels off, compare it against a vetted contractor path instead of guessing.</p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
-              Find vetted contractor
-            </Link>
-            <Link href="/shield" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+            <Link href="/shield" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
               Run contractor check
+            </Link>
+            <Link href="/connect" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Find vetted contractor
             </Link>
           </div>
         </Card>
@@ -176,7 +179,7 @@ export default function ShieldScanPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">📄 Scan a quote or contract</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Scan a quote or contract</h1>
         <p className="text-slate-500">Paste the quote or contract text for the most reliable result. File upload is best-effort for plain text only, and pasted text usually gives a sharper review.</p>
       </div>
 

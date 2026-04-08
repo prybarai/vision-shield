@@ -277,7 +277,7 @@ export default function ContractorCheckFlow() {
         {renderLicenseCard(licensePreview)}
 
         <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-          Next, answer a few trust and payment questions. This helps turn the license result into a more useful risk read, especially when verification is incomplete.
+          Next, answer a few trust and payment questions. This helps turn the license result into a calmer, more practical risk read, especially when verification is incomplete.
         </div>
 
         <Card className="mb-4">
@@ -331,7 +331,10 @@ export default function ContractorCheckFlow() {
       <div className="space-y-6">
         <Card className={cn('border', getRiskBgColor(riskLevel))}>
           <div className="flex items-center justify-between mb-4 gap-3">
-            <h3 className="font-bold text-slate-900 text-lg">Risk assessment</h3>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Contractor check result</p>
+              <h3 className="font-bold text-slate-900 text-lg">Risk assessment</h3>
+            </div>
             <Badge variant={riskLevel === 'low' ? 'green' : riskLevel === 'medium' ? 'amber' : 'red'}>
               {getRiskLabel(riskLevel)}
             </Badge>
@@ -402,22 +405,24 @@ export default function ContractorCheckFlow() {
         )}
 
         <Card className="bg-slate-900 text-white">
-          <h3 className="font-bold text-lg mb-2">Want a safer next step?</h3>
+          <h3 className="font-bold text-lg mb-2">Recommended next move</h3>
           <p className="text-sm text-slate-300 mb-4">
-            If this result feels shaky, skip the pressure and move straight to a cleaner quote path. Share your project and we&apos;ll point you toward vetted contractors.
+            If this result still feels uneasy, move to a cleaner quote path or compare against a vetted contractor option before sending more money.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
-              Get matched with vetted contractors
-            </Link>
-            <Link href="/shield/scan" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+            <Link href="/shield/scan" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
               Scan their quote next
+            </Link>
+            <Link href="/connect" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Find vetted contractors
             </Link>
           </div>
         </Card>
 
-        <Disclaimer text={DISCLAIMERS.license_result} />
-        <Disclaimer text={DISCLAIMERS.not_for_employment} variant="warning" />
+        <div className="grid grid-cols-1 gap-3">
+          <Disclaimer text={DISCLAIMERS.license_result} />
+          <Disclaimer text={DISCLAIMERS.not_for_employment} variant="warning" />
+        </div>
 
         <Button variant="secondary" className="w-full" onClick={resetFlow}>
           Check another contractor
