@@ -135,24 +135,43 @@ export default async function VisionResultsPage({ params }: PageProps) {
             </div>
 
             {(estimate.assumptions?.length > 0 || estimate.estimate_basis || estimate.estimate_breakdown) && (
-              <div className="mb-4">
-                <h4 className="text-sm font-semibold text-slate-700 mb-2">Assumptions</h4>
-                <ul className="space-y-1">
-                  {estimate.assumptions?.map((a: string, i: number) => (
-                    <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
-                      <span className="text-blue-400 mt-0.5">•</span>{a}
-                    </li>
-                  ))}
-                </ul>
-                {estimate.estimate_breakdown && (
-                  <p className="text-sm text-slate-600 mt-3">
-                    <span className="font-medium text-slate-700">Estimated split:</span> {estimate.estimate_breakdown.replace(/^Estimated split:\s*/i, '')}
-                  </p>
-                )}
+              <div className="mb-4 space-y-3">
                 {estimate.estimate_basis && (
-                  <p className="text-sm text-slate-500 mt-3">
-                    <span className="font-medium text-slate-700">Estimate basis:</span> {estimate.estimate_basis}
-                  </p>
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-1">Estimate basis</h4>
+                    <p className="text-sm text-slate-500">{estimate.estimate_basis}</p>
+                  </div>
+                )}
+                {estimate.estimate_breakdown && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-2">Labor and materials split</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Labor</div>
+                        <div className="text-sm font-medium text-slate-800">
+                          {formatCurrencyRange(estimate.estimate_breakdown.labor_low, estimate.estimate_breakdown.labor_high)}
+                        </div>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Materials</div>
+                        <div className="text-sm font-medium text-slate-800">
+                          {formatCurrencyRange(estimate.estimate_breakdown.materials_low, estimate.estimate_breakdown.materials_high)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {estimate.assumptions?.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-2">Assumptions</h4>
+                    <ul className="space-y-1">
+                      {estimate.assumptions?.map((a: string, i: number) => (
+                        <li key={i} className="text-sm text-slate-600 flex items-start gap-2">
+                          <span className="text-blue-400 mt-0.5">•</span>{a}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
             )}

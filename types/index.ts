@@ -23,6 +23,15 @@ export interface Project {
   updated_at: string;
 }
 
+export interface EstimateBreakdown {
+  labor_low: number;
+  labor_mid: number;
+  labor_high: number;
+  materials_low: number;
+  materials_mid: number;
+  materials_high: number;
+}
+
 export interface Estimate {
   id: string;
   project_id: string;
@@ -32,7 +41,7 @@ export interface Estimate {
   assumptions: string[];
   risk_notes: string[];
   estimate_basis: string;
-  estimate_breakdown?: string;
+  estimate_breakdown?: EstimateBreakdown;
   region_multiplier: number;
   created_at: string;
 }

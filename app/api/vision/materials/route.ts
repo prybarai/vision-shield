@@ -37,47 +37,49 @@ function fallbackMaterials(category: string, style: string, qualityTier: string,
     : undefined;
 
   if (category === 'interior_paint') {
-    const values = distributeBudget(estimateMid, [8, 10, 7, 6, 18, 14, 10]);
+    const values = distributeBudget(estimateMid, [10, 12, 9, 7, 8, 24, 18, 12]);
     return {
       line_items: [
-        lineItem('Protection', 'Masking and floor protection', 'Plastic, paper, tape, and room protection for the painted area', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Confirm whether furniture moving/protection is included.'),
-        lineItem('Prep', 'Patch, sand, and caulk allowance', 'Wall prep for nail holes, minor cracks, and touch-up patching', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Upgrade if skim coating, stain blocking, or wallpaper removal is needed.'),
-        lineItem('Paint', 'Wall paint', `${qualityTier} interior wall paint in selected color`, 2, 'gallons', qualityTier, values[2] * 0.8, values[2], 'Confirm exact sheen and number of coats.'),
-        lineItem('Paint', 'Trim paint', `${qualityTier} trim enamel or trim-specific paint`, 1, 'gallon', qualityTier, values[3] * 0.8, values[3], 'Only needed if trim is included in scope.'),
-        lineItem('Labor', 'Wall painting labor', 'Cut-in and roll labor for walls in visible scope', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Pricing assumes standard occupancy and access.'),
-        lineItem('Labor', 'Prep and touch-up labor', 'Setup, prep, sanding, caulking, and cleanup labor', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Hidden wall damage can increase this bucket.'),
-        lineItem('Cleanup', 'Cleanup and haul-off', 'Final cleanup, trash removal, and touch-up allowance', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Confirm whether daily cleanup and final wipe-down are included.'),
+        lineItem('Protection', 'Masking, floor protection, and setup', 'Plastic, paper, tape, zipper doors, and room protection for the painted area', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Confirm whether furniture moving and full-room masking are included.'),
+        lineItem('Prep', 'Patching, sanding, and caulk prep', 'Prep allowance for nail holes, cracks, minor patching, sanding, and caulk touch-up', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Upgrade if skim coating, stain blocking, or wallpaper removal is needed.'),
+        lineItem('Primer', 'Spot primer and stain-blocking allowance', 'Primer for repairs, patched areas, and any visible bleed-through', 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Increase if smoke stains, water marks, or color-change coverage is heavy.'),
+        lineItem('Paint', 'Wall and ceiling paint', `${qualityTier} interior paint allowance for visible wall scope and any included ceilings`, 2, 'gallons', qualityTier, values[3] * 0.8, values[3], 'Confirm exact sheen, color count, and number of coats.'),
+        lineItem('Paint', 'Trim and door enamel allowance', `${qualityTier} trim enamel for base, casing, and any included doors/trim`, 1, 'gallon', qualityTier, values[4] * 0.8, values[4], 'Reduce if trim is excluded from scope.'),
+        lineItem('Labor', 'Painting labor', 'Cut-in, rolling, and finish painting labor for visible room scope', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Pricing assumes standard occupancy and normal room access.'),
+        lineItem('Labor', 'Prep and touch-up labor', 'Setup, patching, sanding, touch-up, and cleanup labor', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Hidden wall damage or extensive prep raises this bucket.'),
+        lineItem('Cleanup', 'Cleanup and haul-off', 'Final cleanup, trash removal, and punch-list touch-up allowance', 1, 'lot', qualityTier, values[7] * 0.8, values[7], 'Confirm whether daily cleanup and final wipe-down are included.'),
       ],
-      sourcing_notes: 'Contractor-usable planning list for interior painting. Best for a single room or defined painted area, not whole-home paint. Verify exact wall area, prep needs, and whether ceilings/trim are included onsite.',
+      sourcing_notes: 'Contractor-usable planning list for interior painting. Sized for a defined room or limited interior scope, not whole-home paint. Verify exact wall and trim scope, prep condition, primer needs, and whether ceilings/doors are included onsite.',
     };
   }
 
   if (category === 'exterior_paint') {
-    const values = distributeBudget(estimateMid, [10, 12, 8, 18, 22, 16, 14]);
+    const values = distributeBudget(estimateMid, [10, 12, 8, 10, 16, 22, 14, 8]);
     return {
       line_items: [
-        lineItem('Prep', 'Pressure wash and surface prep', 'Washing, scraping, sanding, and prep for visible siding/trim', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Increase if peeling paint, chalking, or rot repair is present.'),
-        lineItem('Prep', 'Caulk, filler, and primer', 'Exterior caulk, spot primer, and patch materials', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Lead-safe or heavy prep work is additional.'),
-        lineItem('Paint', 'Body paint', `${qualityTier} exterior body paint in selected color`, 5, 'gallons', qualityTier, values[2] * 0.8, values[2], 'Confirm final body color and sheen.'),
-        lineItem('Paint', 'Trim and accent paint', 'Trim, soffit, fascia, and accent-color paint allowance', 3, 'gallons', qualityTier, values[3] * 0.8, values[3], 'Needed especially when trim/accent colors differ from body.'),
-        lineItem('Labor', 'Siding painting labor', 'Main field painting labor for siding or body surfaces', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Story height and window count can materially affect this item.'),
-        lineItem('Labor', 'Trim and masking labor', 'Cut-in labor around windows, trim, and other details', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Expect higher cost if many windows or detailed trim are present.'),
-        lineItem('Access', 'Ladders, lift, and cleanup allowance', 'Access equipment, masking, and final cleanup', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Lift/scaffold needs should be verified onsite.'),
+        lineItem('Prep', 'Wash, scrape, and surface prep', 'Pressure washing, scraping, sanding, and surface prep for visible siding and trim', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Increase if peeling paint, chalking, or failed coatings are widespread.'),
+        lineItem('Prep', 'Caulk, filler, and spot-prime package', 'Exterior caulk, patch filler, and primer for joints, cracks, and repairs', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Lead-safe or heavy prep work is additional.'),
+        lineItem('Paint', 'Body paint allowance', `${qualityTier} exterior field paint for body surfaces in selected color`, 5, 'gallons', qualityTier, values[2] * 0.8, values[2], 'Confirm final body color, sheen, and coat count.'),
+        lineItem('Paint', 'Trim, fascia, and accent paint', 'Trim, fascia, soffit, and accent-color paint allowance', 3, 'gallons', qualityTier, values[3] * 0.8, values[3], 'Needed especially when trim colors differ from body.'),
+        lineItem('Protection', 'Masking windows, doors, and hardscape', 'Masking and protection allowance around windows, doors, lights, roofs, and adjacent surfaces', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Visible window count and landscaping can materially affect this item.'),
+        lineItem('Labor', 'Body painting labor', 'Main field painting labor for siding or body surfaces', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Story height and exterior access affect this heavily.'),
+        lineItem('Labor', 'Trim and detail labor', 'Cut-in work around windows, trim, soffits, fascia, and architectural details', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Expect higher cost if many windows or detailed trim are present.'),
+        lineItem('Access', 'Ladders, lift, and cleanup allowance', 'Access equipment, protection removal, and final cleanup', 1, 'lot', qualityTier, values[7] * 0.8, values[7], 'Lift or scaffold needs should be verified onsite.'),
       ],
-      sourcing_notes: 'Exterior paint list is aligned to visible elevations and likely siding/trim scope. Confirm exact elevations included, trim detail, paint condition, and any carpentry repairs during the site visit.',
+      sourcing_notes: 'Exterior paint list is aligned to visible elevations and likely siding/trim scope. Confirm exact elevations included, trim detail, paint condition, access equipment, and any carpentry or lead-safe prep during the site visit.',
     };
   }
 
   if (category === 'flooring') {
-    const values = distributeBudget(estimateMid, [12, 10, 8, 20, 18, 14, 10]);
+    const values = distributeBudget(estimateMid, [12, 10, 18, 12, 22, 16, 10]);
     return {
       line_items: [
         lineItem('Demolition', 'Floor removal and disposal', 'Demo and disposal allowance for existing flooring if needed', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Remove or reduce if demo is excluded.'),
         lineItem('Prep', 'Subfloor prep and patching', 'Minor leveling, patching, and prep allowance', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Moisture issues or major leveling are additional.'),
-        lineItem('Materials', 'Main flooring material', `${qualityTier} ${style} flooring material`, 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Confirm exact product, wear layer, or tile spec.'),
-        lineItem('Materials', 'Underlayment and moisture barrier', 'Required underlayment, pad, or uncoupling/waterproofing layer', 1, 'lot', qualityTier, values[3] * 0.8, values[3], 'Material depends on product type and substrate.'),
+        lineItem('Materials', 'Main flooring material', `${qualityTier} ${style} flooring material`, 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Confirm exact product, wear layer, wood grade, or tile spec.'),
+        lineItem('Materials', 'Underlayment and moisture barrier', 'Required underlayment, pad, moisture barrier, or uncoupling layer', 1, 'lot', qualityTier, values[3] * 0.8, values[3], 'Material depends on product type and substrate.'),
         lineItem('Installation', 'Floor installation labor', 'Main install labor for the selected flooring scope', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Tile patterns, stairs, or complicated layouts increase labor.'),
-        lineItem('Finish Carpentry', 'Transitions, base reset, and trim work', 'Transitions, shoe mould, thresholds, and trim touch-up allowance', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Often missed in low bids, confirm explicitly.'),
+        lineItem('Finish Carpentry', 'Transitions, base reset, and trim work', 'Transitions, thresholds, shoe mould, and base reset allowance', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Often missed in low bids, confirm explicitly.'),
         lineItem('Cleanup', 'Final cleanup and debris haul-off', 'Cleanup, haul-off, and protection removal', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Confirm furniture moving and appliance reset separately.'),
       ],
       sourcing_notes: 'Flooring list is trade-specific and sized for a contractor quote. Confirm exact square footage, selected flooring product, demo inclusion, and subfloor conditions onsite.',
@@ -85,34 +87,36 @@ function fallbackMaterials(category: string, style: string, qualityTier: string,
   }
 
   if (category === 'deck_patio') {
-    const values = distributeBudget(estimateMid, [14, 10, 18, 16, 14, 18, 10]);
+    const values = distributeBudget(estimateMid, [10, 16, 18, 10, 12, 14, 22, 8]);
     return {
       line_items: [
-        lineItem('Site Prep', 'Layout, excavation, and prep', 'Basic site prep and layout for deck or patio footprint', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Soil issues, demo, or grading are additional if extensive.'),
-        lineItem('Structure', 'Footings and framing package', 'Footings, posts, beams, joists, or patio base materials', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Attachment and code requirements vary by site.'),
-        lineItem('Finish Materials', 'Deck boards or patio surface material', `${qualityTier} exterior finish material in selected style`, 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Confirm exact decking species/composite line or paver spec.'),
-        lineItem('Railing', 'Railing and guard components', 'Posts, rails, balusters, and hardware if required', 1, 'lot', qualityTier, values[3] * 0.8, values[3], 'Remove or reduce if railing is not part of scope.'),
-        lineItem('Hardware', 'Fasteners, flashing, and connectors', 'Structural connectors, hidden fasteners, and exterior-rated hardware', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Critical for deck jobs, often under-scoped in rough estimates.'),
-        lineItem('Labor', 'Build and installation labor', 'Carpentry or masonry labor for main installation', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Stairs, elevation changes, or access constraints increase labor.'),
-        lineItem('Permit & Cleanup', 'Permit, inspection, and cleanup allowance', 'Permit/admin allowance and final site cleanup', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Permit path should be confirmed before final quote.'),
+        lineItem('Site Prep', 'Layout, excavation, and prep', 'Basic site prep, layout, and excavation for the deck or patio footprint', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Soil issues, demo, or grading are additional if extensive.'),
+        lineItem('Structure', 'Concrete footings and post bases', 'Concrete footings, post bases, and footing hardware allowance', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Depth and footing count vary by code and site conditions.'),
+        lineItem('Structure', 'Framing lumber package', 'Posts, beams, joists, blocking, and framing lumber or patio base structure', 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Attachment details and span requirements vary by site.'),
+        lineItem('Finish Materials', 'Decking boards or patio finish material', `${qualityTier} exterior finish material in selected style`, 1, 'lot', qualityTier, values[3] * 0.8, values[3], 'Confirm exact decking species/composite line or paver spec.'),
+        lineItem('Hardware', 'Structural connectors and fasteners', 'Structural connectors, hidden fasteners, flashing, and exterior-rated hardware', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Critical for deck jobs, often under-scoped in rough estimates.'),
+        lineItem('Railing', 'Railing and guard components', 'Posts, rails, balusters, and hardware if required', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Remove or reduce if railing is not part of scope.'),
+        lineItem('Labor', 'Build and installation labor', 'Carpentry or masonry labor for footing, framing, decking, and finish installation', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Stairs, elevation changes, or access constraints increase labor.'),
+        lineItem('Permit & Cleanup', 'Permit, inspection, and cleanup allowance', 'Permit/admin allowance and final site cleanup', 1, 'lot', qualityTier, values[7] * 0.8, values[7], 'Permit path should be confirmed before final quote.'),
       ],
-      sourcing_notes: 'Deck/patio list is structured to match how contractors usually price outdoor living work. Confirm railing requirements, stairs, footing depth, attachment details, and demolition onsite.',
+      sourcing_notes: 'Deck/patio list is structured to match how contractors usually price outdoor living work. Confirm railing requirements, stairs, footing depth, framing spans, attachment details, demolition, and permit path onsite.',
     };
   }
 
   if (category === 'roofing') {
-    const values = distributeBudget(estimateMid, [12, 8, 16, 10, 18, 24, 12]);
+    const values = distributeBudget(estimateMid, [14, 8, 10, 20, 10, 10, 18, 10]);
     return {
       line_items: [
-        lineItem('Tear-Off', 'Existing roof removal and disposal', 'Tear-off, disposal, and dump fees for existing roofing', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Remove if this is truly an overlay scope.'),
-        lineItem('Deck Prep', 'Deck inspection and minor prep allowance', 'Minor deck prep and dry-in materials', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Rotten decking replacement is usually extra.'),
-        lineItem('Roofing', 'Main roofing material package', `${qualityTier} roofing material package sized to visible roof scope`, 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Confirm exact shingle/metal system and warranty tier.'),
-        lineItem('Protection', 'Underlayment and ice/water shield', 'Synthetic underlayment and leak-prone area protection', 1, 'lot', qualityTier, values[3] * 0.8, values[3], 'Coverage varies by code, climate, and roof design.'),
-        lineItem('Flashing & Ventilation', 'Flashing, pipe boots, ridge vent, and accessories', 'Accessory package for watertight installation', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Chimney, skylight, and complex flashing may add cost.'),
-        lineItem('Labor', 'Roof installation labor', 'Crew labor for tear-off, install, and cleanup', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Steep pitch, complexity, and access affect this heavily.'),
-        lineItem('Cleanup', 'Magnet sweep and final cleanup', 'Debris removal, jobsite cleanup, and magnetic nail sweep', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Confirm same-day cleanup expectations.'),
+        lineItem('Tear-Off', 'Existing roof tear-off and disposal', 'Tear-off, disposal, dump fees, and protection for existing roofing removal', 1, 'lot', qualityTier, values[0] * 0.8, values[0], 'Remove if this is truly an overlay scope.'),
+        lineItem('Deck Prep', 'Deck inspection and dry-in prep', 'Minor deck prep, dry-in materials, and jobsite protection allowance', 1, 'lot', qualityTier, values[1] * 0.8, values[1], 'Rotten decking replacement is usually extra.'),
+        lineItem('Protection', 'Synthetic underlayment and ice/water shield', 'Underlayment package for field areas, valleys, and leak-prone edges', 1, 'lot', qualityTier, values[2] * 0.8, values[2], 'Coverage varies by code, climate, and roof design.'),
+        lineItem('Roofing', 'Shingles or roof panels', `${qualityTier} roofing material package sized to the inferred roof scope`, 1, 'lot', qualityTier, values[3] * 0.8, values[3], 'Confirm exact shingle, architectural, or metal system and warranty tier.'),
+        lineItem('Flashing', 'Flashing, pipe boots, and edge metal', 'Accessory package for penetrations, walls, valleys, and roof edges', 1, 'lot', qualityTier, values[4] * 0.8, values[4], 'Chimney, skylight, and complex flashing may add cost.'),
+        lineItem('Ventilation', 'Ridge vent and ventilation accessories', 'Ridge vent, intake ventilation, and related accessories as needed', 1, 'lot', qualityTier, values[5] * 0.8, values[5], 'Ventilation upgrades should be confirmed onsite.'),
+        lineItem('Labor', 'Roof installation labor', 'Crew labor for tear-off, install, flashing, and cleanup', 1, 'lot', qualityTier, values[6] * 0.8, values[6], 'Steep pitch, complexity, and access affect this heavily.'),
+        lineItem('Cleanup', 'Final cleanup and magnet sweep', 'Debris removal, final jobsite cleanup, and magnetic nail sweep', 1, 'lot', qualityTier, values[7] * 0.8, values[7], 'Confirm same-day cleanup expectations.'),
       ],
-      sourcing_notes: 'Roofing list is aligned to a contractor quote structure and visible roof scope. Confirm exact roof measurements, pitch, complexity, flashing details, and whether decking repairs are excluded.',
+      sourcing_notes: 'Roofing list is aligned to a contractor quote structure and inferred roof scope. Confirm exact roof measurements, pitch, layers to remove, flashing/penetration details, ventilation upgrades, and whether decking repairs are excluded.',
     };
   }
 
