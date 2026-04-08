@@ -79,6 +79,8 @@ export default async function VisionResultsPage({ params }: PageProps) {
   const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/share/${project.share_token}`;
   const analysisSummary = project.notes?.split('AI analysis:')[1]?.trim();
   const requestedDirection = project.generated_image_urls?.length > 0 ? buildRequestedDesignDirection(project.notes) : null;
+  const likelyTrades = Array.isArray(brief?.likely_trades) ? brief.likely_trades : [];
+  const unknownsToVerify = Array.isArray(brief?.unknowns_to_verify) ? brief.unknowns_to_verify : [];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -132,7 +134,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
               Range: {formatCurrencyRange(estimate.low_estimate, estimate.high_estimate)}
             </div>
 
-            {(estimate.assumptions?.length > 0 || estimate.estimate_basis) && (
+            {(estimate.assumptions?.length > 0 || estimate.estimate_basis || estimate.estimate_breakdown) && (
               <div className="mb-4">
                 <h4 className="text-sm font-semibold text-slate-700 mb-2">Assumptions</h4>
                 <ul className="space-y-1">
@@ -142,6 +144,11 @@ export default async function VisionResultsPage({ params }: PageProps) {
                     </li>
                   ))}
                 </ul>
+                {estimate.estimate_breakdown && (
+                  <p className="text-sm text-slate-600 mt-3">
+                    <span className="font-medium text-slate-700">Estimated split:</span> {estimate.estimate_breakdown.replace(/^Estimated split:\s*/i, '')}
+                  </p>
+                )}
                 {estimate.estimate_basis && (
                   <p className="text-sm text-slate-500 mt-3">
                     <span className="font-medium text-slate-700">Estimate basis:</span> {estimate.estimate_basis}
@@ -197,6 +204,28 @@ export default async function VisionResultsPage({ params }: PageProps) {
               <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Contractor Notes</h4>
               <p className="text-slate-700">{brief.contractor_notes}</p>
             </div>
+            {likelyTrades.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Likely Trades</h4>
+                <div className="flex flex-wrap gap-2">
+                  {likelyTrades.map((trade: string, i: number) => (
+                    <span key={i} className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">{trade}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {unknownsToVerify.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Unknowns to Verify Onsite</h4>
+                <ul className="space-y-2">
+                  {unknownsToVerify.map((item: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                      <span className="text-amber-500 font-bold flex-shrink-0">•</span>{item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             {brief.site_verification_questions?.length > 0 && (
               <div>
                 <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-2">Site Questions to Ask</h4>

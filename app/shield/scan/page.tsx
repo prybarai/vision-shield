@@ -94,6 +94,13 @@ export default function ShieldScanPage() {
             </Badge>
           </div>
           <p className="text-slate-700 leading-relaxed">{result.plain_english_summary}</p>
+          <p className="text-sm text-slate-600 mt-3">
+            {result.risk_level === 'low'
+              ? 'No obvious major traps surfaced from this text, but confirm the scope, payment schedule, warranty, and change-order terms before signing.'
+              : result.risk_level === 'medium'
+              ? 'This quote has enough rough edges that I would tighten the paperwork before moving forward.'
+              : 'This quote shows serious risk signals. I would pause and get another quote or a cleaner contract before paying more money.'}
+          </p>
         </Card>
 
         <Card>
@@ -150,10 +157,15 @@ export default function ShieldScanPage() {
 
         <Card className="bg-slate-900 text-white">
           <h3 className="font-bold text-lg mb-2">Want a cleaner second opinion?</h3>
-          <p className="text-sm text-slate-300 mb-4">If this quote feels shaky, send your project and we&apos;ll help you find a vetted contractor to compare against.</p>
-          <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
-            Find vetted contractor
-          </Link>
+          <p className="text-sm text-slate-300 mb-4">If this quote feels shaky, compare it against a vetted contractor path instead of guessing.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
+              Find vetted contractor
+            </Link>
+            <Link href="/shield" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Run contractor check
+            </Link>
+          </div>
         </Card>
 
         <Disclaimer text={DISCLAIMERS.ai_contract_scan} variant="warning" />
@@ -165,7 +177,7 @@ export default function ShieldScanPage() {
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">📄 Scan a quote or contract</h1>
-        <p className="text-slate-500">Paste the document text for the most reliable analysis. File upload is best-effort for plain text only.</p>
+        <p className="text-slate-500">Paste the quote or contract text for the most reliable result. File upload is best-effort for plain text only, and pasted text usually gives a sharper review.</p>
       </div>
 
       <Card className="mb-6">

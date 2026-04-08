@@ -111,6 +111,7 @@ export default function ShieldRescuePage() {
               <span className="text-green-600 font-semibold text-sm">Dispute package ready</span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900">Your documents</h1>
+            <p className="text-sm text-slate-500 mt-1">Review everything carefully, add names, dates, and evidence, then send only what matches your situation.</p>
           </div>
           <button onClick={() => setResult(null)} className="text-sm text-slate-500 hover:text-slate-700">Generate new</button>
         </div>
@@ -156,6 +157,14 @@ export default function ShieldRescuePage() {
           {copyStatus && <p className="text-sm text-slate-500 mt-3">{copyStatus}</p>}
         </Card>
 
+        <Card className="mb-4 bg-slate-900 text-white">
+          <h3 className="font-bold text-lg mb-2">Need a cleaner path after this?</h3>
+          <p className="text-sm text-slate-300 mb-4">If you want to move forward with a new contractor instead, keep your documentation and start fresh with a vetted connection.</p>
+          <a href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
+            Find vetted contractors
+          </a>
+        </Card>
+
         <Disclaimer text={DISCLAIMERS.dispute_letter} variant="warning" />
       </div>
     );
@@ -165,7 +174,7 @@ export default function ShieldRescuePage() {
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">🆘 Get help</h1>
-        <p className="text-slate-500">Describe what happened and generate a calmer, more organized contractor dispute package.</p>
+        <p className="text-slate-500">Describe what happened and generate a calmer, more organized contractor dispute package. This is best for documenting the issue and preparing next steps, not replacing a lawyer.</p>
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 mb-6">

@@ -44,27 +44,27 @@ The result must look like a real contractor's "after" photo taken from the same 
 
   flooring: `You are a professional flooring installer creating a photorealistic installation rendering.
 CHANGE: Replace only the floor surface.
-DO NOT CHANGE: Every single other element — all furniture, all walls, all trim, all windows, all doors, all ceiling elements, all rugs, all lighting fixtures.
+DO NOT CHANGE: Every single other element, including all furniture, layout, walls, trim, windows, doors, ceiling elements, rugs, and lighting fixtures.
 The result must look like a real before/after flooring installation photo taken from the exact same angle.`,
 
   interior_paint: `You are a professional painter creating a photorealistic painting rendering.
 CHANGE: Repaint only the walls and trim.
-DO NOT CHANGE: Every single other element — all furniture, flooring, windows, curtains, artwork, lighting, and ceiling.
+DO NOT CHANGE: Every single other element, including furniture, flooring, layout, windows, curtains, artwork, lighting, and ceiling.
 The result must look like a real before/after painting photo taken from the exact same angle.`,
 
   roofing: `You are a professional roofing contractor creating a photorealistic replacement rendering.
-CHANGE: Replace only the roof surface and materials.
-DO NOT CHANGE: The house silhouette, all siding, all windows, all doors, the driveway, all trees, all landscaping, all neighboring structures, the sky, and all surroundings.
+CHANGE: Replace only the roof surface and roofing materials.
+DO NOT CHANGE: The house silhouette, siding, windows, doors, driveway, neighbors, sky, landscaping, trees, or any surroundings unless explicitly requested.
 The result must look like a real roofing contractor's "after" photo of the exact same house.`,
 
   exterior_paint: `You are a professional exterior design visualizer creating a photorealistic repaint rendering.
-CHANGE: Repaint only the siding and exterior trim.
-DO NOT CHANGE: The roof shape, roof material, windows, doors, landscaping, driveway, neighboring homes, or house structure.
-The final result must follow the requested colors exactly and look like a real contractor's after photo of the same house.`,
+CHANGE: Repaint only the siding, body, trim, and requested exterior accent details.
+DO NOT CHANGE: Roof form, windows, doors, landscaping, driveway, neighboring homes, or any house structure.
+The final result must follow the requested body, trim, and accent colors exactly and look like a real contractor's after photo of the same house.`,
 
   deck_patio: `You are a professional deck builder creating a photorealistic installation rendering.
-CHANGE: Add a new deck or patio structure only in the indicated backyard area.
-DO NOT CHANGE: The house structure, siding, windows, doors, roof, existing fence lines, existing mature trees, and the overall yard dimensions.
+CHANGE: Add or update only the requested deck or patio scope.
+DO NOT CHANGE: House form, siding, windows, doors, roof, neighbors, sky, landscape, fence lines, or existing yard layout unless explicitly requested.
 The result must look like a real deck contractor's "after" photo.`,
 
   landscaping: `You are a professional landscape architect creating a photorealistic design rendering.
@@ -73,8 +73,9 @@ DO NOT CHANGE: The house structure, driveway, hardscape elements, fence lines, m
 The result must look like a real landscaping contractor's "after" photo.`,
 
   custom_project: `You are a professional renovation visualizer creating a photorealistic custom project rendering.
-CHANGE: Apply the requested design/update described by the homeowner while preserving the property structure and unchanged areas exactly.
+CHANGE: Apply the exact requested design update described by the homeowner.
 DO NOT CHANGE: Structural layout, room geometry, building envelope, and any visible elements not requested by the homeowner.
+Prioritize the homeowner notes over generic style direction.
 The result must look like a real contractor's realistic planning rendering from the same viewpoint as the original photo.`,
 };
 
@@ -97,19 +98,19 @@ function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis)
 
   if (category === 'exterior_paint') {
     if (analysis.scope_signals.stories) facts.push(`This is a ${analysis.scope_signals.stories}-story house.`);
-    if ((analysis.scope_signals.window_count_visible ?? 0) >= 6) facts.push('There are many front-facing windows. Preserve the house structure and visible windows exactly.');
+    if ((analysis.scope_signals.window_count_visible ?? 0) >= 6) facts.push('There are many front-facing windows. Preserve the structure and every visible window exactly.');
     if (analysis.scope_signals.paint_complexity) facts.push(`The exterior has ${analysis.scope_signals.paint_complexity} paint complexity.`);
   } else if (category === 'roofing') {
     if (analysis.scope_signals.stories) facts.push(`This appears to be a ${analysis.scope_signals.stories}-story house.`);
     if (analysis.scope_signals.roof_complexity) facts.push(`The roof appears ${analysis.scope_signals.roof_complexity} complexity.`);
-    facts.push('Keep the roofline and any dormers structurally consistent.');
+    facts.push('Keep the roofline, dormers, and house shape structurally consistent.');
   } else if (category === 'interior_paint') {
     if (analysis.scope_signals.room_size) facts.push(`This appears to be a ${analysis.scope_signals.room_size} room.`);
-    if ((analysis.scope_signals.window_count_visible ?? 0) >= 4) facts.push('There are many windows. Only change wall and trim colors; preserve furniture and windows.');
+    if ((analysis.scope_signals.window_count_visible ?? 0) >= 4) facts.push('There are many windows. Change only wall and trim color and preserve furniture, layout, and windows.');
     if (analysis.scope_signals.ceiling_height) facts.push(`Ceiling height appears ${analysis.scope_signals.ceiling_height}.`);
   } else if (category === 'deck_patio') {
     if (analysis.scope_signals.yard_size) facts.push(`The yard appears ${analysis.scope_signals.yard_size}.`);
-    if (analysis.scope_signals.access_difficulty) facts.push(`Access appears ${analysis.scope_signals.access_difficulty}. Keep the house structure and fence lines unchanged.`);
+    if (analysis.scope_signals.access_difficulty) facts.push(`Access appears ${analysis.scope_signals.access_difficulty}. Keep the house structure and surrounding yard context unchanged.`);
   }
 
   if (!facts.length) {
@@ -120,58 +121,64 @@ function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis)
   return facts.slice(0, 4).join(' ');
 }
 
+function hasStrongExactConstraint(constraints: DesignConstraints) {
+  return Boolean(
+    constraints.bodyColor ||
+    constraints.trimColor ||
+    constraints.accentColor ||
+    constraints.flooringMaterial ||
+    constraints.deckMaterial ||
+    constraints.roofColor ||
+    constraints.cabinetColor ||
+    constraints.countertopMaterial ||
+    constraints.tileStyle
+  );
+}
+
 export function buildConstraintText(category: string, constraints: DesignConstraints, notes?: string): string {
   const lines: string[] = [];
 
   if (category === 'exterior_paint') {
-    if (constraints.bodyColor) {
-      lines.push(`Use ${constraints.bodyColor} as the main body/siding color.`);
-      if (constraints.bodyColor === 'cream white') {
-        lines.push('Do not use brown or tan as the dominant exterior color.');
-      }
-    }
-    if (constraints.trimColor && constraints.accentColor && constraints.trimColor === constraints.accentColor) {
-      lines.push(`Use ${constraints.trimColor} for trim and accent details.`);
-    } else {
-      if (constraints.trimColor) lines.push(`Use ${constraints.trimColor} trim. This is required.`);
-      if (constraints.accentColor) lines.push(`Use ${constraints.accentColor} accent details. This is required.`);
+    if (constraints.bodyColor) lines.push(`Main body or siding color must be ${constraints.bodyColor}.`);
+    if (constraints.trimColor) lines.push(`Trim color must be ${constraints.trimColor}.`);
+    if (constraints.accentColor) lines.push(`Accent color must be ${constraints.accentColor}.`);
+    if (constraints.bodyColor || constraints.trimColor || constraints.accentColor) {
+      lines.push('Keep color placement literal: body stays on body surfaces, trim stays on trim, accents stay on accent details only.');
     }
     if (constraints.accentColor === 'black' || constraints.trimColor === 'black') {
-      lines.push('Do not use wood-tone or bronze accents instead of black.');
+      lines.push('Do not substitute bronze, wood tone, or charcoal where black was requested.');
     }
     if (constraints.roofColor && /\broof\b/i.test(notes || '')) {
-      lines.push(`Use ${constraints.roofColor} for the roof color only if the request explicitly includes changing the roof.`);
+      lines.push(`Only if roof changes were explicitly requested, the roof color must be ${constraints.roofColor}.`);
     }
-    if (lines.length > 0) {
-      lines.push('These user-specified colors are mandatory and must override generic style suggestions.');
-    }
+    if (lines.length > 0) lines.push('These user-specified exterior colors are mandatory and override generic style language.');
   }
 
   if (category === 'deck_patio' && constraints.deckMaterial) {
-    lines.push(`Use ${constraints.deckMaterial} deck boards. This material selection is required.`);
+    lines.push(`Deck or patio material must be ${constraints.deckMaterial}.`);
   }
 
   if (category === 'flooring' && constraints.flooringMaterial) {
-    lines.push(`Use ${constraints.flooringMaterial} flooring. This material selection is required.`);
+    lines.push(`Flooring material must be ${constraints.flooringMaterial}.`);
   }
 
   if ((category === 'kitchen' || category === 'bathroom') && constraints.cabinetColor) {
-    lines.push(`Use ${constraints.cabinetColor} cabinets or vanity cabinetry. This color choice is required.`);
+    lines.push(`Cabinet or vanity color must be ${constraints.cabinetColor}.`);
   }
   if ((category === 'kitchen' || category === 'bathroom') && constraints.countertopMaterial) {
-    lines.push(`Use ${constraints.countertopMaterial} countertops. This material selection is required.`);
+    lines.push(`Countertop material must be ${constraints.countertopMaterial}.`);
   }
   if ((category === 'kitchen' || category === 'bathroom') && constraints.tileStyle) {
-    lines.push(`Use ${constraints.tileStyle} tile where tile is shown. This style choice is required.`);
+    lines.push(`Tile style must be ${constraints.tileStyle}.`);
   }
 
   if (category === 'roofing' && constraints.roofColor) {
-    lines.push(`Use ${constraints.roofColor} for the roof color. This is required.`);
+    lines.push(`Roof color must be ${constraints.roofColor}.`);
   }
 
   if (category === 'interior_paint') {
-    if (constraints.bodyColor) lines.push(`Use ${constraints.bodyColor} as the primary wall color. This is required.`);
-    if (constraints.trimColor) lines.push(`Use ${constraints.trimColor} trim. This is required.`);
+    if (constraints.bodyColor) lines.push(`Primary wall color must be ${constraints.bodyColor}.`);
+    if (constraints.trimColor) lines.push(`Trim color must be ${constraints.trimColor}.`);
   }
 
   if (lines.length === 0 && notes) {
@@ -202,6 +209,19 @@ function resolveCustomProjectCategory(category: string, analysis?: VisionAnalysi
   return 'custom_project';
 }
 
+function buildStyleGuidance(category: string, styleDesc: string, constraints: DesignConstraints, notes?: string) {
+  const exactConstraintHeavy = hasStrongExactConstraint(constraints) || /exact|must be|specific|match/i.test(notes || '');
+  if (category === 'custom_project') {
+    return exactConstraintHeavy
+      ? 'Use the homeowner notes as the dominant instruction. Apply only light stylistic interpretation where the notes leave room.'
+      : `Use ${styleDesc} styling only where it does not conflict with the homeowner notes.`;
+  }
+  if (exactConstraintHeavy && (category === 'exterior_paint' || category === 'roofing' || category === 'flooring' || category === 'interior_paint' || category === 'deck_patio')) {
+    return 'Keep style influence light so exact requested colors and materials stay dominant.';
+  }
+  return `Style guidance: ${styleDesc}.`;
+}
+
 function buildInstruction(
   category: string,
   style: string,
@@ -220,11 +240,11 @@ function buildInstruction(
       ? 'Category-specific direction: Apply the requested custom design/update described by the homeowner while preserving the property structure and unchanged areas exactly.'
       : `Category-specific direction: Treat this custom project like a ${resolvedCategory.replace(/_/g, ' ')} scope while preserving all unchanged areas exactly.`
     : resolvedCategory === 'exterior_paint'
-    ? 'Category-specific direction: Repaint only the existing siding and trim on this exact house. Match the requested color placement faithfully.'
+    ? 'Category-specific direction: Repaint only the existing siding, body, trim, and requested accent details on this exact house. Follow body/trim/accent color placement literally.'
     : resolvedCategory === 'deck_patio'
-    ? 'Category-specific direction: Add the requested deck or patio design without changing the house itself.'
+    ? 'Category-specific direction: Add the requested deck or patio design without changing the house, neighbors, sky, or surrounding landscape.'
     : resolvedCategory === 'flooring'
-    ? 'Category-specific direction: Replace only the visible flooring surface.'
+    ? 'Category-specific direction: Replace only the visible flooring surface and preserve furniture, layout, and windows exactly.'
     : resolvedCategory === 'kitchen' || resolvedCategory === 'bathroom'
     ? 'Category-specific direction: Apply the requested materials to the intended renovation surfaces while preserving room geometry.'
     : `Category-specific direction: Apply a ${styleDesc} renovation for the ${resolvedCategory.replace(/_/g, ' ')} project.`;
@@ -234,8 +254,9 @@ function buildInstruction(
     analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
     constraintText ? `MANDATORY DESIGN REQUIREMENTS: ${constraintText}` : '',
     categoryInstruction,
-    `Style guidance: ${styleDesc}.`,
+    buildStyleGuidance(category, styleDesc, constraints, notes),
     extraGuidance ? `Presentation guidance: ${extraGuidance}` : '',
+    'Return one highly believable concept, not multiple alternatives inside one image.',
   ].filter(Boolean).join(' ');
 }
 
@@ -257,8 +278,10 @@ function buildTextPrompt(
     basePrompt,
     analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
     constraintText ? `Mandatory user constraints: ${constraintText}` : '',
-    `Category direction: ${category === 'custom_project' ? 'custom project' : resolvedCategory.replace(/_/g, ' ')} rendered in a ${styleDesc} direction. User notes are mandatory constraints.`,
+    `Category direction: ${category === 'custom_project' ? 'custom project' : resolvedCategory.replace(/_/g, ' ')}.`,
+    buildStyleGuidance(category, styleDesc, constraints, notes),
     extraGuidance ? `Presentation guidance: ${extraGuidance}` : '',
+    'Generate one high-quality, photorealistic concept only.',
   ].filter(Boolean).join(' ');
 }
 
@@ -370,39 +393,40 @@ export async function generateConceptImages(params: {
   count?: number;
 }): Promise<string[]> {
   const client = getClient();
-  const count = params.count ?? 3;
+  const requestedCount = params.count ?? 1;
+  const count = Math.min(1, requestedCount || 1);
   const results: string[] = [];
 
   if (params.referenceImageUrl) {
-    const variations = [
-      undefined,
-      'Focus on showing the finished result clearly with good lighting that shows material quality and craftsmanship.',
-      'Show the result with a slightly wider view to show how the renovation fits within the overall space.',
-    ].slice(0, count);
-
-    for (const variation of variations) {
-      const result = await generateWithEdit(
-        client,
-        params.referenceImageUrl,
-        params.category,
-        params.style,
-        params.notes,
-        params.analysis,
-        variation
-      );
-      if (result) {
-        try {
-          const url = result.startsWith('data:')
-            ? await saveBase64ToSupabase(result, params.projectId)
-            : result;
-          results.push(url);
-        } catch {
-          results.push(result);
-        }
+    const variation = 'Show the requested finished concept clearly, keep unchanged areas untouched, and prioritize realism over dramatic redesign.';
+    const result = await generateWithEdit(
+      client,
+      params.referenceImageUrl,
+      params.category,
+      params.style,
+      params.notes,
+      params.analysis,
+      variation
+    );
+    if (result) {
+      try {
+        const url = result.startsWith('data:')
+          ? await saveBase64ToSupabase(result, params.projectId)
+          : result;
+        results.push(url);
+      } catch {
+        results.push(result);
       }
     }
   } else {
-    const result = await generateTextToImage(client, params.category, params.style, params.notes, params.analysis);
+    const result = await generateTextToImage(
+      client,
+      params.category,
+      params.style,
+      params.notes,
+      params.analysis,
+      'Show one useful first concept that respects the notes literally and avoids extra design flourishes.'
+    );
     if (result) {
       try {
         const url = result.startsWith('data:')
@@ -415,5 +439,5 @@ export async function generateConceptImages(params: {
     }
   }
 
-  return results;
+  return results.slice(0, count);
 }

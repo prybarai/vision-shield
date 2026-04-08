@@ -132,6 +132,14 @@ export default function ContractorCheckFlow() {
     }
   };
 
+  const resetFlow = () => {
+    setStep('form');
+    setResult(null);
+    setLicensePreview(null);
+    setAnswers({});
+    setError(null);
+  };
+
   const licenseStatusBadge = (status: string) => {
     switch (status) {
       case 'active': return <Badge variant="green">Verified license found</Badge>;
@@ -151,6 +159,18 @@ export default function ContractorCheckFlow() {
         </div>
         {licenseStatusBadge(license.status)}
       </div>
+
+      {license.status === 'active' && (
+        <div className="mb-3 rounded-2xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
+          Good sign. An active license lowers risk, but you should still review insurance, contract terms, payment structure, and references.
+        </div>
+      )}
+
+      {license.status === 'not_found' && (
+        <div className="mb-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          Higher caution. No automatic license match was found. Double-check the business name, ask for the license number directly, and verify on the state board before paying a deposit.
+        </div>
+      )}
 
       {license.status === 'fallback' ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
@@ -256,6 +276,10 @@ export default function ContractorCheckFlow() {
 
         {renderLicenseCard(licensePreview)}
 
+        <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+          Next, answer a few trust and payment questions. This helps turn the license result into a more useful risk read, especially when verification is incomplete.
+        </div>
+
         <Card className="mb-4">
           <h3 className="font-bold text-slate-900 mb-4">Risk questionnaire</h3>
           <p className="text-sm text-slate-500 mb-6">Answer these based on what the contractor has actually said or done so far.</p>
@@ -312,6 +336,13 @@ export default function ContractorCheckFlow() {
               {getRiskLabel(riskLevel)}
             </Badge>
           </div>
+          <p className="text-sm text-slate-700 mb-4">
+            {riskLevel === 'low'
+              ? 'This contractor currently shows fewer obvious warning signs based on the information provided. Keep using normal contractor diligence before signing.'
+              : riskLevel === 'medium'
+              ? 'There are meaningful caution signs here. Slow down, tighten the paperwork, and verify the open questions before paying or signing.'
+              : 'There are serious warning signs here. I would avoid paying more money until you independently verify licensing, insurance, scope, and payment terms.'}
+          </p>
           <div className="flex items-center gap-4">
             <div className="relative w-20 h-20 flex-shrink-0">
               <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 36 36">
@@ -371,17 +402,24 @@ export default function ContractorCheckFlow() {
         )}
 
         <Card className="bg-slate-900 text-white">
-          <h3 className="font-bold text-lg mb-2">Need a safer option?</h3>
-          <p className="text-sm text-slate-300 mb-4">Send your project details and we&apos;ll help connect you with vetted contractors instead.</p>
-          <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
-            Find vetted contractors
-          </Link>
+          <h3 className="font-bold text-lg mb-2">Want a safer next step?</h3>
+          <p className="text-sm text-slate-300 mb-4">
+            If this result feels shaky, skip the pressure and move straight to a cleaner quote path. Share your project and we&apos;ll point you toward vetted contractors.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
+              Get matched with vetted contractors
+            </Link>
+            <Link href="/shield/scan" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+              Scan their quote next
+            </Link>
+          </div>
         </Card>
 
         <Disclaimer text={DISCLAIMERS.license_result} />
         <Disclaimer text={DISCLAIMERS.not_for_employment} variant="warning" />
 
-        <Button variant="secondary" className="w-full" onClick={() => { setStep('form'); setResult(null); setLicensePreview(null); setAnswers({}); setError(null); }}>
+        <Button variant="secondary" className="w-full" onClick={resetFlow}>
           Check another contractor
         </Button>
       </div>

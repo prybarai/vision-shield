@@ -21,6 +21,8 @@ interface BriefResult {
   homeowner_goals: string;
   contractor_notes: string;
   site_verification_questions: string[];
+  likely_trades?: string[];
+  unknowns_to_verify?: string[];
 }
 
 function getAnalysis(input: unknown): VisionAnalysis | undefined {
@@ -28,9 +30,27 @@ function getAnalysis(input: unknown): VisionAnalysis | undefined {
   return input as VisionAnalysis;
 }
 
+function inferLikelyTrades(category: string, analysis?: VisionAnalysis) {
+  if (category === 'custom_project') {
+    const suggested = analysis?.suggested_trade && analysis.suggested_trade !== 'unknown'
+      ? analysis.suggested_trade.replace(/_/g, ' ')
+      : undefined;
+    return suggested ? [suggested, 'general contractor or remodeler'] : ['general contractor or remodeler'];
+  }
+
+  if (category === 'interior_paint' || category === 'exterior_paint') return ['painting contractor'];
+  if (category === 'roofing') return ['roofing contractor'];
+  if (category === 'flooring') return ['flooring contractor'];
+  if (category === 'deck_patio') return ['deck builder or exterior contractor'];
+  if (category === 'bathroom') return ['bathroom remodeler', 'plumber', 'tile installer'];
+  if (category === 'kitchen') return ['kitchen remodeler', 'cabinet installer', 'countertop fabricator'];
+  return ['general contractor'];
+}
+
 function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis): BriefResult {
   const category = params.category.replace(/_/g, ' ');
   const facts = describeAnalysisFacts(analysis).slice(0, 3).join(', ');
+  const likelyTrades = inferLikelyTrades(params.category, analysis);
 
   if (params.category === 'custom_project') {
     const likelyTrade = analysis?.suggested_trade && analysis.suggested_trade !== 'unknown'
@@ -40,14 +60,21 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
     return {
       summary: `Homeowner wants help scoping a custom project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}. Requested change: ${params.notes || 'Homeowner description pending.'}${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
       homeowner_goals: params.notes || 'Clarify the desired update, repair, redesign, or addition and turn it into a contractor-ready scope.',
-      contractor_notes: `Likely trades involved: ${likelyTrade}. Prioritize translating the homeowner request into a clear scope, identifying the biggest unknowns, and separating must-have work from optional upgrades.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+      contractor_notes: `Likely trade focus is ${likelyTrade}. Convert the homeowner request into a clear scope, separate must-have work from optional upgrades, and tighten the biggest pricing unknowns before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
       site_verification_questions: [
         'What exact work is included versus excluded in this custom scope?',
-        'Which trades are required to complete the project properly?',
-        'What existing conditions, damage, or access issues need verification onsite?',
-        'What measurements, utilities, or structural conditions must be confirmed before pricing?',
+        'Which trades are actually required to complete the project properly?',
+        'What measurements, utilities, framing, or structural conditions must be verified before pricing?',
+        'Are there hidden conditions, demolition needs, or access constraints not visible in the photo?',
         'Will permits, engineering, inspections, or code upgrades be required?',
         'What alternate scope options should be quoted if budget becomes the constraint?',
+      ],
+      likely_trades: likelyTrades,
+      unknowns_to_verify: [
+        'Exact scope boundaries and exclusions',
+        'Measurements and quantities that drive final pricing',
+        'Trade coordination requirements and sequencing',
+        'Permit, engineering, or code triggers',
       ],
     };
   }
@@ -55,14 +82,20 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
   return {
     summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
     homeowner_goals: params.notes || `Wants a clean, practical ${category} upgrade that feels cohesive and ready for contractor pricing.`,
-    contractor_notes: `Confirm measurements, existing conditions, code requirements, lead times, demolition scope, and finish selections before final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+    contractor_notes: `Use this as a planning-grade brief, not a final scope. Confirm measurements, existing conditions, code requirements, demolition scope, finish selections, and lead times before issuing a final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
     site_verification_questions: [
-      'What existing conditions or hidden issues could affect the final scope?',
-      'What measurements need to be confirmed onsite before pricing?',
+      'What exact measurements need to be confirmed onsite before pricing?',
+      'What existing conditions or hidden issues could affect the scope?',
       'Which material and finish selections are still open?',
+      'What demolition, prep, or protection work should be included?',
       'Will permits, inspections, or code upgrades be required?',
-      'What demolition, prep work, or disposal should be included?',
       'What timeline assumptions should be built into the quote?',
+    ],
+    likely_trades: likelyTrades,
+    unknowns_to_verify: [
+      'Existing conditions behind finished surfaces',
+      'Final material selections and product specs',
+      'Scope inclusions like prep, disposal, and touch-ups',
     ],
   };
 }
@@ -82,7 +115,20 @@ export async function POST(req: NextRequest) {
         notes: params.notes,
         estimateLow: params.estimate_low,
         estimateHigh: params.estimate_high,
-      })}${analysis ? `\n- Uploaded photo analysis facts: ${describeAnalysisFacts(analysis).join(', ')}\n- Visible features: ${analysis.visible_features.join(', ')}\n- Estimation notes: ${analysis.estimation_notes.join(', ')}\n- Suggested trade: ${analysis.suggested_trade || 'unknown'}\n- Suggested location type: ${analysis.suggested_location_type || 'unknown'}\n- Complexity: ${analysis.complexity || 'moderate'}` : ''}${params.category === 'custom_project' ? '\n- For custom_project briefs, emphasize the homeowner request, likely trades involved, top unknowns needing site verification, and strong contractor questions. Make the brief useful even if estimate scope is broad.' : ''}`;
+      })}
+- Make this brief contractor-ready and practical.
+- Include likely trades involved.
+- Include strong unknowns to verify onsite.
+- Make site questions specific, not generic.
+- If scope is mixed or custom, help a contractor understand what to verify before quoting.
+- Output valid JSON with fields: summary, homeowner_goals, contractor_notes, site_verification_questions, likely_trades, unknowns_to_verify.
+${analysis ? `
+- Uploaded photo analysis facts: ${describeAnalysisFacts(analysis).join(', ')}
+- Visible features: ${analysis.visible_features.join(', ')}
+- Estimation notes: ${analysis.estimation_notes.join(', ')}
+- Suggested trade: ${analysis.suggested_trade || 'unknown'}
+- Suggested location type: ${analysis.suggested_location_type || 'unknown'}
+- Complexity: ${analysis.complexity || 'moderate'}` : ''}${params.category === 'custom_project' ? '\n- For custom_project briefs, emphasize the homeowner request, likely trades involved, top unknowns needing site verification, and strong contractor questions. Make the brief useful even if estimate scope is broad.' : ''}`;
 
       result = await parseClaudeJSON<BriefResult>(
         'You are a construction project manager creating contractor-ready briefs. Output ONLY valid JSON.',
@@ -109,7 +155,7 @@ export async function POST(req: NextRequest) {
 
     await supabaseAdmin.from('projects').update({ status: 'brief_generated' }).eq('id', params.project_id);
 
-    return NextResponse.json({ brief: data });
+    return NextResponse.json({ brief: { ...data, likely_trades: result.likely_trades, unknowns_to_verify: result.unknowns_to_verify } });
   } catch (error) {
     console.error('brief error:', error);
     return NextResponse.json({ error: 'Failed to generate brief' }, { status: 500 });

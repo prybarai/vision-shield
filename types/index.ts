@@ -32,6 +32,7 @@ export interface Estimate {
   assumptions: string[];
   risk_notes: string[];
   estimate_basis: string;
+  estimate_breakdown?: string;
   region_multiplier: number;
   created_at: string;
 }
@@ -62,6 +63,8 @@ export interface ProjectBrief {
   homeowner_goals: string;
   contractor_notes: string;
   site_verification_questions: string[];
+  likely_trades?: string[];
+  unknowns_to_verify?: string[];
   created_at: string;
 }
 

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Plus, Eye, Shield, ArrowRight, Camera } from 'lucide-react';
+import { Plus, Eye, Shield, ArrowRight, Camera, Sparkles, FileText } from 'lucide-react';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { formatCurrency } from '@/lib/utils';
 import type { Project } from '@/types';
@@ -33,6 +33,23 @@ export default async function DashboardPage() {
     projects = (data as Project[]) || [];
   }
 
+  const projectIds = projects.map(project => project.id);
+  const estimateMap = new Map<string, { low_estimate: number; high_estimate: number; mid_estimate: number }>();
+
+  if (projectIds.length > 0) {
+    const { data: estimates } = await supabaseAdmin
+      .from('estimates')
+      .select('project_id, low_estimate, mid_estimate, high_estimate, created_at')
+      .in('project_id', projectIds)
+      .order('created_at', { ascending: false });
+
+    for (const estimate of estimates || []) {
+      if (!estimateMap.has(estimate.project_id)) {
+        estimateMap.set(estimate.project_id, estimate);
+      }
+    }
+  }
+
   const statusColors: Record<string, string> = {
     draft: 'bg-slate-100 text-slate-600',
     estimated: 'bg-blue-100 text-blue-700',
@@ -58,7 +75,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <Link href="/vision/start" className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-all flex items-center gap-4 group">
           <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
             <Eye className="h-6 w-6 text-blue-600" />
@@ -76,6 +93,26 @@ export default async function DashboardPage() {
           <div className="flex-1">
             <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Shield Tools</div>
             <div className="text-sm text-slate-500">Verify contractors + scan quotes</div>
+          </div>
+          <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+        </Link>
+        <Link href="/connect" className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Sparkles className="h-6 w-6 text-emerald-600" />
+          </div>
+          <div className="flex-1">
+            <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Find a Contractor</div>
+            <div className="text-sm text-slate-500">Move from planning into real quotes</div>
+          </div>
+          <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+        </Link>
+        <Link href="/shield/scan" className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hover:shadow-md transition-all flex items-center gap-4 group">
+          <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <FileText className="h-6 w-6 text-amber-600" />
+          </div>
+          <div className="flex-1">
+            <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Scan a Quote</div>
+            <div className="text-sm text-slate-500">Catch risky payment or scope terms</div>
           </div>
           <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
         </Link>
@@ -119,15 +156,27 @@ export default async function DashboardPage() {
                   </div>
                 )}
                 <div className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColors[project.status]}`}>
                       {project.status.replace(/_/g, ' ')}
+                    </span>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${project.generated_image_urls?.length ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                      {project.generated_image_urls?.length ? `${project.generated_image_urls.length} concept${project.generated_image_urls.length > 1 ? 's' : ''}` : 'No concepts yet'}
                     </span>
                   </div>
                   <h3 className="font-bold text-slate-900 capitalize group-hover:text-blue-600 transition-colors">
                     {project.project_category.replace(/_/g, ' ')}
                   </h3>
                   <p className="text-xs text-slate-400 mt-1">ZIP: {project.zip_code}</p>
+                  {estimateMap.get(project.id) && (
+                    <p className="text-sm text-slate-700 mt-3 font-medium">
+                      Estimate: {formatCurrency(estimateMap.get(project.id)!.low_estimate)} to {formatCurrency(estimateMap.get(project.id)!.high_estimate)}
+                    </p>
+                  )}
+                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
+                    <span>{new Date(project.created_at).toLocaleDateString()}</span>
+                    <span className="font-medium text-blue-600 group-hover:text-blue-700">Open project</span>
+                  </div>
                 </div>
               </Link>
             ))}
