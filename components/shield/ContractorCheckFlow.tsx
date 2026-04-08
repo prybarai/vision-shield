@@ -10,8 +10,9 @@ import Disclaimer from '@/components/ui/Disclaimer';
 import { DISCLAIMERS } from '@/lib/disclaimers';
 import { getRiskColor, getRiskBgColor, getRiskLabel, cn } from '@/lib/utils';
 import { US_STATES } from '@/types';
-import { CheckCircle, XCircle, AlertTriangle, ShieldAlert, ExternalLink } from 'lucide-react';
+import { AlertTriangle, CheckCircle, ExternalLink, ShieldAlert, ShieldCheck, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 type Step = 'form' | 'questionnaire' | 'results';
 
@@ -97,6 +98,10 @@ export default function ContractorCheckFlow() {
       }
 
       const data = await res.json();
+      posthog.capture('shield_check_lookup_complete', {
+        state: form.state,
+        license_status: data.license?.status,
+      });
       setLicensePreview(data.license);
       setStep('questionnaire');
     } catch (lookupError) {
@@ -123,6 +128,11 @@ export default function ContractorCheckFlow() {
 
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || 'Check failed');
+      posthog.capture('shield_check_completed', {
+        state: form.state,
+        risk_level: data.risk?.risk_level,
+        license_status: data.license?.status,
+      });
       setResult(data);
       setStep('results');
     } catch (submitError) {
@@ -151,24 +161,30 @@ export default function ContractorCheckFlow() {
   };
 
   const renderLicenseCard = (license: LicenseResult) => (
-    <Card className="mb-4">
-      <div className="flex items-start justify-between gap-4 mb-3">
+    <Card className="mb-4 p-5 sm:p-6">
+      <div className="flex items-start justify-between gap-4 mb-4 flex-wrap">
         <div>
           <h3 className="font-bold text-slate-900 mb-1">License check</h3>
-          <p className="text-sm text-slate-500">We try automatic verification first, then fall back to the state board if needed.</p>
+          <p className="text-sm text-slate-500">We try automatic verification first, then point you to the state board when automation is incomplete.</p>
         </div>
         {licenseStatusBadge(license.status)}
       </div>
 
       {license.status === 'active' && (
-        <div className="mb-3 rounded-2xl border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-          Good sign. An active license lowers risk, but you should still review insurance, contract terms, payment structure, and references.
+        <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+          Good sign. An active license lowers risk, but it does not replace checking insurance, written scope, payment structure, and references.
+        </div>
+      )}
+
+      {license.status === 'expired' && (
+        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          Caution. A license record was found, but it does not appear currently active. Ask the contractor to explain that before moving forward.
         </div>
       )}
 
       {license.status === 'not_found' && (
-        <div className="mb-3 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-          Higher caution. No automatic license match was found. Double-check the business name, ask for the license number directly, and verify on the state board before paying a deposit.
+        <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          Higher caution. No automatic match was found. Double-check the business name, ask for the exact license number, and verify directly before paying a deposit.
         </div>
       )}
 
@@ -177,27 +193,31 @@ export default function ContractorCheckFlow() {
           <div className="flex items-start gap-3">
             <ShieldAlert className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-amber-900">{license.fallbackMessage || 'We could not automatically verify this license.'}</p>
+              <p className="text-sm font-semibold text-amber-900">{license.fallbackMessage || 'Automatic verification could not confirm the record.'}</p>
               {license.boardName && <p className="text-sm text-amber-800 mt-1">Check directly with {license.boardName}.</p>}
               {license.boardUrl && (
                 <a href={license.boardUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-amber-900 underline">
-                  Open state board verification <ExternalLink className="h-4 w-4" />
+                  Open state board verification
+                  <ExternalLink className="h-4 w-4" />
                 </a>
               )}
             </div>
           </div>
         </div>
       ) : (
-        <div className="space-y-1 text-sm text-slate-600">
-          {license.businessName && <p><strong>Business:</strong> {license.businessName}</p>}
-          {license.licenseNumber && <p><strong>License #:</strong> {license.licenseNumber}</p>}
-          {license.licenseType && <p><strong>Type:</strong> {license.licenseType}</p>}
-          {license.expiresAt && <p><strong>Expires:</strong> {license.expiresAt}</p>}
-          {license.boardName && <p><strong>Board:</strong> {license.boardName}</p>}
+        <div className="grid gap-3 sm:grid-cols-2 text-sm text-slate-700">
+          {license.businessName && <div><span className="font-semibold text-slate-900">Business:</span> {license.businessName}</div>}
+          {license.licenseNumber && <div><span className="font-semibold text-slate-900">License #:</span> {license.licenseNumber}</div>}
+          {license.licenseType && <div><span className="font-semibold text-slate-900">Type:</span> {license.licenseType}</div>}
+          {license.expiresAt && <div><span className="font-semibold text-slate-900">Expires:</span> {license.expiresAt}</div>}
+          {license.boardName && <div><span className="font-semibold text-slate-900">Board:</span> {license.boardName}</div>}
           {license.boardUrl && (
-            <a href={license.boardUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline mt-2">
-              Verify on board website <ExternalLink className="h-4 w-4" />
-            </a>
+            <div>
+              <a href={license.boardUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+                Verify on board website
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </div>
           )}
         </div>
       )}
@@ -206,63 +226,72 @@ export default function ContractorCheckFlow() {
 
   if (step === 'form') {
     return (
-      <form onSubmit={handleLookup}>
-        <Card className="space-y-4 mb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Contractor name"
-              placeholder="John Smith"
-              value={form.contractor_name}
-              onChange={e => updateForm('contractor_name', e.target.value)}
-            />
-            <Input
-              label="Business name"
-              placeholder="Smith Construction LLC"
-              value={form.contractor_business_name}
-              onChange={e => updateForm('contractor_business_name', e.target.value)}
-              required
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Phone"
-              type="tel"
-              placeholder="(555) 555-5555"
-              value={form.contractor_phone}
-              onChange={e => updateForm('contractor_phone', e.target.value)}
-            />
-            <Input
-              label="License number"
-              placeholder="Optional but helpful"
-              value={form.contractor_license_number}
-              onChange={e => updateForm('contractor_license_number', e.target.value)}
-            />
-          </div>
-          <Input
-            label="Website"
-            type="url"
-            placeholder="https://example.com"
-            value={form.contractor_website}
-            onChange={e => updateForm('contractor_website', e.target.value)}
-          />
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">State <span className="text-red-500">*</span></label>
-            <select
-              className="block w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={form.state}
-              onChange={e => updateForm('state', e.target.value)}
-              required
-            >
-              <option value="">Select state...</option>
-              {US_STATES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-            </select>
-          </div>
-        </Card>
+      <div className="space-y-5">
+        <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Check a contractor before you commit</h2>
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+            Start with the business name and state. If you have a license number, include it, but you do not need every field filled in to get a useful result.
+          </p>
+        </div>
 
-        {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm mb-4">{error}</div>}
-        <Disclaimer text={DISCLAIMERS.license_result} className="mb-4" />
-        <Button type="submit" className="w-full" size="lg" loading={loading}>Check license and continue</Button>
-      </form>
+        <form onSubmit={handleLookup}>
+          <Card className="space-y-4 mb-4 p-5 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Contractor name"
+                placeholder="John Smith"
+                value={form.contractor_name}
+                onChange={e => updateForm('contractor_name', e.target.value)}
+              />
+              <Input
+                label="Business name"
+                placeholder="Smith Construction LLC"
+                value={form.contractor_business_name}
+                onChange={e => updateForm('contractor_business_name', e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Phone"
+                type="tel"
+                placeholder="(555) 555-5555"
+                value={form.contractor_phone}
+                onChange={e => updateForm('contractor_phone', e.target.value)}
+              />
+              <Input
+                label="License number"
+                placeholder="Optional but helpful"
+                value={form.contractor_license_number}
+                onChange={e => updateForm('contractor_license_number', e.target.value)}
+              />
+            </div>
+            <Input
+              label="Website"
+              type="url"
+              placeholder="https://example.com"
+              value={form.contractor_website}
+              onChange={e => updateForm('contractor_website', e.target.value)}
+            />
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">State <span className="text-red-500">*</span></label>
+              <select
+                className="block w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={form.state}
+                onChange={e => updateForm('state', e.target.value)}
+                required
+              >
+                <option value="">Select state...</option>
+                {US_STATES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              </select>
+            </div>
+          </Card>
+
+          {error && <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm mb-4">{error}</div>}
+          <Disclaimer text={DISCLAIMERS.license_result} className="mb-4" />
+          <Button type="submit" className="w-full" size="lg" loading={loading}>Check license and continue</Button>
+        </form>
+      </div>
     );
   }
 
@@ -277,17 +306,17 @@ export default function ContractorCheckFlow() {
         {renderLicenseCard(licensePreview)}
 
         <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-          Next, answer a few trust and payment questions. This helps turn the license result into a calmer, more practical risk read, especially when verification is incomplete.
+          Next, answer a few trust and payment questions. This turns the lookup into a more practical risk read, especially when the license result is incomplete.
         </div>
 
-        <Card className="mb-4">
-          <h3 className="font-bold text-slate-900 mb-4">Risk questionnaire</h3>
-          <p className="text-sm text-slate-500 mb-6">Answer these based on what the contractor has actually said or done so far.</p>
+        <Card className="mb-4 p-5 sm:p-6">
+          <h3 className="font-bold text-slate-900 mb-2">Risk questionnaire</h3>
+          <p className="text-sm text-slate-500 mb-6">Answer based on what the contractor has actually said, requested, or avoided so far.</p>
           <div className="space-y-4">
             {QUESTIONNAIRE.map((q) => (
-              <div key={q.key} className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                <p className="text-sm text-slate-700 flex-1">{q.question}</p>
-                <div className="flex gap-2 flex-wrap sm:flex-nowrap flex-shrink-0">
+              <div key={q.key} className="rounded-2xl border border-slate-200 p-4">
+                <p className="text-sm text-slate-700 mb-3">{q.question}</p>
+                <div className="flex gap-2 flex-wrap">
                   {[
                     { value: 'yes', label: 'Yes' },
                     { value: 'no', label: 'No' },
@@ -298,7 +327,7 @@ export default function ContractorCheckFlow() {
                       type="button"
                       onClick={() => updateAnswer(q.key, option.value)}
                       className={cn(
-                        'px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors',
+                        'px-3 py-2 rounded-xl text-xs font-semibold border transition-colors',
                         answers[q.key] === option.value
                           ? option.value === 'yes' ? 'bg-red-500 text-white border-red-500'
                             : option.value === 'no' ? 'bg-green-500 text-white border-green-500'
@@ -329,8 +358,8 @@ export default function ContractorCheckFlow() {
 
     return (
       <div className="space-y-6">
-        <Card className={cn('border', getRiskBgColor(riskLevel))}>
-          <div className="flex items-center justify-between mb-4 gap-3">
+        <Card className={cn('border p-5 sm:p-6', getRiskBgColor(riskLevel))}>
+          <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Contractor check result</p>
               <h3 className="font-bold text-slate-900 text-lg">Risk assessment</h3>
@@ -339,12 +368,12 @@ export default function ContractorCheckFlow() {
               {getRiskLabel(riskLevel)}
             </Badge>
           </div>
-          <p className="text-sm text-slate-700 mb-4">
+          <p className="text-sm text-slate-700 mb-4 leading-relaxed">
             {riskLevel === 'low'
-              ? 'This contractor currently shows fewer obvious warning signs based on the information provided. Keep using normal contractor diligence before signing.'
+              ? 'This contractor currently shows fewer obvious warning signs based on what you shared. Keep using normal diligence before signing.'
               : riskLevel === 'medium'
               ? 'There are meaningful caution signs here. Slow down, tighten the paperwork, and verify the open questions before paying or signing.'
-              : 'There are serious warning signs here. I would avoid paying more money until you independently verify licensing, insurance, scope, and payment terms.'}
+              : 'There are serious warning signs here. I would not send more money until licensing, insurance, scope, and payment terms are independently verified.'}
           </p>
           <div className="flex items-center gap-4">
             <div className="relative w-20 h-20 flex-shrink-0">
@@ -372,17 +401,17 @@ export default function ContractorCheckFlow() {
         {renderLicenseCard(license)}
 
         {risk.risk_flags?.length > 0 && (
-          <Card>
-            <h3 className="font-bold text-slate-900 mb-3">Triggered flags</h3>
+          <Card className="p-5 sm:p-6">
+            <h3 className="font-bold text-slate-900 mb-3">What triggered concern</h3>
             <div className="space-y-3">
               {risk.risk_flags.map((flag, i) => (
-                <div key={i} className={cn('flex items-start gap-3 p-3 rounded-xl', flag.severity === 'high' ? 'bg-red-50' : 'bg-amber-50')}>
+                <div key={i} className={cn('flex items-start gap-3 p-4 rounded-2xl', flag.severity === 'high' ? 'bg-red-50' : 'bg-amber-50')}>
                   {flag.severity === 'high'
                     ? <XCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                     : <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />}
                   <div>
                     <div className="font-semibold text-sm text-slate-900">{flag.flag}</div>
-                    <div className="text-xs text-slate-600 mt-0.5">{flag.explanation}</div>
+                    <div className="text-xs text-slate-600 mt-1 leading-relaxed">{flag.explanation}</div>
                   </div>
                 </div>
               ))}
@@ -391,9 +420,9 @@ export default function ContractorCheckFlow() {
         )}
 
         {risk.next_steps?.length > 0 && (
-          <Card>
+          <Card className="p-5 sm:p-6">
             <h3 className="font-bold text-slate-900 mb-3">Recommended next steps</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {risk.next_steps.map((stepItem, index) => (
                 <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
                   <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
@@ -404,10 +433,13 @@ export default function ContractorCheckFlow() {
           </Card>
         )}
 
-        <Card className="bg-slate-900 text-white">
-          <h3 className="font-bold text-lg mb-2">Recommended next move</h3>
-          <p className="text-sm text-slate-300 mb-4">
-            If this result still feels uneasy, move to a cleaner quote path or compare against a vetted contractor option before sending more money.
+        <Card className="bg-slate-900 text-white p-5 sm:p-6">
+          <div className="flex items-center gap-2 text-sm font-semibold text-blue-200 mb-2">
+            <ShieldCheck className="h-4 w-4" />
+            Recommended next move
+          </div>
+          <p className="text-sm text-slate-300 mb-4 leading-relaxed">
+            If this result still feels uneasy, compare against a cleaner contractor path or scan their paperwork before sending more money.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link href="/shield/scan" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">

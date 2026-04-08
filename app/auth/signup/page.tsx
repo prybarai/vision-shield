@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ShieldCheck, Sparkles } from 'lucide-react';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -32,15 +32,15 @@ export default function SignupPage() {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
+        <div className="max-w-md w-full bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
             <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Check your email!</h2>
-          <p className="text-slate-500">We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account.</p>
-          <Link href="/vision/start" className="mt-6 inline-block text-blue-600 hover:underline text-sm">
-            Start a project while you wait →
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Check your email</h2>
+          <p className="text-slate-500 leading-relaxed">We sent a confirmation link to <strong>{email}</strong>. Once you confirm, your dashboard will be ready.</p>
+          <Link href="/vision/start" className="mt-6 inline-block text-blue-600 hover:underline text-sm font-medium">
+            Start a project while you wait
           </Link>
         </div>
       </div>
@@ -48,15 +48,26 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-          <div className="text-center mb-8">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <span className="text-white font-bold">P</span>
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
-            <p className="text-slate-500 text-sm mt-1">Free to start — no credit card required</p>
+    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:py-12">
+      <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="rounded-[2rem] bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-4">
+            <span className="text-xl font-bold">P</span>
+          </div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-3">Create your Prybar account</h1>
+          <p className="text-slate-600 leading-relaxed mb-6">
+            Save projects, reopen estimates, and keep your planning and contractor trust tools in one place.
+          </p>
+          <div className="space-y-3 text-sm text-slate-600">
+            <div className="flex items-start gap-2"><Sparkles className="h-4 w-4 mt-0.5 text-blue-600" /><span>Free to start, no credit card required.</span></div>
+            <div className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 mt-0.5 text-blue-600" /><span>Use Shield when you want it, without jumping into contractor calls.</span></div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 sm:p-8">
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900">Get started</h2>
+            <p className="text-slate-500 text-sm mt-1">Your account keeps projects, results, and next steps organized.</p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
@@ -77,7 +88,7 @@ export default function SignupPage() {
               hint="At least 8 characters"
               minLength={8}
             />
-            {error && <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">{error}</div>}
+            {error && <div className="bg-red-50 border border-red-200 rounded-2xl p-3 text-red-700 text-sm">{error}</div>}
             <Button type="submit" className="w-full" loading={loading}>
               Create account
             </Button>
@@ -88,8 +99,8 @@ export default function SignupPage() {
             <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">Sign in</Link>
           </div>
 
-          <p className="text-xs text-slate-400 text-center mt-4">
-            By signing up, you agree to our terms of service.
+          <p className="text-xs text-slate-400 text-center mt-4 leading-relaxed">
+            By signing up, you agree to our terms and understand Prybar provides planning and informational tools, not legal or contractor guarantees.
           </p>
         </div>
       </div>
