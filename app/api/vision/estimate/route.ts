@@ -41,6 +41,10 @@ type ScopeAnswers = Record<string, string>;
 type QualityTier = 'budget' | 'mid' | 'premium';
 type SizeKey = 'small' | 'medium' | 'large';
 
+type AreaBucket = 'low' | 'medium' | 'high' | null | undefined;
+type WidthBucket = 'narrow' | 'standard' | 'wide' | null | undefined;
+type DepthBucket = 'shallow' | 'standard' | 'deep' | null | undefined;
+
 function roundToHundred(value: number) {
   return Math.round(value / 100) * 100;
 }
@@ -88,6 +92,24 @@ function getQualityMultiplier(qualityTier: string) {
   return multipliers[qualityTier] ?? 1.0;
 }
 
+function areaBucketMultiplier(bucket: AreaBucket, low = 0.85, high = 1.15) {
+  if (bucket === 'low') return low;
+  if (bucket === 'high') return high;
+  return 1;
+}
+
+function widthBucketMultiplier(bucket: WidthBucket, narrow = 0.94, wide = 1.1) {
+  if (bucket === 'narrow') return narrow;
+  if (bucket === 'wide') return wide;
+  return 1;
+}
+
+function depthBucketMultiplier(bucket: DepthBucket, shallow = 0.95, deep = 1.1) {
+  if (bucket === 'shallow') return shallow;
+  if (bucket === 'deep') return deep;
+  return 1;
+}
+
 function getAnalysis(input: unknown): VisionAnalysis | undefined {
   if (!input || typeof input !== 'object') return undefined;
 
@@ -96,11 +118,20 @@ function getAnalysis(input: unknown): VisionAnalysis | undefined {
     ...FALLBACK_VISION_ANALYSIS,
     ...partial,
     visible_features: Array.isArray(partial.visible_features) ? partial.visible_features : [],
+    size_reasoning: Array.isArray(partial.size_reasoning) ? partial.size_reasoning : [],
     estimation_notes: Array.isArray(partial.estimation_notes) ? partial.estimation_notes : [],
     materials_signals: Array.isArray(partial.materials_signals) ? partial.materials_signals : [],
     scope_signals: {
       ...FALLBACK_VISION_ANALYSIS.scope_signals,
       ...(partial.scope_signals || {}),
+    },
+    estimated_dimensions: {
+      ...FALLBACK_VISION_ANALYSIS.estimated_dimensions,
+      ...(partial.estimated_dimensions || {}),
+    },
+    area_signals: {
+      ...FALLBACK_VISION_ANALYSIS.area_signals,
+      ...(partial.area_signals || {}),
     },
   };
 }
@@ -187,6 +218,17 @@ function buildEstimateBreakdown(range: { low_estimate: number; mid_estimate: num
   };
 }
 
+function addConfidenceAssumption(assumptions: string[], analysis?: VisionAnalysis) {
+  if (!analysis?.confidence) return;
+  if (analysis.confidence === 'low') {
+    assumptions.push('Photo visibility confidence was low, so size and scope assumptions were kept broader than usual');
+  } else if (analysis.confidence === 'high') {
+    assumptions.push('Photo visibility confidence was high, so visible size and complexity assumptions could be grounded more tightly');
+  } else {
+    assumptions.push('Photo visibility confidence was moderate, so visible scope signals were used with standard planning caution');
+  }
+}
+
 function addPhotoDrivenAssumptions(assumptions: string[], analysis?: VisionAnalysis, category?: string) {
   if (!analysis) return;
 
@@ -208,6 +250,20 @@ function addPhotoDrivenAssumptions(assumptions: string[], analysis?: VisionAnaly
     assumptions.push(`Roof complexity appears ${analysis.scope_signals.roof_complexity} from uploaded image`);
   }
 
+  if (analysis.estimated_dimensions.width_bucket) {
+    assumptions.push(`Visible width reads as ${humanize(analysis.estimated_dimensions.width_bucket)}`);
+  }
+
+  if (analysis.estimated_dimensions.depth_bucket) {
+    assumptions.push(`Visible depth reads as ${humanize(analysis.estimated_dimensions.depth_bucket)}`);
+  }
+
+  if (analysis.size_reasoning.length > 0) {
+    assumptions.push(`Visible size cues: ${analysis.size_reasoning.slice(0, 2).join('; ')}`);
+  }
+
+  addConfidenceAssumption(assumptions, analysis);
+
   const firstNote = analysis.estimation_notes.find(Boolean);
   if (firstNote) assumptions.push(`Photo-based planning note: ${firstNote}`);
 }
@@ -221,6 +277,7 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
   const prepLevel = scopeAnswers.prep_level || 'light';
   const zipMultiplier = getZipMultiplier(zip);
   const openingAdjustments = getPaintOpeningAdjustments(analysis?.scope_signals.window_count_visible);
+  const wallAreaMultiplier = areaBucketMultiplier(analysis?.area_signals.wall_area_bucket, 0.85, 1.15);
 
   const scopeRates: Record<string, { labor: number; materials: number; label: string }> = {
     walls_only: { labor: 1.45, materials: 0.28, label: 'walls only' },
@@ -232,33 +289,33 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
   const ceilingMultiplier = analysis?.scope_signals.ceiling_height === 'tall' ? 1.12 : analysis?.scope_signals.ceiling_height === 'vaulted' ? 1.18 : 1;
   const scopeRate = scopeRates[paintScope] ?? scopeRates.walls_only;
   const prepMultiplier = (prepMultiplierByLevel[prepLevel] ?? 1) * ceilingMultiplier;
-  const grossWallArea = room.wallArea;
+  const grossWallArea = room.wallArea * wallAreaMultiplier;
   const paintableWallArea = grossWallArea * openingAdjustments.reductionFactor;
   const trimLinearFeet = paintScope === 'walls_ceiling_trim' ? Math.max(40, Math.round(room.floorArea / 2.5)) : 0;
 
   let labor = paintableWallArea * scopeRate.labor * prepMultiplier;
-  let materials = paintableWallArea * scopeRate.materials * qualityAdjustment[qualityTier];
+  let materials = paintableWallArea * scopeRate.materials * qualityAdjustment[qualityTier as QualityTier];
 
   if (paintScope === 'walls_and_ceiling') {
     labor += room.floorArea * 0.55 * prepMultiplier;
-    materials += room.floorArea * 0.12 * qualityAdjustment[qualityTier];
+    materials += room.floorArea * 0.12 * qualityAdjustment[qualityTier as QualityTier];
   }
 
   if (paintScope === 'walls_ceiling_trim') {
     labor += room.floorArea * 0.6 * prepMultiplier + trimLinearFeet * 2.5 * openingAdjustments.trimLaborFactor;
-    materials += room.floorArea * 0.14 * qualityAdjustment[qualityTier] + trimLinearFeet * 0.35;
+    materials += room.floorArea * 0.14 * qualityAdjustment[qualityTier as QualityTier] + trimLinearFeet * 0.35;
   } else {
     labor *= openingAdjustments.trimLaborFactor;
   }
 
-  const midBeforeRegional = (labor + materials) * qualityAdjustment[qualityTier];
+  const midBeforeRegional = (labor + materials) * qualityAdjustment[qualityTier as QualityTier];
   const minimumByScope: Record<string, number> = {
     walls_only: room.key === 'small' ? 500 : room.key === 'medium' ? 900 : 1300,
     walls_and_ceiling: room.key === 'small' ? 800 : room.key === 'medium' ? 1200 : 1800,
     walls_ceiling_trim: room.key === 'small' ? 1100 : room.key === 'medium' ? 1700 : 2500,
   };
   const mid = Math.max(midBeforeRegional * zipMultiplier, minimumByScope[paintScope] ?? 700);
-  const spread = room.key === 'small' && paintScope === 'walls_only' ? 0.16 : 0.19;
+  const spread = analysis?.confidence === 'low' ? 0.23 : room.key === 'small' && paintScope === 'walls_only' ? 0.16 : 0.19;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.82, Math.max(0.66, labor / Math.max(labor + materials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
@@ -267,6 +324,7 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
     `${room.key} room planning assumption using about ${room.floorArea} floor sq ft and ${Math.round(grossWallArea)} gross wall sq ft`,
     `${scopeRate.label} scope with ${prepLevel} prep`,
     `Paintable wall area modeled at about ${Math.round(paintableWallArea)} sq ft after visible opening deductions`,
+    analysis?.area_signals.wall_area_bucket ? `Wall area signal of ${analysis.area_signals.wall_area_bucket} adjusted wall area by visible scale` : 'Wall area kept at a standard room-planning assumption',
     openingAdjustments.summary,
     analysis?.scope_signals.ceiling_height === 'tall' || analysis?.scope_signals.ceiling_height === 'vaulted'
       ? `${humanize(analysis.scope_signals.ceiling_height)} ceiling signal increased labor and prep allowance`
@@ -305,17 +363,19 @@ function estimateFlooring(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
     tile: { budget: { labor: 5.0, materials: 3.2 }, mid: { labor: 6.0, materials: 4.8 }, premium: { labor: 7.5, materials: 6.8 } },
   };
 
-  const area = areaBySize[roomSize] ?? areaBySize.medium;
+  const floorAreaMultiplier = areaBucketMultiplier(analysis?.area_signals.floor_area_bucket, 0.85, 1.2);
+  const area = Math.round((areaBySize[roomSize] ?? areaBySize.medium) * floorAreaMultiplier);
   const rates = pricingByMaterial[materialType]?.[qualityTier];
   if (!rates) return null;
 
   const demoRate = demoRequired === 'yes' ? (materialType === 'tile' ? 2.5 : 1.5) : 0;
   const transitionsAllowance = materialType === 'tile' ? 1.0 : 0.55;
+  const wideComplexityFactor = analysis?.estimated_dimensions.width_bucket === 'wide' ? 1.05 : 1;
   const zipMultiplier = getZipMultiplier(zip);
-  const labor = area * (rates.labor + demoRate + transitionsAllowance * 0.65);
+  const labor = area * (rates.labor + demoRate + transitionsAllowance * 0.65) * wideComplexityFactor;
   const materials = area * (rates.materials + transitionsAllowance * 0.35);
   const mid = (labor + materials) * zipMultiplier;
-  const spread = materialType === 'tile' || demoRequired === 'yes' ? 0.18 : 0.14;
+  const spread = analysis?.confidence === 'low' ? 0.22 : materialType === 'tile' || demoRequired === 'yes' ? 0.18 : 0.14;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.68, Math.max(0.52, labor / Math.max(labor + materials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
@@ -323,10 +383,13 @@ function estimateFlooring(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
 
   assumptions.push(
     `${roomSize} flooring scope using about ${area} sq ft`,
+    analysis?.area_signals.floor_area_bucket ? `Floor area signal of ${analysis.area_signals.floor_area_bucket} adjusted the planning square footage` : 'Floor area kept at a standard room-planning assumption',
     `${materialType.replace(/_/g, ' ')} installed planning rate modeled around ${formatCurrency(installedRate)}/sq ft before spread`,
     demoRequired === 'yes' ? `Included demolition/removal allowance of about ${formatCurrency(demoRate)}/sq ft` : 'No demolition/removal allowance included',
-    `Included a transitions and trim reset allowance of about ${formatCurrency(transitionsAllowance)}/sq ft`,
-    `Area and installed rate remain planning-grade until exact square footage and substrate conditions are measured onsite`,
+    analysis?.estimated_dimensions.width_bucket === 'wide'
+      ? 'Wide visible layout increased transition and trim-reset complexity slightly'
+      : `Included a transitions and trim reset allowance of about ${formatCurrency(transitionsAllowance)}/sq ft`,
+    'Area and installed rate remain planning-grade until exact square footage and substrate conditions are measured onsite',
   );
   addPhotoDrivenAssumptions(assumptions, analysis, 'flooring');
 
@@ -422,11 +485,14 @@ function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: stri
     cedar_redwood: { labor: 62, materials: 48 },
   };
 
-  const area = areaBySize[deckSize];
+  const yardMultiplier = areaBucketMultiplier(analysis?.area_signals.yard_area_bucket, 0.9, 1.18);
+  const widthMultiplier = widthBucketMultiplier(analysis?.estimated_dimensions.width_bucket, 0.96, 1.08);
+  const depthMultiplier = depthBucketMultiplier(analysis?.estimated_dimensions.depth_bucket, 0.97, 1.1);
+  const area = Math.round(areaBySize[deckSize] * yardMultiplier * widthMultiplier * depthMultiplier);
   const rates = pricingByMaterial[materialType]?.[qualityTier];
   if (!area || !rates) return null;
 
-  const estimatedPerimeter = deckSize === 'small' ? 32 : deckSize === 'medium' ? 48 : 64;
+  const estimatedPerimeter = Math.round((deckSize === 'small' ? 32 : deckSize === 'medium' ? 48 : 64) * Math.max(widthMultiplier, depthMultiplier));
   const hasRailing = railing === 'yes';
   let labor = area * rates.labor;
   let materials = area * rates.materials;
@@ -441,7 +507,7 @@ function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: stri
 
   const zipMultiplier = getZipMultiplier(zip);
   const mid = (labor + materials) * zipMultiplier;
-  const range = buildRange(mid, hasRailing ? 0.18 : 0.15);
+  const range = buildRange(mid, analysis?.confidence === 'low' ? 0.22 : hasRailing ? 0.18 : 0.15);
   const laborShare = Math.min(0.72, Math.max(0.58, labor / Math.max(labor + materials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
 
@@ -449,9 +515,14 @@ function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: stri
     ...range,
     assumptions: [
       `${deckSize} deck/patio planning scope using about ${area} sq ft`,
+      analysis?.area_signals.yard_area_bucket ? `Yard area signal of ${analysis.area_signals.yard_area_bucket} refined the likely outdoor footprint` : 'Outdoor footprint kept at a standard planning assumption',
       `${materialType.replace(/_/g, ' ')} deck structure and boards priced separately from railing allowances`,
       hasRailing ? `Included about ${estimatedPerimeter} linear ft of matching railing allowance` : 'No railing allowance included',
+      analysis?.estimated_dimensions.width_bucket === 'wide' || analysis?.estimated_dimensions.depth_bucket === 'deep'
+        ? 'Wide/deep backyard cues allowed a larger visible deck footprint assumption'
+        : 'No oversized backyard cues were used in the footprint assumption',
       analysis?.scope_signals.access_difficulty === 'difficult' ? 'Difficult access signal increased framing and install labor' : 'Normal backyard access assumed',
+      ...(analysis?.size_reasoning.length ? [`Visible size cues: ${analysis.size_reasoning.slice(0, 2).join('; ')}`] : []),
     ],
     risk_notes: [
       'Footings, stairs, permit requirements, demolition, height off grade, and guardrail code rules can increase pricing',
@@ -477,7 +548,8 @@ function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
     metal: { budget: { labor: 4.5, materials: 5.0 }, mid: { labor: 5.4, materials: 7.6 }, premium: { labor: 6.2, materials: 10.5 } },
   };
 
-  const area = areaBySize[roofSize];
+  const areaMultiplier = areaBucketMultiplier(analysis?.area_signals.roof_area_bucket, 0.85, 1.18) * widthBucketMultiplier(analysis?.estimated_dimensions.width_bucket, 0.96, 1.08);
+  const area = Math.round((areaBySize[roofSize] ?? areaBySize.medium) * areaMultiplier);
   const rates = pricingByMaterial[materialType]?.[qualityTier];
   if (!area || !rates) return null;
 
@@ -500,25 +572,28 @@ function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
   if (complexity === 'low') laborMultiplier -= 0.04;
   if (difficultAccess) laborMultiplier += 0.08;
   if (roofSize === 'small' && complexity !== 'high') laborMultiplier -= 0.03;
+  if (analysis?.estimated_dimensions.width_bucket === 'wide') laborMultiplier += 0.03;
 
   labor *= laborMultiplier;
   if (complexity === 'high') materials *= 1.04;
 
   const zipMultiplier = getZipMultiplier(zip);
   const mid = (labor + materials) * zipMultiplier;
-  const spread = materialType === 'metal' || complexity === 'high' ? 0.17 : 0.14;
+  const spread = analysis?.confidence === 'low' ? 0.22 : materialType === 'metal' || complexity === 'high' ? 0.17 : 0.14;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.74, Math.max(0.58, labor / Math.max(labor + materials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
 
   const assumptions = [
     `${roofSize} roof planning assumption using about ${area.toLocaleString()} inferred roofing sq ft`,
+    analysis?.area_signals.roof_area_bucket ? `Roof area signal of ${analysis.area_signals.roof_area_bucket} refined the base roof footprint` : 'Roof area kept at a standard planning assumption',
     `${materialType.replace(/_/g, ' ')} roof priced with separate labor and material allowances`,
     tearOff === 'yes' ? 'Included full tear-off and disposal allowance' : 'Overlay/no tear-off assumption used',
     stories > 1 ? `${stories}-story access increased labor allowance modestly` : 'Single-story access assumption used',
     complexity === 'high' ? 'High roof complexity increased detail labor and waste allowance, but multipliers were kept measured' : `Roof complexity assumed ${complexity}`,
+    analysis?.estimated_dimensions.width_bucket === 'wide' ? 'Wide visible roofline increased labor and layout allowance modestly' : 'No extra width-based roof layout allowance applied',
     difficultAccess ? 'Difficult access increased labor allowance modestly' : 'Normal access assumed',
-    'Roof square footage is inferred from scope answers, not measured from plans or a roof report',
+    'Roof square footage is inferred from scope answers and visible scale cues, not measured from plans or a roof report',
   ];
   addPhotoDrivenAssumptions(assumptions, analysis, 'roofing');
 
@@ -559,9 +634,13 @@ function estimateExteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
     premium: { labor: 2.95, materials: 1.24 },
   };
 
+  const areaMultiplier = areaBucketMultiplier(analysis.area_signals.wall_area_bucket, 0.88, 1.15);
+  const widthMultiplier = widthBucketMultiplier(analysis.estimated_dimensions.width_bucket, 0.96, 1.08);
+  const depthMultiplier = depthBucketMultiplier(analysis.estimated_dimensions.depth_bucket, 0.97, 1.05);
   const sizeProfile = sizeProfiles[sizeKey] ?? sizeProfiles.medium;
   const rates = qualityRates[qualityTier] ?? qualityRates.mid;
-  const paintableArea = sizeProfile.surfaceArea * openingAdjustments.reductionFactor;
+  const adjustedSurfaceArea = sizeProfile.surfaceArea * areaMultiplier * widthMultiplier * depthMultiplier;
+  const paintableArea = adjustedSurfaceArea * openingAdjustments.reductionFactor;
   let labor = paintableArea * rates.labor;
   let materials = paintableArea * rates.materials;
   labor += sizeProfile.trimLinearFeet * 2.4 * openingAdjustments.trimLaborFactor;
@@ -576,6 +655,10 @@ function estimateExteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
     labor *= 0.95;
   }
 
+  if (analysis.estimated_dimensions.width_bucket === 'wide' && stories >= 2) {
+    labor *= 1.05;
+  }
+
   if (sizeKey === 'small' && stories === 1 && visibleWindows <= 2 && complexity === 'low') {
     labor *= 0.93;
     materials *= 0.96;
@@ -588,17 +671,21 @@ function estimateExteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
 
   const zipMultiplier = getZipMultiplier(zip);
   const mid = (labor + materials) * zipMultiplier;
-  const spread = complexity === 'high' || stories >= 3 ? 0.18 : 0.15;
+  const spread = analysis.confidence === 'low' ? 0.22 : complexity === 'high' || stories >= 3 ? 0.18 : 0.15;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.8, Math.max(0.68, labor / Math.max(labor + materials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
 
   assumptions.push(
-    `${sizeKey} exterior size bucket using about ${sizeProfile.surfaceArea.toLocaleString()} gross paintable sq ft of siding and trim surfaces`,
+    `${sizeKey} exterior size bucket using about ${Math.round(adjustedSurfaceArea).toLocaleString()} gross paintable sq ft of siding and trim surfaces`,
+    analysis.area_signals.wall_area_bucket ? `Wall area signal of ${analysis.area_signals.wall_area_bucket} refined the facade surface assumption` : 'Facade wall area kept at a standard exterior planning assumption',
     `Visible openings reduced modeled body paint area to about ${Math.round(paintableArea).toLocaleString()} sq ft while trim/detail labor stayed active`,
     stories ? `${stories}-story access assumption applied` : 'Story count not confidently visible',
     openingAdjustments.summary,
     complexity ? `${complexity} paint complexity signal used for trim/detail labor` : 'Standard exterior paint complexity assumed',
+    analysis.estimated_dimensions.width_bucket === 'wide' && stories >= 2 && visibleWindows >= 4
+      ? 'Wide multi-story facade with many windows increased trim, ladder, and masking labor assumptions'
+      : 'No major facade width-driven trim premium was added',
   );
   addPhotoDrivenAssumptions(assumptions, analysis, 'exterior_paint');
 
@@ -636,13 +723,16 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
 
   if (mappedCategory) {
     const mapped = fallbackEstimate(mappedCategory, qualityTier, zip, notes);
+    const assumptions = [
+      `Custom project scope was inferred most closely as ${mappedCategory.replace(/_/g, ' ')} from uploaded photo analysis and homeowner notes`,
+      ...mapped.assumptions,
+      'Estimate remains planning-grade until exact onsite scope and quantities are confirmed',
+    ];
+    addPhotoDrivenAssumptions(assumptions, analysis, 'custom_project');
+
     return {
       ...mapped,
-      assumptions: [
-        `Custom project scope was inferred most closely as ${mappedCategory.replace(/_/g, ' ')} from uploaded photo analysis and homeowner notes`,
-        ...mapped.assumptions,
-        'Estimate remains planning-grade until exact onsite scope and quantities are confirmed',
-      ],
+      assumptions,
       risk_notes: [
         'Custom-project pricing may change once hidden scope, sequencing, and exact measurements are confirmed onsite',
         ...mapped.risk_notes,
@@ -657,7 +747,7 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
   const complexityMultiplier: Record<string, number> = { simple: 1.0, moderate: 1.25, complex: 1.6 };
   const qualityMultiplier = getQualityMultiplier(qualityTier);
   const mid = (baseMidBySize[sizeBucket] ?? 9000) * (complexityMultiplier[complexity] ?? 1.25) * qualityMultiplier * zipMultiplier;
-  const range = buildRange(mid, 0.22);
+  const range = buildRange(mid, analysis?.confidence === 'low' ? 0.26 : 0.22);
   const breakdown = buildEstimateBreakdown(range, 0.68);
   const assumptions = [
     'This is a mixed-scope planning estimate for a custom project',
@@ -786,6 +876,7 @@ export async function POST(req: NextRequest) {
 
     if (analysis) {
       result.estimate_basis = withAnalysisBasis(result.estimate_basis, analysis, 4);
+      addConfidenceAssumption(result.assumptions, analysis);
     }
 
     const { data, error } = await supabaseAdmin

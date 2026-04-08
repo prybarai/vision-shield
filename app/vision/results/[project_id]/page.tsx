@@ -81,6 +81,9 @@ export default async function VisionResultsPage({ params }: PageProps) {
   const requestedDirection = project.generated_image_urls?.length > 0 ? buildRequestedDesignDirection(project.notes) : null;
   const likelyTrades = Array.isArray(brief?.likely_trades) ? brief.likely_trades : [];
   const unknownsToVerify = Array.isArray(brief?.unknowns_to_verify) ? brief.unknowns_to_verify : [];
+  const sizeDrivenAssumptions = Array.isArray(estimate?.assumptions)
+    ? estimate.assumptions.filter((item: string) => /photo|visible|wall area|floor area|roof area|yard area|width|depth|confidence|story|window/i.test(item))
+    : [];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -116,6 +119,9 @@ export default async function VisionResultsPage({ params }: PageProps) {
                 This is a planning-grade estimate for a custom scope. A contractor site visit will narrow pricing.
               </div>
             )}
+            <div className="mb-4 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+              Prybar used uploaded photo analysis to estimate visible size and complexity.
+            </div>
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="text-center p-4 bg-slate-50 rounded-xl">
                 <div className="text-sm text-slate-500 mb-1">Low</div>
@@ -159,6 +165,18 @@ export default async function VisionResultsPage({ params }: PageProps) {
                         </div>
                       </div>
                     </div>
+                  </div>
+                )}
+                {sizeDrivenAssumptions.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-700 mb-2">Photo-based size and complexity signals</h4>
+                    <ul className="space-y-1">
+                      {sizeDrivenAssumptions.map((a: string, i: number) => (
+                        <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
+                          <span className="text-blue-500 mt-0.5">•</span>{a}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
                 {estimate.assumptions?.length > 0 && (

@@ -24,6 +24,10 @@ export type VisionCeilingHeight = 'standard' | 'tall' | 'vaulted';
 export type VisionSuggestedTrade = 'paint' | 'flooring' | 'roofing' | 'deck' | 'landscaping' | 'bathroom' | 'kitchen' | 'mixed_finish' | 'general_remodel' | 'repair' | 'unknown';
 export type VisionSuggestedLocationType = 'interior' | 'exterior' | 'unknown';
 export type VisionProjectComplexity = 'simple' | 'moderate' | 'complex';
+export type VisionDimensionBucket = 'narrow' | 'standard' | 'wide';
+export type VisionDepthBucket = 'shallow' | 'standard' | 'deep';
+export type VisionAreaSignalBucket = 'low' | 'medium' | 'high';
+export type VisionConfidence = 'low' | 'medium' | 'high';
 
 export interface VisionAnalysis {
   property_type: VisionPropertyType;
@@ -40,6 +44,18 @@ export interface VisionAnalysis {
     ceiling_height: VisionCeilingHeight | null;
     access_difficulty: VisionAccessDifficulty | null;
   };
+  estimated_dimensions: {
+    width_bucket: VisionDimensionBucket | null;
+    depth_bucket: VisionDepthBucket | null;
+  };
+  area_signals: {
+    wall_area_bucket: VisionAreaSignalBucket | null;
+    floor_area_bucket: VisionAreaSignalBucket | null;
+    roof_area_bucket: VisionAreaSignalBucket | null;
+    yard_area_bucket: VisionAreaSignalBucket | null;
+  };
+  confidence: VisionConfidence | null;
+  size_reasoning: string[];
   estimation_notes: string[];
   materials_signals: string[];
   suggested_trade?: VisionSuggestedTrade;
@@ -62,6 +78,18 @@ export const FALLBACK_VISION_ANALYSIS: VisionAnalysis = {
     ceiling_height: null,
     access_difficulty: null,
   },
+  estimated_dimensions: {
+    width_bucket: null,
+    depth_bucket: null,
+  },
+  area_signals: {
+    wall_area_bucket: null,
+    floor_area_bucket: null,
+    roof_area_bucket: null,
+    yard_area_bucket: null,
+  },
+  confidence: null,
+  size_reasoning: [],
   estimation_notes: ['Photo analysis unavailable; continue with scope-based planning assumptions.'],
   materials_signals: [],
   suggested_trade: 'unknown',
@@ -80,15 +108,21 @@ export function buildAnalysisSummary(analysis?: VisionAnalysis | null): string |
   if (analysis.property_type !== 'unknown') parts.push(humanize(analysis.property_type));
   if (analysis.scope_signals.roof_complexity) parts.push(`${analysis.scope_signals.roof_complexity} roof complexity`);
   if (analysis.scope_signals.paint_complexity) parts.push(`${analysis.scope_signals.paint_complexity} paint complexity`);
+  if (analysis.area_signals.wall_area_bucket) parts.push(`${analysis.area_signals.wall_area_bucket} visible wall area`);
+  if (analysis.area_signals.floor_area_bucket) parts.push(`${analysis.area_signals.floor_area_bucket} visible floor area`);
+  if (analysis.area_signals.roof_area_bucket) parts.push(`${analysis.area_signals.roof_area_bucket} visible roof area`);
+  if (analysis.estimated_dimensions.width_bucket) parts.push(`${analysis.estimated_dimensions.width_bucket} width`);
+  if (analysis.estimated_dimensions.depth_bucket) parts.push(`${analysis.estimated_dimensions.depth_bucket} depth`);
   if (typeof analysis.scope_signals.window_count_visible === 'number') parts.push(`${analysis.scope_signals.window_count_visible} visible windows`);
   if (analysis.scope_signals.access_difficulty) parts.push(`${analysis.scope_signals.access_difficulty} access`);
   if (analysis.scope_signals.room_size) parts.push(`${analysis.scope_signals.room_size} room`);
+  if (analysis.confidence) parts.push(`${analysis.confidence} confidence`);
   if (analysis.suggested_trade && analysis.suggested_trade !== 'unknown') parts.push(`${humanize(analysis.suggested_trade)} scope`);
   if (analysis.suggested_location_type && analysis.suggested_location_type !== 'unknown') parts.push(`${analysis.suggested_location_type} project`);
   if (analysis.complexity) parts.push(`${analysis.complexity} complexity`);
   if (parts.length === 0) return null;
 
-  return `AI analysis: ${parts.slice(0, 4).join('; ')}`;
+  return `AI analysis: ${parts.slice(0, 5).join('; ')}`;
 }
 
 export function describeAnalysisFacts(analysis?: VisionAnalysis | null): string[] {
@@ -102,7 +136,14 @@ export function describeAnalysisFacts(analysis?: VisionAnalysis | null): string[
   if (analysis.scope_signals.roof_complexity) facts.push(`${analysis.scope_signals.roof_complexity} roof complexity`);
   if (analysis.scope_signals.paint_complexity) facts.push(`${analysis.scope_signals.paint_complexity} paint complexity`);
   if (analysis.scope_signals.access_difficulty) facts.push(`${analysis.scope_signals.access_difficulty} access`);
+  if (analysis.area_signals.wall_area_bucket) facts.push(`${analysis.area_signals.wall_area_bucket} wall area signal`);
+  if (analysis.area_signals.floor_area_bucket) facts.push(`${analysis.area_signals.floor_area_bucket} floor area signal`);
+  if (analysis.area_signals.roof_area_bucket) facts.push(`${analysis.area_signals.roof_area_bucket} roof area signal`);
+  if (analysis.area_signals.yard_area_bucket) facts.push(`${analysis.area_signals.yard_area_bucket} yard area signal`);
+  if (analysis.estimated_dimensions.width_bucket) facts.push(`${analysis.estimated_dimensions.width_bucket} width`);
+  if (analysis.estimated_dimensions.depth_bucket) facts.push(`${analysis.estimated_dimensions.depth_bucket} depth`);
   if (typeof analysis.scope_signals.window_count_visible === 'number') facts.push(`${analysis.scope_signals.window_count_visible} visible windows`);
+  if (analysis.confidence) facts.push(`${analysis.confidence} confidence`);
   if (analysis.suggested_trade && analysis.suggested_trade !== 'unknown') facts.push(`${humanize(analysis.suggested_trade)} scope`);
   if (analysis.suggested_location_type && analysis.suggested_location_type !== 'unknown') facts.push(`${analysis.suggested_location_type} project`);
   if (analysis.complexity) facts.push(`${analysis.complexity} complexity`);

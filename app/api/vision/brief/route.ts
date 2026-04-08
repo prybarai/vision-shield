@@ -47,9 +47,25 @@ function inferLikelyTrades(category: string, analysis?: VisionAnalysis) {
   return ['general contractor'];
 }
 
+function sizeSignalSummary(analysis?: VisionAnalysis) {
+  if (!analysis) return '';
+  const parts = [
+    analysis.area_signals.wall_area_bucket ? `${analysis.area_signals.wall_area_bucket} wall area signal` : null,
+    analysis.area_signals.floor_area_bucket ? `${analysis.area_signals.floor_area_bucket} floor area signal` : null,
+    analysis.area_signals.roof_area_bucket ? `${analysis.area_signals.roof_area_bucket} roof area signal` : null,
+    analysis.area_signals.yard_area_bucket ? `${analysis.area_signals.yard_area_bucket} yard area signal` : null,
+    analysis.estimated_dimensions.width_bucket ? `${analysis.estimated_dimensions.width_bucket} width` : null,
+    analysis.estimated_dimensions.depth_bucket ? `${analysis.estimated_dimensions.depth_bucket} depth` : null,
+    analysis.confidence ? `${analysis.confidence} confidence` : null,
+  ].filter(Boolean);
+
+  return parts.length ? parts.join(', ') : '';
+}
+
 function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis): BriefResult {
   const category = params.category.replace(/_/g, ' ');
   const facts = describeAnalysisFacts(analysis).slice(0, 3).join(', ');
+  const sizeSignals = sizeSignalSummary(analysis);
   const likelyTrades = inferLikelyTrades(params.category, analysis);
 
   if (params.category === 'custom_project') {
@@ -58,9 +74,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
       : 'mixed residential improvement scope';
 
     return {
-      summary: `Homeowner wants help scoping a custom project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}. Requested change: ${params.notes || 'Homeowner description pending.'}${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
+      summary: `Homeowner wants help scoping a custom project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}. Requested change: ${params.notes || 'Homeowner description pending.'}${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Size cues suggest ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Clarify the desired update, repair, redesign, or addition and turn it into a contractor-ready scope.',
-      contractor_notes: `Likely trade focus is ${likelyTrade}. Convert the homeowner request into a clear scope, separate must-have work from optional upgrades, and tighten the biggest pricing unknowns before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+      contractor_notes: `Likely trade focus is ${likelyTrade}. Convert the homeowner request into a clear scope, separate must-have work from optional upgrades, and tighten the biggest pricing unknowns before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact work is included versus excluded in this custom scope?',
         'Which trades are actually required to complete the project properly?',
@@ -81,23 +97,23 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
 
   if (params.category === 'roofing') {
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} roofing project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} roofing project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Replace or upgrade the roof with a durable system, clean finish details, and a quote that clearly separates tear-off, materials, and accessory work.',
-      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Build a quote around inferred roof size, material system, tear-off scope, flashing details, ventilation needs, and any access constraints.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Build a quote around inferred roof size, material system, tear-off scope, flashing details, ventilation needs, and any access constraints.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       site_verification_questions: [
+        'What is the exact roof measurement, and how does it compare to the photo-based roof area assumption?',
         'How many roofing layers need to be removed, and is any section planned as overlay only?',
         'What is the condition of the roof decking once tear-off starts?',
         'Which flashing details, valleys, chimney areas, skylights, or penetrations need replacement?',
         'Are ridge vent, intake ventilation, or other ventilation upgrades required?',
         'What pitch, access, and fall-protection setup will affect crew labor?',
-        'Are gutters, edge metal, or insurance scope items included or excluded?',
       ],
       likely_trades: likelyTrades,
       unknowns_to_verify: [
+        'Exact roof measurement and waste factor',
         'Layers to remove and disposal scope',
         'Roof decking condition under existing roofing',
-        'Flashing, chimney, skylight, and penetration details',
-        'Ventilation upgrades and code requirements',
+        'Flashing, chimney, skylight, penetration, and ventilation details',
       ],
     };
   }
@@ -105,39 +121,39 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
   if (params.category === 'interior_paint' || params.category === 'exterior_paint') {
     const isExterior = params.category === 'exterior_paint';
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || `Refresh the ${isExterior ? 'outside appearance' : 'interior painted space'} with a clean, cohesive finish and a quote that clearly defines prep, surfaces included, and final coats.`,
-      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Clarify exactly which wall, ceiling, trim, door, siding, fascia, or accent surfaces are included, then tighten prep assumptions before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Clarify exactly which wall, ceiling, trim, door, siding, fascia, or accent surfaces are included, then tighten prep assumptions before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact wall, ceiling, trim, door, siding, or accent surfaces are included versus excluded?',
         'What is the true surface-prep condition, including peeling paint, cracks, patching, sanding, or caulking needs?',
+        'What wall area, opening count, and ceiling height should be measured onsite to replace the photo-based assumption?',
         'Is there any lead paint risk, stain blocking, carpentry repair, or damage repair that should be priced separately?',
         'How many colors, sheens, and coats are expected in the final scope?',
         isExterior ? 'Will ladders, lift access, scaffold, or landscaping protection be required?' : 'What furniture moving, masking, and floor protection is expected?',
-        'Are touch-ups, cleanup, and punch-list return visits included in the quote?',
       ],
       likely_trades: likelyTrades,
       unknowns_to_verify: [
         'Exact painted surfaces and exclusions',
         'Surface prep condition and repair scope',
+        'Wall area, ceiling height, openings, and trim scope',
         'Lead-safe, primer, or stain-blocking requirements',
-        'Color changes, sheen selections, and coat count',
       ],
     };
   }
 
   if (params.category === 'flooring') {
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} flooring project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} flooring project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Install updated flooring that looks cohesive, wears well, and includes clear allowances for demo, prep, transitions, and trim reset.',
-      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Confirm exact square footage, selected product, substrate readiness, and whether transitions/base work are included.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Confirm exact square footage, selected product, substrate readiness, and whether transitions/base work are included.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact square footage, closets, and adjacent areas are included?',
+        'How does the measured floor area compare to the photo-based flooring size assumption?',
         'Is demolition and disposal of existing flooring included?',
         'What subfloor prep, leveling, moisture mitigation, or crack isolation is needed?',
         'What product is being installed and what underlayment or waterproofing layer is required?',
         'Which transitions, stair noses, thresholds, and baseboard resets should be included?',
-        'Will furniture moving, appliance reset, or phased installation affect labor?',
       ],
       likely_trades: likelyTrades,
       unknowns_to_verify: [
@@ -149,10 +165,33 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
     };
   }
 
+  if (params.category === 'deck_patio') {
+    return {
+      summary: `Homeowner is planning a ${params.quality_tier} deck patio project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      homeowner_goals: params.notes || 'Build or refresh an outdoor living area with a footprint and features that fit the yard and budget.',
+      contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Confirm exact outdoor footprint, railing needs, footing requirements, grade changes, and access before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      site_verification_questions: [
+        'What exact deck or patio footprint should be measured onsite?',
+        'Do grade changes, drainage, or soil conditions affect footing or base requirements?',
+        'Are railings, stairs, skirting, or guards required by design or code?',
+        'How will attachment details, setbacks, or existing structures affect layout?',
+        'What demolition, haul-off, or site-prep work is included?',
+        'Will permits, engineering, or inspections be required for the final design?',
+      ],
+      likely_trades: likelyTrades,
+      unknowns_to_verify: [
+        'Exact footprint and elevation changes',
+        'Railing, stair, and skirting scope',
+        'Footing depth, code, and permit requirements',
+        'Site access, drainage, and demolition needs',
+      ],
+    };
+  }
+
   return {
-    summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}`,
+    summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
     homeowner_goals: params.notes || `Wants a clean, practical ${category} upgrade that feels cohesive and ready for contractor pricing.`,
-    contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Use this as a planning-grade brief, not a final scope. Confirm measurements, existing conditions, code requirements, demolition scope, finish selections, and lead times before issuing a final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}`,
+    contractor_notes: `Likely trades: ${likelyTrades.join(', ')}. Use this as a planning-grade brief, not a final scope. Confirm measurements, existing conditions, code requirements, demolition scope, finish selections, and lead times before issuing a final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
     site_verification_questions: [
       'What exact measurements need to be confirmed onsite before pricing?',
       'What existing conditions or hidden issues could affect the scope?',
@@ -192,13 +231,19 @@ export async function POST(req: NextRequest) {
 - Make site questions specific, not generic.
 - Explicitly reflect homeowner goals, likely trade(s), top unknowns, and actionable site verification questions.
 - If scope is mixed or custom, help a contractor understand what to verify before quoting.
-- For roofing, ask about layers to remove, decking condition, flashing or chimney penetrations, and ventilation upgrades.
-- For paint, ask about exact wall/trim scope, prep condition, and lead paint, patching, or repair requirements.
+- For roofing, ask about exact roof measurement, penetrations, layers to remove, decking condition, flashing or chimney penetrations, and ventilation upgrades.
+- For flooring, ask about exact square footage, transitions, substrate condition, and product-specific install requirements.
+- For paint, ask about exact wall/trim scope, wall condition, ceiling height, openings, prep condition, and lead paint, patching, or repair requirements.
+- For deck/patio, ask about exact footprint, railing, footing requirements, grade changes, and permit triggers.
 - Output valid JSON with fields: summary, homeowner_goals, contractor_notes, site_verification_questions, likely_trades, unknowns_to_verify.
 ${analysis ? `
 - Uploaded photo analysis facts: ${describeAnalysisFacts(analysis).join(', ')}
 - Visible features: ${analysis.visible_features.join(', ') || 'none noted'}
+- Size reasoning: ${analysis.size_reasoning.join(', ') || 'none noted'}
 - Estimation notes: ${analysis.estimation_notes.join(', ') || 'none noted'}
+- Estimated dimensions: ${JSON.stringify(analysis.estimated_dimensions)}
+- Area signals: ${JSON.stringify(analysis.area_signals)}
+- Confidence: ${analysis.confidence || 'unknown'}
 - Suggested trade: ${analysis.suggested_trade || 'unknown'}
 - Suggested location type: ${analysis.suggested_location_type || 'unknown'}
 - Complexity: ${analysis.complexity || 'moderate'}` : ''}${params.category === 'custom_project' ? '\n- For custom_project briefs, emphasize the homeowner request, likely trades involved, top unknowns needing site verification, and strong contractor questions. Make the brief useful even if estimate scope is broad.' : ''}`;
