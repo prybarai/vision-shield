@@ -81,14 +81,14 @@ export default function ConnectPage({ params }: PageProps) {
         </div>
         <h1 className="text-3xl font-bold text-slate-900 mb-3">You&apos;re all set!</h1>
         <p className="text-slate-500 text-lg mb-8">
-          We&apos;ve received your project details. Verified contractors in your area will reach out soon.
+          We saved your request. A vetted contractor match or follow-up can happen once dispatch is available.
         </p>
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 text-left">
           <h3 className="font-semibold text-slate-900 mb-2">What happens next?</h3>
           <ul className="space-y-2 text-sm text-slate-600">
-            <li className="flex items-start gap-2"><span className="text-blue-500">1.</span> Your project brief goes to verified local contractors</li>
-            <li className="flex items-start gap-2"><span className="text-blue-500">2.</span> Contractors who match reach out via email or phone</li>
-            <li className="flex items-start gap-2"><span className="text-blue-500">3.</span> You compare quotes — no pressure, no obligation</li>
+            <li className="flex items-start gap-2"><span className="text-blue-500">1.</span> Your request is saved immediately</li>
+            <li className="flex items-start gap-2"><span className="text-blue-500">2.</span> Matching and dispatch happen when contractor routing is available</li>
+            <li className="flex items-start gap-2"><span className="text-blue-500">3.</span> You can keep using Shield while you wait</li>
           </ul>
         </div>
         <div className="flex flex-col gap-3">
@@ -109,8 +109,8 @@ export default function ConnectPage({ params }: PageProps) {
         <ArrowLeft className="h-4 w-4" /> Back to results
       </Link>
 
-      <h1 className="text-3xl font-bold text-slate-900 mb-2">Find a contractor</h1>
-      <p className="text-slate-500 mb-8">Fill out the form below. No pressure — we&apos;ll send your project brief to vetted local contractors.</p>
+      <h1 className="text-3xl font-bold text-slate-900 mb-2">Request a contractor match</h1>
+      <p className="text-slate-500 mb-8">Share your details to save this project for vetted-contractor follow-up when routing is available. No surprise outreach.</p>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
@@ -200,7 +200,7 @@ export default function ConnectPage({ params }: PageProps) {
         </Button>
 
         <p className="text-xs text-slate-400 text-center">
-          By submitting, you agree to be contacted by contractors. No spam. Unsubscribe anytime.
+          Submitting saves your request for vetted follow-up. Prybar will not trigger contractor outreach until routing is actually available.
         </p>
       </form>
     </div>
