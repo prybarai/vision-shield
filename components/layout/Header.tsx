@@ -3,17 +3,35 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Camera, Menu, Shield, Sparkles, X } from 'lucide-react';
-import { useState } from 'react';
+import { Camera, LayoutGrid, Menu, Shield, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      setSignedIn(Boolean(data.user));
+    }).catch(() => {
+      setSignedIn(false);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSignedIn(Boolean(session?.user));
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const navLinks = [
     { href: '/vision', label: 'Vision', icon: Camera },
     { href: '/shield', label: 'Shield', icon: Shield },
-    { href: '/dashboard', label: 'Dashboard', icon: Sparkles },
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
   ];
 
   const closeMenu = () => setMobileOpen(false);
@@ -52,16 +70,16 @@ export default function Header() {
 
           <div className="hidden md:flex items-center gap-3">
             <Link
-              href="/auth/login"
+              href={signedIn ? '/dashboard' : '/auth/login'}
               className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
             >
-              Sign in
+              {signedIn ? 'Dashboard' : 'Sign in'}
             </Link>
             <Link
-              href="/vision/start"
+              href={signedIn ? '/vision/start' : '/vision/start'}
               className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition-colors"
             >
-              Start free
+              {signedIn ? 'New project' : 'Start free'}
             </Link>
           </div>
 
@@ -94,11 +112,11 @@ export default function Header() {
             </Link>
           ))}
           <div className="border-t border-slate-100 pt-3 mt-3 flex flex-col gap-2">
-            <Link href="/auth/login" onClick={closeMenu} className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-2xl">
-              Sign in
+            <Link href={signedIn ? '/dashboard' : '/auth/login'} onClick={closeMenu} className="px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-2xl">
+              {signedIn ? 'Go to dashboard' : 'Sign in'}
             </Link>
             <Link href="/vision/start" onClick={closeMenu} className="bg-blue-600 text-white text-sm font-semibold px-4 py-3 rounded-2xl text-center">
-              Start free
+              {signedIn ? 'Start new project' : 'Start free'}
             </Link>
           </div>
         </div>

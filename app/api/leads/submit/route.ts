@@ -51,19 +51,26 @@ export async function POST(req: NextRequest) {
       source,
     };
 
-    const { data: insertedLead, error } = await supabaseAdmin.from('leads').insert(insertPayload).select().single();
-    if (error || !insertedLead) throw error || new Error('Lead insert returned no data');
-    const lead = insertedLead as Record<string, unknown>;
+    let insertResult = await supabaseAdmin.from('leads').insert(insertPayload).select().single();
+
+    if (insertResult.error && /source/i.test(insertResult.error.message || '')) {
+      const { source: _source, ...fallbackPayload } = insertPayload;
+      insertResult = await supabaseAdmin.from('leads').insert(fallbackPayload).select().single();
+    }
+
+    if (insertResult.error || !insertResult.data) throw insertResult.error || new Error('Lead insert returned no data');
+    const lead = insertResult.data as Record<string, unknown>;
 
     if (params.project_id) {
       await supabaseAdmin.from('projects').update({ status: 'lead_submitted' }).eq('id', params.project_id);
     }
 
     const webhookConfigured = Boolean(process.env.PRYBAR_CORE_WEBHOOK_URL);
+    const readyForDispatch = Boolean(project && estimate);
     let dispatchAttempted = false;
     let dispatchSucceeded = false;
 
-    if (project && estimate) {
+    if (webhookConfigured && readyForDispatch) {
       dispatchAttempted = true;
       dispatchSucceeded = await dispatchLeadToPrybarCore({
         source,
@@ -77,25 +84,25 @@ export async function POST(req: NextRequest) {
           zip_code: params.zip_code,
         },
         project: {
-          category: String(project.project_category || 'general_home_improvement'),
-          location_type: (project.location_type as 'interior' | 'exterior') || 'interior',
-          address: project.address ? String(project.address) : undefined,
-          style_preference: project.style_preference ? String(project.style_preference) : undefined,
-          quality_tier: String(project.quality_tier || 'standard'),
-          notes: project.notes ? String(project.notes) : undefined,
+          category: String(project?.project_category || 'general_home_improvement'),
+          location_type: (project?.location_type as 'interior' | 'exterior') || 'interior',
+          address: project?.address ? String(project.address) : undefined,
+          style_preference: project?.style_preference ? String(project.style_preference) : undefined,
+          quality_tier: String(project?.quality_tier || 'standard'),
+          notes: project?.notes ? String(project.notes) : undefined,
         },
         context: {
-          generated_image_urls: Array.isArray(project.generated_image_urls) ? project.generated_image_urls as string[] : [],
-          uploaded_image_urls: Array.isArray(project.uploaded_image_urls) ? project.uploaded_image_urls as string[] : [],
+          generated_image_urls: Array.isArray(project?.generated_image_urls) ? project.generated_image_urls as string[] : [],
+          uploaded_image_urls: Array.isArray(project?.uploaded_image_urls) ? project.uploaded_image_urls as string[] : [],
           estimate_range: {
-            low: Number(estimate.low_estimate || 0),
-            mid: Number(estimate.mid_estimate || 0),
-            high: Number(estimate.high_estimate || 0),
+            low: Number(estimate?.low_estimate || 0),
+            mid: Number(estimate?.mid_estimate || 0),
+            high: Number(estimate?.high_estimate || 0),
           },
           materials_summary: '',
           homeowner_goals: brief?.homeowner_goals ? String(brief.homeowner_goals) : '',
           brief_summary: brief?.summary ? String(brief.summary) : '',
-          contractor_questions: Array.isArray(brief?.site_verification_questions) ? brief?.site_verification_questions as string[] : [],
+          contractor_questions: Array.isArray(brief?.site_verification_questions) ? brief.site_verification_questions as string[] : [],
           risk_scan_completed: false,
         },
         intent: {
@@ -105,10 +112,12 @@ export async function POST(req: NextRequest) {
         },
         contractor_acquisition: {
           send_lead_alert: true,
-          service_categories: [String(project.project_category || 'general_home_improvement')],
+          service_categories: [String(project?.project_category || 'general_home_improvement')],
         },
       });
-    } else if (!webhookConfigured) {
+    }
+
+    if (!webhookConfigured) {
       console.info('Lead saved without webhook dispatch because PRYBAR_CORE_WEBHOOK_URL is unset.', {
         lead_id: String(lead.id),
         source,
@@ -125,6 +134,20 @@ export async function POST(req: NextRequest) {
         attempted: dispatchAttempted,
         succeeded: dispatchSucceeded,
         pending_dispatch: !dispatchSucceeded,
+        mode: !webhookConfigured
+          ? 'saved_only'
+          : readyForDispatch && dispatchSucceeded
+          ? 'dispatched'
+          : readyForDispatch
+          ? 'dispatch_pending'
+          : 'saved_only',
+        message: !webhookConfigured
+          ? 'Lead saved. Contractor routing is not configured yet, so no outreach was triggered.'
+          : readyForDispatch && dispatchSucceeded
+          ? 'Lead saved and sent for contractor routing.'
+          : readyForDispatch
+          ? 'Lead saved, but contractor routing did not complete yet.'
+          : 'Lead saved. Contractor routing will happen once the rest of the project data is ready.',
       },
     });
   } catch (error) {

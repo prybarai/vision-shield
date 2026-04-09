@@ -76,6 +76,9 @@ export default async function VisionResultsPage({ params }: PageProps) {
             <div className="flex flex-wrap items-center gap-2 mb-3">
               <Badge variant="blue">{project.quality_tier} tier</Badge>
               <Badge variant="gray" className="capitalize">{categoryLabel}</Badge>
+              <Badge variant={estimate || materials || brief ? 'green' : 'amber'}>
+                {estimate || materials || brief ? 'Planning outputs ready' : 'Still preparing outputs'}
+              </Badge>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">{categoryLabel} project plan</h1>
             <p className="text-slate-600 mt-3 max-w-2xl">
@@ -84,11 +87,29 @@ export default async function VisionResultsPage({ params }: PageProps) {
           </div>
           <ShareButton shareUrl={shareUrl} />
         </div>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-sm font-semibold text-slate-900 mb-1">Estimate</div>
+            <div className="text-sm text-slate-600">{estimate ? 'Budget range is ready.' : 'Still generating, check back in a moment.'}</div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-sm font-semibold text-slate-900 mb-1">Materials</div>
+            <div className="text-sm text-slate-600">{materials ? 'Materials plan is ready.' : 'Still preparing material guidance.'}</div>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-sm font-semibold text-slate-900 mb-1">Contractor brief</div>
+            <div className="text-sm text-slate-600">{brief ? 'Walk-through brief is ready.' : 'Still drafting contractor notes.'}</div>
+          </div>
+        </div>
       </section>
 
-      {estimate && (
+      {estimate ? (
         <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Cost estimate</h2>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-slate-900">Planning estimate</h2>
+            <p className="text-sm text-slate-500 mt-1">A planning-grade budget range based on your photo, project choices, and local pricing.</p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <div className="rounded-2xl bg-slate-50 p-4 text-center">
               <div className="text-sm text-slate-500 mb-1">Low</div>
@@ -136,18 +157,34 @@ export default async function VisionResultsPage({ params }: PageProps) {
           )}
           <Disclaimer text={DISCLAIMERS.estimate} className="mt-4" />
         </section>
-      )}
-
-      {materials && (
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Materials list</h2>
-          <MaterialsAccordion materials={materials} />
+      ) : (
+        <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Planning estimate</h2>
+          <p className="text-slate-600 text-sm leading-relaxed">Your estimate is still generating. The rest of the page can still help you move forward, and this section usually fills in shortly after.</p>
         </section>
       )}
 
-      {brief && (
+      {materials ? (
+        <section className="mb-8">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-slate-900">Materials plan</h2>
+            <p className="text-sm text-slate-500 mt-1">Use this to sanity-check allowances and keep quote conversations grounded.</p>
+          </div>
+          <MaterialsAccordion materials={materials} />
+        </section>
+      ) : (
         <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Project brief</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Materials plan</h2>
+          <p className="text-slate-600 text-sm leading-relaxed">Your materials list is still being prepared. You can still use the estimate and contractor brief in the meantime.</p>
+        </section>
+      )}
+
+      {brief ? (
+        <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-slate-900">Contractor-ready brief</h2>
+            <p className="text-sm text-slate-500 mt-1">A more useful way to frame scope, walk-through notes, and quote questions.</p>
+          </div>
           <div className="space-y-5">
             {hasText(brief.summary) && (
               <div>
@@ -165,7 +202,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
 
             {hasText(brief.contractor_notes) && (
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-2">Contractor notes</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-2">Walk-through notes</h3>
                 <p className="text-slate-800 leading-relaxed whitespace-pre-wrap">{brief.contractor_notes}</p>
               </div>
             )}
@@ -183,7 +220,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
 
             {siteQuestions.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-2">Questions to ask</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-2">Questions to ask before approving a quote</h3>
                 <ul className="space-y-2">
                   {siteQuestions.map((question, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
@@ -195,6 +232,11 @@ export default async function VisionResultsPage({ params }: PageProps) {
               </div>
             )}
           </div>
+        </section>
+      ) : (
+        <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Contractor-ready brief</h2>
+          <p className="text-slate-600 text-sm leading-relaxed">Your brief is still being assembled. Once it lands, this section will help you run a cleaner contractor walk-through.</p>
         </section>
       )}
 
@@ -247,16 +289,26 @@ export default async function VisionResultsPage({ params }: PageProps) {
         )}
       </section>
 
-      <section className="bg-blue-600 rounded-[2rem] p-8 text-white text-center mb-8">
-        <h2 className="text-2xl font-bold mb-2">Ready to talk to a contractor?</h2>
-        <p className="text-blue-100 mb-6">Bring this estimate, materials list, and brief into the conversation so quotes start from a clearer scope.</p>
-        <Link
-          href={`/vision/results/${project_id}/connect`}
-          className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3 rounded-xl transition-colors"
-        >
-          Find a contractor
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+      <section className="bg-blue-600 rounded-[2rem] p-6 sm:p-8 text-white mb-8">
+        <div className="max-w-3xl">
+          <h2 className="text-2xl font-bold mb-2">Ready to turn this into real quotes?</h2>
+          <p className="text-blue-100 mb-6">Use your estimate, materials plan, and contractor brief to start from a cleaner scope, then use Shield before you hire.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              href={`/vision/results/${project_id}/connect`}
+              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-6 py-3 rounded-xl transition-colors"
+            >
+              Request contractor match
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/shield/check"
+              className="inline-flex items-center justify-center gap-2 border border-white/20 text-white hover:bg-white/10 font-semibold px-6 py-3 rounded-xl transition-colors"
+            >
+              Verify a contractor first
+            </Link>
+          </div>
+        </div>
       </section>
 
       <Disclaimer text="Design concepts are optional inspiration only and may not reflect final buildable dimensions, code requirements, or contractor scope." />
