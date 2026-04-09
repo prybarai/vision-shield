@@ -41,7 +41,7 @@ export default function VisionPage() {
               className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl text-base transition-colors"
             >
               <Camera className="h-5 w-5" />
-              Start with a photo
+              Upload a photo
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link

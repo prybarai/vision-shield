@@ -10,7 +10,6 @@ import {
   ImagePlus,
   Info,
   Loader2,
-  MapPin,
   ShieldCheck,
   Sparkles,
   Trash2,
@@ -229,12 +228,12 @@ const QUALITY_TIERS = [
 ];
 
 const PROGRESS_STEPS = [
-  'Setting up your project workspace',
-  'Reading the photo and sizing up the scope',
-  'Calculating your rough budget range',
-  'Building the materials plan',
-  'Writing the contractor brief',
-  'Preparing your results page',
+  'Setting up your project...',
+  'Calculating cost estimate...',
+  'Building materials list...',
+  'Writing contractor brief...',
+  'Generating AI design concepts...',
+  'Almost done...',
 ];
 
 const PHOTO_TIPS = [
@@ -389,8 +388,6 @@ export default function VisionStartFlow() {
       if (!uploadRes.ok) throw new Error('Failed to upload image');
       const { url: referenceImageUrl } = await uploadRes.json() as { url: string };
 
-      setProgressStep(1);
-
       let analysis: VisionAnalysis = FALLBACK_VISION_ANALYSIS;
       try {
         const analysisRes = await fetch('/api/vision/analyze-photo', {
@@ -412,7 +409,7 @@ export default function VisionStartFlow() {
         console.error('photo analysis failed:', analysisError);
       }
 
-      setProgressStep(2);
+      setProgressStep(1);
 
       const inferredLocationType = category === 'custom_project' && analysis.suggested_location_type === 'exterior'
         ? 'exterior'
@@ -438,7 +435,7 @@ export default function VisionStartFlow() {
         estimate?: { low_estimate?: number; mid_estimate?: number; high_estimate?: number };
       };
 
-      setProgressStep(3);
+      setProgressStep(2);
       const materialsRes = await fetch('/api/vision/materials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -448,6 +445,7 @@ export default function VisionStartFlow() {
           style,
           quality_tier: qualityTier,
           estimate_mid: estimate?.mid_estimate || 15000,
+          generated_image_url: referenceImageUrl,
           analysis,
           notes: notesWithScope,
         }),
@@ -455,7 +453,7 @@ export default function VisionStartFlow() {
 
       if (!materialsRes.ok) throw new Error('Failed to generate materials list');
 
-      setProgressStep(4);
+      setProgressStep(3);
       const briefRes = await fetch('/api/vision/brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -473,23 +471,31 @@ export default function VisionStartFlow() {
 
       if (!briefRes.ok) throw new Error('Failed to generate project brief');
 
+      setProgressStep(4);
+      try {
+        const conceptsRes = await fetch('/api/vision/generate-concepts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: projectId,
+            category,
+            style,
+            quality_tier: qualityTier,
+            notes: notesWithScope,
+            reference_image_url: referenceImageUrl,
+            analysis,
+            count: 1,
+          }),
+        });
+
+        if (!conceptsRes.ok) {
+          throw new Error(`Concept generation returned ${conceptsRes.status}`);
+        }
+      } catch (conceptError) {
+        console.error('Concept generation failed', conceptError);
+      }
+
       setProgressStep(5);
-      await fetch('/api/vision/generate-concepts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          project_id: projectId,
-          category,
-          style,
-          quality_tier: qualityTier,
-          notes: notesWithScope,
-          reference_image_url: referenceImageUrl,
-          analysis,
-          count: 1,
-        }),
-      }).catch((conceptError) => {
-        console.error('concept generation failed:', conceptError);
-      });
 
       posthog.capture('vision_results_ready', {
         category,
@@ -558,7 +564,7 @@ export default function VisionStartFlow() {
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <Card className="p-5 sm:p-6">
             <div className="mb-5">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Upload your space</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Upload a photo of your space</h2>
               <p className="text-slate-600">One clear photo is enough to start. Add your ZIP code so the estimate uses local pricing, not a generic national average.</p>
             </div>
 
@@ -620,8 +626,7 @@ export default function VisionStartFlow() {
                 onChange={e => setZipCode(e.target.value)}
                 required
               />
-              <p className="mt-2 flex items-center gap-2 text-xs text-slate-500">
-                <MapPin className="h-3.5 w-3.5" />
+              <p className="mt-2 text-xs text-slate-500">
                 Used for regional pricing and labor assumptions, not for contractor outreach.
               </p>
             </div>
@@ -838,9 +843,9 @@ export default function VisionStartFlow() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Building your project plan</h2>
           <p className="text-slate-600 mb-3 max-w-2xl mx-auto">
-            We&apos;re preparing your estimate, materials list, and contractor brief first so you can act on the practical pieces immediately.
+            We&apos;re generating your estimate, materials list, and contractor brief first so your planning results are ready even if design concepts take longer.
           </p>
-          <p className="text-sm text-slate-500 mb-10">Concept images may keep rendering in the background after your results page opens.</p>
+          <p className="text-sm text-slate-500 mb-10">Design concepts are optional and may keep rendering in the background after your results page opens.</p>
 
           <div className="max-w-lg mx-auto space-y-3 text-left">
             {PROGRESS_STEPS.map((label, i) => (
