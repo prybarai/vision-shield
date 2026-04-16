@@ -96,6 +96,15 @@ function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis)
 
   const facts: string[] = [];
 
+  if (analysis.space_type) facts.push(`The visible space is a ${analysis.space_type.replace(/_/g, ' ')}.`);
+  if (analysis.estimated_sqft) facts.push(`Visible project size reads as ${analysis.estimated_sqft}.`);
+  if (analysis.current_condition && analysis.current_condition !== 'unknown') facts.push(`Current condition looks ${analysis.current_condition}.`);
+  if (analysis.existing_style) facts.push(`Existing style reads as ${analysis.existing_style}.`);
+  if (analysis.current_materials.length) facts.push(`Visible materials include ${analysis.current_materials.slice(0, 4).join(', ')}.`);
+  if (analysis.architectural_features.length) facts.push(`Preserve architectural elements such as ${analysis.architectural_features.slice(0, 3).join(', ')}.`);
+  if (analysis.renovation_scope) facts.push(`Requested design direction: ${analysis.renovation_scope}`);
+  if (analysis.key_challenges.length) facts.push(`Key challenge: ${analysis.key_challenges[0]}.`);
+
   if (category === 'exterior_paint') {
     if (analysis.scope_signals.stories) facts.push(`This is a ${analysis.scope_signals.stories}-story house.`);
     if ((analysis.scope_signals.window_count_visible ?? 0) >= 6) facts.push('There are many front-facing windows. Preserve the structure and every visible window exactly.');
@@ -118,7 +127,7 @@ function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis)
     if (analysis.visible_features.length) facts.push(`Preserve visible elements like ${analysis.visible_features.slice(0, 3).join(', ')}.`);
   }
 
-  return facts.slice(0, 4).join(' ');
+  return facts.slice(0, 6).join(' ');
 }
 
 function hasStrongExactConstraint(constraints: DesignConstraints) {
@@ -394,21 +403,26 @@ export async function generateConceptImages(params: {
 }): Promise<string[]> {
   const client = getClient();
   const requestedCount = params.count ?? 1;
-  const count = Math.min(1, requestedCount || 1);
+  const count = Math.min(3, requestedCount || 1);
   const results: string[] = [];
+  const variations = [
+    'Show the requested finished concept clearly, keep unchanged areas untouched, and prioritize realism over dramatic redesign.',
+    'Show a second believable option with brighter finished styling while preserving the same structure, angle, and visible constraints.',
+    'Show a third polished option with slightly warmer presentation, but still preserve the same layout, windows, and structure exactly.',
+  ].slice(0, count);
 
   if (params.referenceImageUrl) {
-    const variation = 'Show the requested finished concept clearly, keep unchanged areas untouched, and prioritize realism over dramatic redesign.';
-    const result = await generateWithEdit(
-      client,
-      params.referenceImageUrl,
-      params.category,
-      params.style,
-      params.notes,
-      params.analysis,
-      variation
-    );
-    if (result) {
+    for (const variation of variations) {
+      const result = await generateWithEdit(
+        client,
+        params.referenceImageUrl,
+        params.category,
+        params.style,
+        params.notes,
+        params.analysis,
+        variation
+      );
+      if (!result) continue;
       try {
         const url = result.startsWith('data:')
           ? await saveBase64ToSupabase(result, params.projectId)
@@ -419,15 +433,16 @@ export async function generateConceptImages(params: {
       }
     }
   } else {
-    const result = await generateTextToImage(
-      client,
-      params.category,
-      params.style,
-      params.notes,
-      params.analysis,
-      'Show one useful first concept that respects the notes literally and avoids extra design flourishes.'
-    );
-    if (result) {
+    for (const variation of variations) {
+      const result = await generateTextToImage(
+        client,
+        params.category,
+        params.style,
+        params.notes,
+        params.analysis,
+        variation
+      );
+      if (!result) continue;
       try {
         const url = result.startsWith('data:')
           ? await saveBase64ToSupabase(result, params.projectId)

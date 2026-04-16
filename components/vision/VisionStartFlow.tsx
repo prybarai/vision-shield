@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useDropzone } from 'react-dropzone';
 import {
   ArrowLeft,
-  Camera,
   CheckCircle,
   ImagePlus,
   Info,
@@ -21,11 +20,10 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
-import { FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
+import { buildLoadingObservations, FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 import posthog from 'posthog-js';
 
-const STEPS = ['entry', 'category', 'scope', 'style', 'quality', 'loading'] as const;
-type Step = typeof STEPS[number];
+type Step = 'entry' | 'category' | 'scope' | 'style' | 'quality' | 'loading';
 
 type ScopeQuestion = {
   key: string;
@@ -228,12 +226,12 @@ const QUALITY_TIERS = [
 ];
 
 const PROGRESS_STEPS = [
-  'Setting up your project...',
-  'Calculating cost estimate...',
-  'Building materials list...',
-  'Writing contractor brief...',
-  'Generating AI design concepts...',
-  'Almost done...',
+  'Reading your photo and request...',
+  'Building your local cost range...',
+  'Drafting your materials plan...',
+  'Writing your contractor brief...',
+  'Rendering your design concepts...',
+  'Finalizing your plan...',
 ];
 
 const PHOTO_TIPS = [
@@ -254,6 +252,7 @@ export default function VisionStartFlow() {
   const [qualityTier, setQualityTier] = useState<QualityTier>('mid');
   const [notes, setNotes] = useState('');
   const [progressStep, setProgressStep] = useState(0);
+  const [analysisHighlights, setAnalysisHighlights] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -266,6 +265,10 @@ export default function VisionStartFlow() {
       const url = URL.createObjectURL(file);
       setUploadPreview(url);
       setError(null);
+      posthog.capture('naili_photo_uploaded', {
+        file_type: file.type,
+        file_size: file.size,
+      });
     }
   }, [uploadPreview]);
 
@@ -313,6 +316,11 @@ export default function VisionStartFlow() {
     setStep('quality');
   };
 
+  const handleScopeSkip = () => {
+    setError(null);
+    setStep('style');
+  };
+
   const updateScopeAnswer = (key: string, value: string) => {
     setScopeAnswers(prev => ({ ...prev, [key]: value }));
   };
@@ -345,15 +353,25 @@ export default function VisionStartFlow() {
 
     setStep('loading');
     setError(null);
+    setAnalysisHighlights([]);
     const sessionId = uuidv4();
     const notesWithScope = buildNotesWithScope(notes, scopeAnswers);
 
     try {
-      posthog.capture('naili_vision_started', {
+      if (notesWithScope) {
+        posthog.capture('naili_prompt_entered', {
+          category,
+          has_scope_answers: Object.keys(scopeAnswers).length > 0,
+          is_custom_project: isCustomProject,
+        });
+      }
+
+      posthog.capture('naili_generation_started', {
         category,
         style,
         quality_tier: qualityTier,
         has_scope_questions: hasScopeStep,
+        has_scope_answers: Object.keys(scopeAnswers).length > 0,
         is_custom_project: isCustomProject,
       });
 
@@ -404,6 +422,7 @@ export default function VisionStartFlow() {
         if (analysisRes.ok) {
           const data = await analysisRes.json() as { analysis?: VisionAnalysis };
           analysis = data.analysis || FALLBACK_VISION_ANALYSIS;
+          setAnalysisHighlights(buildLoadingObservations(analysis));
         }
       } catch (analysisError) {
         console.error('photo analysis failed:', analysisError);
@@ -445,7 +464,6 @@ export default function VisionStartFlow() {
           style,
           quality_tier: qualityTier,
           estimate_mid: estimate?.mid_estimate || 15000,
-          generated_image_url: referenceImageUrl,
           analysis,
           notes: notesWithScope,
         }),
@@ -484,7 +502,7 @@ export default function VisionStartFlow() {
             notes: notesWithScope,
             reference_image_url: referenceImageUrl,
             analysis,
-            count: 1,
+            count: 3,
           }),
         });
 
@@ -497,7 +515,7 @@ export default function VisionStartFlow() {
 
       setProgressStep(5);
 
-      posthog.capture('vision_results_ready', {
+      posthog.capture('naili_generation_completed', {
         category,
         style,
         quality_tier: qualityTier,
@@ -508,7 +526,7 @@ export default function VisionStartFlow() {
       router.push(`/vision/results/${projectId}`);
     } catch (err) {
       console.error(err);
-      posthog.capture('vision_start_failed', {
+      posthog.capture('naili_generation_failed', {
         category,
         style,
         quality_tier: qualityTier,
@@ -527,7 +545,7 @@ export default function VisionStartFlow() {
               <p className="text-sm font-semibold text-blue-600 mb-1">naili vision</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Start your project from a real photo</h1>
               <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
-                We&apos;ll build your estimate, materials plan, and contractor brief first. Design concepts are optional and can keep rendering after your results page is ready.
+                naili reads the actual photo with your request first, then turns that analysis into a cost range, materials plan, contractor brief, and design concepts.
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -715,7 +733,7 @@ export default function VisionStartFlow() {
           </button>
           <div className="mb-6">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">A few quick scope details</h2>
-            <p className="text-slate-600">These answers keep the estimate grounded in your likely scope instead of a vague benchmark.</p>
+            <p className="text-slate-600">These answers help tighten the estimate faster, but you can skip them and let naili lean more heavily on the photo and your notes.</p>
           </div>
 
           <div className="space-y-6 mb-8">
@@ -743,9 +761,14 @@ export default function VisionStartFlow() {
             ))}
           </div>
 
-          <Button className="w-full" size="lg" onClick={handleScopeNext} disabled={!allScopeAnswered}>
-            Continue
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button className="w-full" size="lg" onClick={handleScopeNext} disabled={!allScopeAnswered}>
+              Continue
+            </Button>
+            <Button className="w-full sm:w-auto" size="lg" variant="secondary" onClick={handleScopeSkip}>
+              Skip for now
+            </Button>
+          </div>
         </div>
       )}
 
@@ -830,7 +853,7 @@ export default function VisionStartFlow() {
           {error && <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm mb-4">{error}</div>}
 
           <Button className="w-full" size="lg" onClick={handleStart} disabled={isCustomProject && !notes.trim()}>
-            Generate my project
+            Nail it
           </Button>
           <p className="text-xs text-slate-500 text-center mt-3">You&apos;ll land on the results page as soon as the planning outputs are ready.</p>
         </div>
@@ -843,7 +866,7 @@ export default function VisionStartFlow() {
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">naili is building your vision…</h2>
           <p className="text-slate-600 mb-3 max-w-2xl mx-auto">
-            We&apos;re generating your estimate, materials list, and contractor brief first so your planning results are ready even if design concepts take longer.
+            We&apos;re reading your actual photo and request first, then turning that analysis into your estimate, materials list, contractor brief, and concepts.
           </p>
           <p className="text-sm text-slate-500 mb-10">Design concepts are optional and may keep rendering in the background after your results page opens.</p>
 
@@ -871,6 +894,20 @@ export default function VisionStartFlow() {
               </div>
             ))}
           </div>
+
+          {analysisHighlights.length > 0 && (
+            <div className="max-w-lg mx-auto mt-6 rounded-3xl border border-blue-100 bg-white/80 p-5 text-left shadow-sm">
+              <p className="text-sm font-semibold text-slate-900 mb-3">What naili sees so far</p>
+              <div className="space-y-2">
+                {analysisHighlights.map((item, index) => (
+                  <div key={`${item}-${index}`} className="flex items-start gap-2 text-sm text-slate-700">
+                    <Sparkles className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

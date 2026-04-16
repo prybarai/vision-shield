@@ -46,7 +46,7 @@ export default function ConceptsLoader({
           quality_tier: qualityTier,
           notes: notes || undefined,
           reference_image_url: referenceImageUrl || undefined,
-          count: 1,
+          count: 3,
         }),
       });
 
@@ -79,7 +79,7 @@ export default function ConceptsLoader({
         <div>
           <p className="text-blue-900 text-sm font-medium">Your planning results are ready.</p>
           <p className="text-blue-800 text-sm mt-1">
-            We&apos;re generating your first design concept in the background so you don&apos;t have to wait on this page.
+            We&apos;re generating three design concepts in the background so you don&apos;t have to wait on this page.
           </p>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function ConceptsLoader({
 
       {!loading && !done && (
         <div>
-          <Button size="sm" onClick={runGeneration}>Generate first concept</Button>
+          <Button size="sm" onClick={runGeneration}>Generate concepts</Button>
         </div>
       )}
     </div>

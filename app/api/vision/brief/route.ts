@@ -278,6 +278,17 @@ export async function POST(req: NextRequest) {
 - Output valid JSON with fields: summary, homeowner_goals, contractor_notes, site_verification_questions, likely_trades, unknowns_to_verify, suggested_site_measurements.
 ${analysis ? `
 - Uploaded photo analysis facts: ${describeAnalysisFacts(analysis).join(', ')}
+- Space type: ${analysis.space_type || 'unknown'}
+- Estimated project size: ${analysis.estimated_sqft || 'unknown'}
+- Current materials: ${analysis.current_materials.join(', ') || 'none noted'}
+- Current condition: ${analysis.current_condition || 'unknown'}
+- Architectural features: ${analysis.architectural_features.join(', ') || 'none noted'}
+- Existing style: ${analysis.existing_style || 'unknown'}
+- Renovation scope: ${analysis.renovation_scope || 'unknown'}
+- Key challenges: ${analysis.key_challenges.join(', ') || 'none noted'}
+- Photo observations: ${analysis.photo_observations || 'none noted'}
+- Customization notes: ${analysis.customization_notes || 'none noted'}
+- Visible constraints: ${analysis.visible_constraints?.join(', ') || 'none noted'}
 - Visible features: ${analysis.visible_features.join(', ') || 'none noted'}
 - Size reasoning: ${analysis.size_reasoning.join(', ') || 'none noted'}
 - Estimation notes: ${analysis.estimation_notes.join(', ') || 'none noted'}

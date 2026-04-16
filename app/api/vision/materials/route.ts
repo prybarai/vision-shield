@@ -235,6 +235,17 @@ Requirements:
 - Each description should explain what the item is for.
 
 ${analysis ? `Uploaded photo analysis context:
+- Space type: ${analysis.space_type || 'unknown'}
+- Estimated project size: ${analysis.estimated_sqft || 'unknown'}
+- Current materials: ${analysis.current_materials.join(', ') || 'none noted'}
+- Current condition: ${analysis.current_condition || 'unknown'}
+- Architectural features: ${analysis.architectural_features.join(', ') || 'none noted'}
+- Existing style: ${analysis.existing_style || 'unknown'}
+- Renovation scope: ${analysis.renovation_scope || 'unknown'}
+- Key challenges: ${analysis.key_challenges.join(', ') || 'none noted'}
+- Photo observations: ${analysis.photo_observations || 'none noted'}
+- Customization notes: ${analysis.customization_notes || 'none noted'}
+- Visible constraints: ${analysis.visible_constraints?.join(', ') || 'none noted'}
 - Visible features: ${analysis.visible_features.join(', ') || 'none noted'}
 - Size reasoning: ${analysis.size_reasoning.join(', ') || 'none noted'}
 - Materials signals: ${analysis.materials_signals.join(', ') || 'none noted'}
@@ -250,7 +261,7 @@ ${analysis ? `Uploaded photo analysis context:
 ${params.notes ? `Homeowner notes: ${params.notes}` : ''}
 
 ${visualDescription ? `The design concept shows: ${visualDescription}
-Match visible finishes and materials where practical.` : analysis ? 'No generated concept image is available yet, so use uploaded photo analysis as the main visual context.' : ''}
+Match visible finishes and materials where practical.` : analysis ? 'No generated concept image is available yet, so use the uploaded photo analysis and homeowner request as the main visual context.' : ''}
 
 Output ONLY valid JSON:
 {

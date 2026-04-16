@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import Anthropic from '@anthropic-ai/sdk';
+import { parseClaudeVisionJSONFromUrl } from '@/lib/anthropic';
 import { FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
@@ -10,23 +10,29 @@ const schema = z.object({
   notes: z.string().optional(),
 });
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY || 'placeholder' });
+const SYSTEM_PROMPT = 'You are an expert home renovation consultant and construction estimator. Analyze the actual uploaded photo together with the homeowner request. Be observant, conservative, and useful. Do not hallucinate hidden conditions or exact dimensions. Return only valid JSON.';
 
-const SYSTEM_PROMPT = 'You are a construction scope analysis expert. Analyze home project photos conservatively and return structured JSON describing only visible or strongly implied property type, size clues, scope clues, estimating signals, and confidence. Do not hallucinate exact measurements. Output ONLY valid JSON.';
+const USER_PROMPT_TEMPLATE = `Analyze the uploaded home project photo together with the homeowner request.
 
-const USER_PROMPT_TEMPLATE = `Analyze this uploaded home project photo for construction estimating context.
-
-Be conservative. Infer only bucketed approximations from the visible image and any homeowner notes.
-Do NOT invent exact dimensions, square footage, or hidden conditions.
-If you cannot tell, use null.
-Return a short size_reasoning list that explains what visible clues made the space or scope seem smaller, standard, or larger.
-
-Return exactly this JSON shape and nothing else:
+Return one JSON object with exactly these fields:
 {
+  "space_type": string | null,
+  "estimated_sqft": string | null,
+  "current_materials": string[],
+  "current_condition": "good" | "dated" | "poor" | "damaged" | "mixed" | "unknown",
+  "architectural_features": string[],
+  "existing_style": string | null,
+  "renovation_scope": string | null,
+  "key_challenges": string[],
+  "photo_observations": string | null,
+  "customization_notes": string | null,
+  "homeowner_goal": string | null,
+  "visible_constraints": string[],
+  "loading_observations": string[],
   "property_type": "one_story_house" | "two_story_house" | "townhome" | "condo_interior" | "single_room_interior" | "open_plan_interior" | "unknown",
   "project_area": "front_exterior" | "backyard" | "roof" | "kitchen" | "bathroom" | "living_room" | "bedroom" | "other",
   "estimated_size_bucket": "small" | "medium" | "large",
-  "visible_features": ["..."],
+  "visible_features": string[],
   "scope_signals": {
     "stories": 1 | 2 | 3 | null,
     "window_count_visible": number | null,
@@ -48,15 +54,30 @@ Return exactly this JSON shape and nothing else:
     "yard_area_bucket": "low" | "medium" | "high" | null
   },
   "confidence": "low" | "medium" | "high" | null,
-  "size_reasoning": ["..."],
-  "estimation_notes": ["..."],
-  "materials_signals": ["..."],
+  "size_reasoning": string[],
+  "estimation_notes": string[],
+  "materials_signals": string[],
   "suggested_trade": "paint" | "flooring" | "roofing" | "deck" | "landscaping" | "bathroom" | "kitchen" | "mixed_finish" | "general_remodel" | "repair" | "unknown",
   "suggested_location_type": "interior" | "exterior" | "unknown",
   "complexity": "simple" | "moderate" | "complex"
 }
 
-Use null for unknown numeric or enum fields. Keep visible_features, size_reasoning, estimation_notes, and materials_signals concise and specific. When the category is custom_project, infer likely trade, whether the job appears interior or exterior, overall complexity, size bucket, and major visible elements from the photo and homeowner notes.`;
+Rules:
+- Use the actual photo first, then use the homeowner notes to understand the desired change.
+- Do not invent exact dimensions, exact square footage, or hidden conditions.
+- estimated_sqft should be a short planning string like "small powder room", "roughly 180-240 sq ft", or "front elevation only".
+- current_materials, architectural_features, key_challenges, visible_features, size_reasoning, estimation_notes, materials_signals, visible_constraints, and loading_observations must be concise and specific.
+- loading_observations should be 3 to 5 short, user-facing lines that sound like live analysis updates.
+- renovation_scope should explain what would need to change to achieve the homeowner goal in this exact visible space.
+- customization_notes should connect the homeowner request to what is actually visible.
+- If something is unknown, use null for nullable fields or an empty array.
+- Output only valid JSON with no markdown.`;
+
+function arrayOfStrings(value: unknown, limit: number) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string').map((item) => item.trim()).filter(Boolean).slice(0, limit)
+    : [];
+}
 
 function sanitizeAnalysis(input: Partial<VisionAnalysis> | null | undefined): VisionAnalysis {
   const sizeReasoning = Array.isArray(input?.size_reasoning)
@@ -68,10 +89,25 @@ function sanitizeAnalysis(input: Partial<VisionAnalysis> | null | undefined): Vi
   return {
     ...FALLBACK_VISION_ANALYSIS,
     ...input,
-    visible_features: Array.isArray(input?.visible_features) ? input.visible_features.filter(Boolean).slice(0, 12) : [],
+    space_type: typeof input?.space_type === 'string' ? input.space_type.trim() : null,
+    estimated_sqft: typeof input?.estimated_sqft === 'string' ? input.estimated_sqft.trim() : null,
+    current_materials: arrayOfStrings(input?.current_materials, 10),
+    architectural_features: arrayOfStrings(input?.architectural_features, 10),
+    renovation_scope: typeof input?.renovation_scope === 'string' ? input.renovation_scope.trim() : null,
+    key_challenges: arrayOfStrings(input?.key_challenges, 8),
+    photo_observations: typeof input?.photo_observations === 'string' ? input.photo_observations.trim() : null,
+    customization_notes: typeof input?.customization_notes === 'string' ? input.customization_notes.trim() : null,
+    homeowner_goal: typeof input?.homeowner_goal === 'string' ? input.homeowner_goal.trim() : null,
+    visible_constraints: arrayOfStrings(input?.visible_constraints, 6),
+    loading_observations: arrayOfStrings(input?.loading_observations, 6),
+    visible_features: arrayOfStrings(input?.visible_features, 12),
     size_reasoning: sizeReasoning,
-    estimation_notes: Array.isArray(input?.estimation_notes) ? input.estimation_notes.filter(Boolean).slice(0, 8) : FALLBACK_VISION_ANALYSIS.estimation_notes,
-    materials_signals: Array.isArray(input?.materials_signals) ? input.materials_signals.filter(Boolean).slice(0, 8) : [],
+    estimation_notes: arrayOfStrings(input?.estimation_notes, 8).length > 0
+      ? arrayOfStrings(input?.estimation_notes, 8)
+      : FALLBACK_VISION_ANALYSIS.estimation_notes,
+    materials_signals: arrayOfStrings(input?.materials_signals, 8),
+    existing_style: typeof input?.existing_style === 'string' ? input.existing_style.trim() : null,
+    current_condition: input?.current_condition || FALLBACK_VISION_ANALYSIS.current_condition,
     scope_signals: {
       ...FALLBACK_VISION_ANALYSIS.scope_signals,
       ...(input?.scope_signals || {}),
@@ -93,33 +129,12 @@ export async function POST(req: NextRequest) {
     const params = schema.parse(body);
 
     try {
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1600,
-        system: SYSTEM_PROMPT,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `${USER_PROMPT_TEMPLATE}\n\nProject category: ${params.category}${params.zip_code ? `\nZIP code: ${params.zip_code}` : ''}${params.notes ? `\nHomeowner notes: ${params.notes}` : ''}`,
-            },
-            { type: 'image', source: { type: 'url', url: params.image_url } },
-          ],
-        }],
-      });
-
-      const text = response.content
-        .filter((content): content is Extract<(typeof response.content)[number], { type: 'text' }> => content.type === 'text')
-        .map((content) => content.text)
-        .join('\n')
-        .trim();
-
-      const candidate = text.replace(/```(?:json)?\s*/g, '').replace(/```/g, '').trim();
-      const firstBrace = candidate.indexOf('{');
-      const lastBrace = candidate.lastIndexOf('}');
-      const jsonText = firstBrace >= 0 && lastBrace > firstBrace ? candidate.slice(firstBrace, lastBrace + 1) : candidate;
-      const analysis = sanitizeAnalysis(JSON.parse(jsonText) as VisionAnalysis);
+      const analysis = sanitizeAnalysis(await parseClaudeVisionJSONFromUrl<VisionAnalysis>({
+        systemPrompt: SYSTEM_PROMPT,
+        userPrompt: `${USER_PROMPT_TEMPLATE}\n\nProject category: ${params.category}${params.zip_code ? `\nZIP code: ${params.zip_code}` : ''}${params.notes ? `\nHomeowner request: ${params.notes}` : '\nHomeowner request: none provided'}`,
+        imageUrl: params.image_url,
+        maxTokens: 2200,
+      }));
 
       return NextResponse.json({ analysis });
     } catch (visionError) {

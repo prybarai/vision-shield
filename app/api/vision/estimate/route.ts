@@ -232,6 +232,26 @@ function addConfidenceAssumption(assumptions: string[], analysis?: VisionAnalysi
 function addPhotoDrivenAssumptions(assumptions: string[], analysis?: VisionAnalysis, category?: string) {
   if (!analysis) return;
 
+  if (analysis.space_type) {
+    assumptions.push(`Uploaded photo reads as a ${analysis.space_type.replace(/_/g, ' ')}`);
+  }
+
+  if (analysis.estimated_sqft) {
+    assumptions.push(`Visible project size was planned around ${analysis.estimated_sqft}`);
+  }
+
+  if (analysis.current_condition && analysis.current_condition !== 'unknown') {
+    assumptions.push(`Current visible condition appears ${analysis.current_condition}`);
+  }
+
+  if (analysis.current_materials.length > 0) {
+    assumptions.push(`Visible materials include ${analysis.current_materials.slice(0, 3).join(', ')}`);
+  }
+
+  if (analysis.renovation_scope) {
+    assumptions.push(`Homeowner goal interpreted as: ${analysis.renovation_scope}`);
+  }
+
   if ((category === 'exterior_paint' || category === 'roofing') && analysis.scope_signals.stories) {
     const windowText = typeof analysis.scope_signals.window_count_visible === 'number'
       ? ` with ${analysis.scope_signals.window_count_visible} visible windows`
@@ -262,10 +282,42 @@ function addPhotoDrivenAssumptions(assumptions: string[], analysis?: VisionAnaly
     assumptions.push(`Visible size cues: ${analysis.size_reasoning.slice(0, 2).join('; ')}`);
   }
 
+  if (analysis.key_challenges.length > 0) {
+    assumptions.push(`Key visible challenge: ${analysis.key_challenges[0]}`);
+  }
+
+  if (analysis.photo_observations) {
+    assumptions.push(`Photo observation: ${analysis.photo_observations}`);
+  }
+
   addConfidenceAssumption(assumptions, analysis);
 
   const firstNote = analysis.estimation_notes.find(Boolean);
   if (firstNote) assumptions.push(`Photo-based planning note: ${firstNote}`);
+}
+
+function inferScopeLevelFromAnalysis(notes: string | undefined, analysis?: VisionAnalysis) {
+  const text = `${notes || ''} ${analysis?.renovation_scope || ''} ${analysis?.customization_notes || ''}`.toLowerCase();
+
+  if (
+    /(full remodel|full renovation|gut|reconfigure|relocate|addition|expand|move plumbing|move wall|structural|tear out|down to studs)/.test(text) ||
+    analysis?.current_condition === 'poor' ||
+    analysis?.current_condition === 'damaged'
+  ) {
+    return 'full_remodel';
+  }
+
+  if (/(shower|tub|tile|vanity|cabinet|counter|backsplash|fixtures|refresh|update|replace)/.test(text) || analysis?.current_condition === 'dated') {
+    return 'mid_refresh';
+  }
+
+  return 'cosmetic';
+}
+
+function inferRemodelSizeFromAnalysis(analysis?: VisionAnalysis): SizeKey {
+  const inferred = analysis?.scope_signals.room_size || analysis?.estimated_size_bucket;
+  if (inferred === 'small' || inferred === 'large') return inferred;
+  return 'medium';
 }
 
 function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
@@ -406,61 +458,63 @@ function estimateFlooring(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
   };
 }
 
-function estimateBathroom(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string): EstimateResult | null {
-  const scopeLevel = scopeAnswers.scope_level;
-  const bathroomSize = scopeAnswers.bathroom_size;
-
-  if (!scopeLevel || !bathroomSize) return null;
+function estimateBathroom(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis, notes?: string): EstimateResult | null {
+  const scopeLevel = scopeAnswers.scope_level || inferScopeLevelFromAnalysis(notes, analysis);
+  const bathroomSize = (scopeAnswers.bathroom_size as SizeKey | undefined) || inferRemodelSizeFromAnalysis(analysis);
 
   const baseMidByScope: Record<string, number> = { cosmetic: 9000, mid_refresh: 18000, full_remodel: 30000 };
   const sizeMultiplierBySize: Record<string, number> = { small: 0.85, medium: 1.0, large: 1.25 };
+  const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.16 : analysis?.current_condition === 'poor' ? 1.1 : analysis?.current_condition === 'dated' ? 1.05 : 1.0;
   const zipMultiplier = getZipMultiplier(zip);
-  const mid = baseMidByScope[scopeLevel] * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier) * zipMultiplier;
-  const range = buildRange(mid, 0.2);
+  const mid = baseMidByScope[scopeLevel] * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
+  const range = buildRange(mid, analysis?.confidence === 'low' ? 0.24 : 0.2);
   const breakdown = buildEstimateBreakdown(range, 0.62);
+  const assumptions = [
+    `${scopeLevel.replace(/_/g, ' ')} bathroom scope`,
+    `${bathroomSize} bathroom size multiplier applied`,
+    `${qualityTier} finish multiplier applied`,
+  ];
+  addPhotoDrivenAssumptions(assumptions, analysis, 'bathroom');
 
   return {
     ...range,
-    assumptions: [
-      `${scopeLevel.replace(/_/g, ' ')} bathroom scope`,
-      `${bathroomSize} bathroom size multiplier applied`,
-      `${qualityTier} finish multiplier applied`,
-    ],
+    assumptions,
     risk_notes: [
       'Plumbing relocation, waterproofing repairs, and permit/code updates can materially raise final cost',
       'Older bathrooms often uncover hidden substrate or water damage once opened up',
     ],
-    estimate_basis: 'Scope-based planning estimate using bathroom remodel tier, size multiplier, finish level, and ZIP multiplier.',
+    estimate_basis: withAnalysisBasis('Scope-based planning estimate using bathroom remodel tier, size multiplier, visible condition, finish level, and ZIP multiplier.', analysis),
     regional_notes: getRegionalNotes(zip, zipMultiplier),
     estimate_breakdown: breakdown,
   };
 }
 
-function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string): EstimateResult | null {
-  const scopeLevel = scopeAnswers.scope_level;
-  const kitchenSize = scopeAnswers.kitchen_size;
-
-  if (!scopeLevel || !kitchenSize) return null;
+function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis, notes?: string): EstimateResult | null {
+  const scopeLevel = scopeAnswers.scope_level || inferScopeLevelFromAnalysis(notes, analysis);
+  const kitchenSize = (scopeAnswers.kitchen_size as SizeKey | undefined) || inferRemodelSizeFromAnalysis(analysis);
 
   const baseMidByScope: Record<string, number> = { cosmetic: 18000, mid_refresh: 35000, full_remodel: 65000 };
   const sizeMultiplierBySize: Record<string, number> = { small: 0.85, medium: 1.0, large: 1.3 };
+  const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.18 : analysis?.current_condition === 'poor' ? 1.12 : analysis?.current_condition === 'dated' ? 1.06 : 1.0;
   const zipMultiplier = getZipMultiplier(zip);
-  const mid = baseMidByScope[scopeLevel] * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier) * zipMultiplier;
-  const range = buildRange(mid, 0.18);
+  const mid = baseMidByScope[scopeLevel] * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
+  const range = buildRange(mid, analysis?.confidence === 'low' ? 0.22 : 0.18);
   const breakdown = buildEstimateBreakdown(range, 0.58);
+  const assumptions = [
+    `${scopeLevel.replace(/_/g, ' ')} kitchen scope`,
+    `${kitchenSize} kitchen size multiplier applied`,
+    `${qualityTier} finish multiplier applied`,
+  ];
+  addPhotoDrivenAssumptions(assumptions, analysis, 'kitchen');
 
   return {
     ...range,
-    assumptions: [
-      `${scopeLevel.replace(/_/g, ' ')} kitchen scope`,
-      `${kitchenSize} kitchen size multiplier applied`,
-      `${qualityTier} finish multiplier applied`,
-    ],
+    assumptions,
     risk_notes: [
       'Cabinet layout changes, electrical upgrades, and appliance moves can increase final kitchen bids',
       'Countertop selection and custom storage details often change pricing late in planning',
     ],
-    estimate_basis: 'Scope-based planning estimate using kitchen remodel tier, size multiplier, finish level, and ZIP multiplier.',
+    estimate_basis: withAnalysisBasis('Scope-based planning estimate using kitchen remodel tier, size multiplier, visible condition, finish level, and ZIP multiplier.', analysis),
     regional_notes: getRegionalNotes(zip, zipMultiplier),
     estimate_breakdown: breakdown,
   };
@@ -839,8 +893,8 @@ function estimateDeterministically(category: string, scopeAnswers: ScopeAnswers 
   const estimators: Record<string, (answers: ScopeAnswers, tier: string, zipCode: string, analysis?: VisionAnalysis) => EstimateResult | null> = {
     interior_paint: estimateInteriorPaint,
     flooring: estimateFlooring,
-    bathroom: (answers, tier, zipCode) => estimateBathroom(answers, tier, zipCode),
-    kitchen: (answers, tier, zipCode) => estimateKitchen(answers, tier, zipCode),
+    bathroom: (answers, tier, zipCode, analysisValue) => estimateBathroom(answers, tier, zipCode, analysisValue, notes),
+    kitchen: (answers, tier, zipCode, analysisValue) => estimateKitchen(answers, tier, zipCode, analysisValue, notes),
     deck_patio: estimateDeck,
     roofing: estimateRoofing,
   };
@@ -866,6 +920,8 @@ export async function POST(req: NextRequest) {
           qualityTier: params.quality_tier,
           zipCode: params.zip_code,
           notes: params.notes,
+          scopeAnswers: params.scope_answers,
+          analysis,
         });
         result = await parseClaudeJSON<EstimateResult>(system, user);
       } catch (aiError) {
