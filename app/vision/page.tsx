@@ -4,19 +4,19 @@ import { ArrowRight, Camera, DollarSign, FileText, ShieldCheck, Sparkles } from 
 
 const FEATURES = [
   {
+    icon: Sparkles,
+    title: 'Photo-aware concept direction',
+    desc: 'naili reads the actual photo and your request before it generates inspiration, instead of relying on category defaults alone.',
+  },
+  {
     icon: DollarSign,
-    title: 'What this should cost',
-    desc: 'Get a planning-grade estimate shaped by your uploaded photo, ZIP code, project type, and finish level.',
+    title: 'Smart cost range',
+    desc: 'Get low, mid, and high planning ranges shaped by visible condition, likely scope, ZIP code, and finish tier.',
   },
   {
     icon: FileText,
-    title: 'Your contractor-ready brief',
-    desc: 'Walk into quote conversations with cleaner scope notes, materials guidance, and practical follow-up questions.',
-  },
-  {
-    icon: Sparkles,
-    title: 'AI concept inspiration',
-    desc: 'See visual directions for the space while keeping the estimate and planning outputs front and center.',
+    title: 'Contractor-ready brief',
+    desc: 'Walk into quote conversations with scope notes, material direction, and better questions already in hand.',
   },
 ];
 
@@ -37,23 +37,22 @@ export const metadata: Metadata = {
 
 export default function VisionPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <section className="rounded-[2rem] bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.18),transparent_35%),linear-gradient(135deg,#eff6ff_0%,#ffffff_55%,#f8fafc_100%)] border border-blue-100 px-5 py-10 sm:px-8 sm:py-12 lg:px-12 lg:py-14 mb-10 sm:mb-14">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700 mb-5">
-            <Sparkles className="h-4 w-4" />
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] px-6 py-10 text-white shadow-[0_24px_90px_rgba(15,23,42,0.22)] sm:px-8 sm:py-12 lg:px-12">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.26),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.14),transparent_24%)]" />
+        <div className="relative max-w-3xl">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/90 mb-5">
+            <Sparkles className="h-4 w-4 text-[#ffd27a]" />
             naili vision
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 text-balance">
-            See the project before it starts.
-          </h1>
-          <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mb-7 leading-relaxed">
-            Show naili your space, answer a few smart scope questions, and get concept images, a real cost range, a materials plan, and a contractor-ready brief.
+          <h1 className="text-4xl font-bold text-balance md:text-5xl">See the project before it starts.</h1>
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/76">
+            Upload a photo of your space, describe what you want to change, and get concepts, a real cost range, a materials plan, and a contractor-ready brief before you talk to anyone.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/vision/start"
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3.5 rounded-xl text-base transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(233,69,96,0.32)] transition-opacity hover:opacity-95"
             >
               <Camera className="h-5 w-5" />
               Nail my project
@@ -61,24 +60,24 @@ export default function VisionPage() {
             </Link>
             <Link
               href="/shield"
-              className="inline-flex items-center justify-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-6 py-3.5 rounded-xl text-base transition-colors"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
             >
               <ShieldCheck className="h-5 w-5" />
               See naili shield
             </Link>
           </div>
-          <p className="text-sm text-slate-500">Free to start, private by default, no contractor outreach until you decide.</p>
+          <p className="mt-4 text-sm text-white/60">Free to start, private by default, no contractor outreach until you choose.</p>
         </div>
       </section>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12 sm:mb-16">
+      <section className="grid gap-5 py-12 md:grid-cols-3 sm:py-14">
         {FEATURES.map((feature) => (
-          <div key={feature.title} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
-              <feature.icon className="h-6 w-6 text-blue-600" />
+          <div key={feature.title} className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef0ff] text-[#533483] mb-4">
+              <feature.icon className="h-6 w-6" />
             </div>
-            <h2 className="font-semibold text-slate-900 text-lg mb-2">{feature.title}</h2>
-            <p className="text-slate-600 text-sm leading-relaxed">{feature.desc}</p>
+            <h2 className="text-lg font-semibold text-[#0d0d1a]">{feature.title}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.desc}</p>
           </div>
         ))}
       </section>

@@ -40,48 +40,53 @@ export default function LoginPage() {
 
   if (magicSent) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
-        <div className="max-w-md w-full bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle className="h-8 w-8 text-green-600" />
+      <div className="min-h-screen bg-[#f8f9fc] px-4 py-10">
+        <div className="mx-auto flex max-w-md items-center justify-center">
+          <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+              <CheckCircle className="h-8 w-8 text-emerald-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#0d0d1a] mb-2">Check your email</h2>
+            <p className="text-slate-500 leading-relaxed">We sent a magic link to <strong>{email}</strong>. Open it on this device to jump into your dashboard.</p>
+            <Link href="/vision/start" className="mt-6 inline-flex text-sm font-medium text-[#533483] hover:text-[#e94560]">
+              Start a new project while you wait
+            </Link>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Check your email</h2>
-          <p className="text-slate-500 leading-relaxed">We sent a magic link to <strong>{email}</strong>. Open it on this device to jump into your dashboard.</p>
-          <Link href="/vision/start" className="mt-6 inline-flex text-sm font-medium text-blue-600 hover:underline">
-            Start a new project while you wait
-          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:py-12">
-      <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div className="rounded-[2rem] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_100%)] p-6 sm:p-8 text-white">
-          <Logo theme="dark" className="mb-4" markClassName="h-12 w-[3.25rem]" />
-          <h1 className="text-3xl font-bold mb-3">Welcome back to naili</h1>
-          <p className="text-slate-200 leading-relaxed mb-6">
-            Reopen saved projects, review estimates, and move into contractor vetting only when you&apos;re ready.
-          </p>
-          <div className="space-y-3 text-sm text-slate-200">
-            <div className="flex items-start gap-2"><Sparkles className="h-4 w-4 mt-0.5 text-blue-200" /><span>Vision results stay organized in one place.</span></div>
-            <div className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 mt-0.5 text-blue-200" /><span>Shield tools are ready whenever you want to verify a contractor or quote.</span></div>
+    <div className="min-h-screen bg-[#f8f9fc] px-4 py-8 sm:py-12">
+      <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] p-6 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+          <div className="relative">
+            <Logo theme="dark" className="mb-4" markClassName="h-12 w-[3.25rem]" taglineClassName="text-slate-300" />
+            <h1 className="text-3xl font-bold mb-3">Welcome back to naili</h1>
+            <p className="text-white/74 leading-relaxed mb-6">
+              Reopen saved projects, review estimates, and move into contractor vetting only when you&apos;re ready.
+            </p>
+            <div className="space-y-3 text-sm text-white/78">
+              <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#ffd27a]" /><span>Vision results stay organized in one place.</span></div>
+              <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 text-[#ffd27a]" /><span>Shield tools are ready whenever you want to verify a contractor or quote.</span></div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 sm:p-8">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-8">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900">Sign in</h2>
-            <p className="text-slate-500 text-sm mt-1">Use a magic link for the fastest login, or enter your password.</p>
+            <h2 className="text-2xl font-bold text-[#0d0d1a]">Sign in</h2>
+            <p className="text-sm text-slate-500 mt-1">Use a magic link for the fastest login, or enter your password.</p>
           </div>
 
-          <div className="flex gap-2 mb-6 rounded-2xl bg-slate-100 p-1">
-            {(['magic', 'password'] as const).map(m => (
+          <div className="flex gap-2 rounded-2xl bg-[#f3f4ff] p-1 mb-6">
+            {(['magic', 'password'] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-colors ${mode === m ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-colors ${mode === m ? 'bg-white text-[#0d0d1a] shadow-sm' : 'text-slate-600 hover:text-[#0d0d1a]'}`}
               >
                 {m === 'magic' ? 'Magic link' : 'Password'}
               </button>
@@ -93,7 +98,7 @@ export default function LoginPage() {
               label="Email"
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="you@example.com"
             />
@@ -102,19 +107,19 @@ export default function LoginPage() {
                 label="Password"
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             )}
-            {error && <div className="bg-red-50 border border-red-200 rounded-2xl p-3 text-red-700 text-sm">{error}</div>}
-            <Button type="submit" className="w-full" loading={loading}>
+            {error && <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+            <Button type="submit" className="w-full border-0 bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] shadow-[0_14px_40px_rgba(233,69,96,0.24)] hover:opacity-95" loading={loading}>
               {mode === 'magic' ? 'Send magic link' : 'Sign in'}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-slate-500">
             Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="text-blue-600 hover:underline font-medium">Sign up free</Link>
+            <Link href="/auth/signup" className="font-medium text-[#533483] hover:text-[#e94560]">Sign up free</Link>
           </div>
         </div>
       </div>

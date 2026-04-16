@@ -2,48 +2,78 @@ import Link from 'next/link';
 import { DISCLAIMERS } from '@/lib/disclaimers';
 import Logo from '@/components/brand/Logo';
 
+const PRODUCT_LINKS = [
+  { href: '/vision', label: 'naili vision' },
+  { href: '/shield', label: 'naili shield' },
+  { href: '/dashboard', label: 'Dashboard' },
+];
+
+const GET_STARTED_LINKS = [
+  { href: '/vision/start', label: 'Nail my project' },
+  { href: '/auth/signup', label: 'Create account' },
+  { href: '/auth/login', label: 'Sign in' },
+];
+
+const LEARN_LINKS = [
+  { href: '/vision', label: 'How Vision works' },
+  { href: '/shield', label: 'How Shield works' },
+  { href: '/', label: 'Pricing' },
+];
+
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-400 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.3fr_0.7fr_0.7fr] mb-10">
+    <footer className="mt-auto bg-[linear-gradient(180deg,#111426_0%,#0b1020_100%)] text-slate-400">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
+        <div className="mb-10 grid gap-10 md:grid-cols-[1.2fr_0.75fr_0.75fr_0.75fr]">
           <div>
-            <Logo theme="dark" showTagline className="mb-4 gap-2.5" markClassName="h-9 w-10" wordmarkClassName="text-[1.65rem]" />
-            <p className="text-sm leading-relaxed max-w-md text-slate-400">
-              naili helps homeowners plan, estimate, vet, and hire with total confidence before any contractor shows up.
+            <Logo theme="dark" showTagline className="mb-4 gap-2.5" markClassName="h-9 w-10" wordmarkClassName="text-[1.65rem]" taglineClassName="text-slate-400" />
+            <p className="max-w-md text-sm leading-relaxed text-slate-400">
+              naili helps homeowners plan, estimate, vet, and hire with more confidence before any contractor shows up.
             </p>
+            <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300">
+              Nail the vision. Know the cost.
+            </div>
           </div>
 
           <div>
-            <h4 className="text-white font-semibold text-sm mb-3">Product</h4>
+            <h4 className="mb-3 text-sm font-semibold text-white">Product</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/vision" className="hover:text-white transition-colors">Vision</Link></li>
-              <li><Link href="/shield" className="hover:text-white transition-colors">Shield</Link></li>
-              <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+              {PRODUCT_LINKS.map((link) => (
+                <li key={link.href}><Link href={link.href} className="transition-colors hover:text-white">{link.label}</Link></li>
+              ))}
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-semibold text-sm mb-3">Get started</h4>
+            <h4 className="mb-3 text-sm font-semibold text-white">Get started</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/vision/start" className="hover:text-white transition-colors">Nail my project</Link></li>
-              <li><Link href="/auth/signup" className="hover:text-white transition-colors">Create account</Link></li>
-              <li><Link href="/auth/login" className="hover:text-white transition-colors">Sign in</Link></li>
+              {GET_STARTED_LINKS.map((link) => (
+                <li key={link.href}><Link href={link.href} className="transition-colors hover:text-white">{link.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-3 text-sm font-semibold text-white">Learn</h4>
+            <ul className="space-y-2 text-sm">
+              {LEARN_LINKS.map((link) => (
+                <li key={link.href}><Link href={link.href} className="transition-colors hover:text-white">{link.label}</Link></li>
+              ))}
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-6 space-y-3">
+        <div className="space-y-4 border-t border-white/10 pt-6">
           <p className="text-xs leading-relaxed text-slate-500">{DISCLAIMERS.global_footer}</p>
-          <div className="flex flex-col gap-2 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 naili. All rights reserved.</p>
             <Link
               href="https://prybar.ai"
-              className="text-blue-300 hover:text-white transition-colors"
+              className="font-medium text-[#ffd27a] transition-colors hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Are you a contractor? Try Prybar →
+              Are you a contractor? Try prybar.ai →
             </Link>
           </div>
         </div>

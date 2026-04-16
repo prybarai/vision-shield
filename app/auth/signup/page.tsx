@@ -33,74 +33,79 @@ export default function SignupPage() {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
-        <div className="max-w-md w-full bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle className="h-8 w-8 text-green-600" />
+      <div className="min-h-screen bg-[#f8f9fc] px-4 py-10">
+        <div className="mx-auto flex max-w-md items-center justify-center">
+          <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+              <CheckCircle className="h-8 w-8 text-emerald-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#0d0d1a] mb-2">Check your email</h2>
+            <p className="text-slate-500 leading-relaxed">We sent a confirmation link to <strong>{email}</strong>. Once you confirm, your dashboard will be ready.</p>
+            <Link href="/vision/start" className="mt-6 inline-block text-sm font-medium text-[#533483] hover:text-[#e94560]">
+              Start a project while you wait
+            </Link>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Check your email</h2>
-          <p className="text-slate-500 leading-relaxed">We sent a confirmation link to <strong>{email}</strong>. Once you confirm, your dashboard will be ready.</p>
-          <Link href="/vision/start" className="mt-6 inline-block text-blue-600 hover:underline text-sm font-medium">
-            Start a project while you wait
-          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-8 sm:py-12">
-      <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div className="rounded-[2rem] bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
+    <div className="min-h-screen bg-[#f8f9fc] px-4 py-8 sm:py-12">
+      <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-8">
           <Logo className="mb-4" markClassName="h-12 w-[3.25rem]" />
-          <h1 className="text-3xl font-bold text-slate-900 mb-3">Create your naili account</h1>
+          <h1 className="text-3xl font-bold text-[#0d0d1a] mb-3">Create your naili account</h1>
           <p className="text-slate-600 leading-relaxed mb-6">
             Save projects, reopen estimates, and keep your planning and contractor trust tools in one place.
           </p>
           <div className="space-y-3 text-sm text-slate-600">
-            <div className="flex items-start gap-2"><Sparkles className="h-4 w-4 mt-0.5 text-blue-600" /><span>Free to start, no credit card required.</span></div>
-            <div className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 mt-0.5 text-blue-600" /><span>Use Shield when you want it, without jumping into contractor calls.</span></div>
+            <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#533483]" /><span>Free to start, no credit card required.</span></div>
+            <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 text-[#533483]" /><span>Use shield when you want it, without jumping into contractor calls.</span></div>
           </div>
         </div>
 
-        <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 p-6 sm:p-8">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900">Get started</h2>
-            <p className="text-slate-500 text-sm mt-1">Your account keeps projects, results, and next steps organized.</p>
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] p-6 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+          <div className="relative">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold">Get started</h2>
+              <p className="text-sm text-white/70 mt-1">Your account keeps projects, results, and next steps organized.</p>
+            </div>
+
+            <form onSubmit={handleSignup} className="space-y-4">
+              <Input
+                label="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="you@example.com"
+              />
+              <Input
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                hint="At least 8 characters"
+                minLength={8}
+              />
+              {error && <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-3 text-sm text-red-100">{error}</div>}
+              <Button type="submit" className="w-full border-0 bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] shadow-[0_14px_40px_rgba(233,69,96,0.24)] hover:opacity-95" loading={loading}>
+                Create account
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center text-sm text-white/70">
+              Already have an account?{' '}
+              <Link href="/auth/login" className="font-medium text-white hover:text-[#ffd27a]">Sign in</Link>
+            </div>
+
+            <p className="mt-4 text-center text-xs leading-relaxed text-white/55">
+              By signing up, you agree to our terms and understand naili provides planning and informational tools, not legal or contractor guarantees.
+            </p>
           </div>
-
-          <form onSubmit={handleSignup} className="space-y-4">
-            <Input
-              label="Email"
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              placeholder="you@example.com"
-            />
-            <Input
-              label="Password"
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              hint="At least 8 characters"
-              minLength={8}
-            />
-            {error && <div className="bg-red-50 border border-red-200 rounded-2xl p-3 text-red-700 text-sm">{error}</div>}
-            <Button type="submit" className="w-full" loading={loading}>
-              Create account
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center text-sm text-slate-500">
-            Already have an account?{' '}
-            <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">Sign in</Link>
-          </div>
-
-          <p className="text-xs text-slate-400 text-center mt-4 leading-relaxed">
-            By signing up, you agree to our terms and understand naili provides planning and informational tools, not legal or contractor guarantees.
-          </p>
         </div>
       </div>
     </div>

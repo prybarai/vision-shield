@@ -79,25 +79,26 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7 shadow-sm mb-8">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] p-5 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-7 mb-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-blue-600 mb-2">Dashboard</p>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Your naili workspace</h1>
-            <p className="text-slate-600 max-w-2xl leading-relaxed">Reopen project plans, review estimates, and move into contractor vetting only when you&apos;re ready.</p>
-            <p className="text-sm text-slate-500 mt-3">Signed in as {user.email}</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60 mb-2">Dashboard</p>
+            <h1 className="text-3xl font-bold mb-2">Your naili workspace</h1>
+            <p className="max-w-2xl leading-relaxed text-white/74">Reopen project plans, review estimates, and move into contractor vetting only when you&apos;re ready.</p>
+            <p className="text-sm text-white/55 mt-3">Signed in as {user.email}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/vision/start"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(233,69,96,0.24)] transition-opacity hover:opacity-95"
             >
               <Plus className="h-4 w-4" />
               New project
             </Link>
             <Link
               href="/shield"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
               <Shield className="h-4 w-4" />
               Open Shield
@@ -107,28 +108,28 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <Link href="/vision/start" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        <Link href="/vision/start" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
           <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
             <Camera className="h-6 w-6 text-blue-600" />
           </div>
           <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Start a Vision project</div>
           <div className="text-sm text-slate-500 mt-1">Upload a photo and get planning outputs.</div>
         </Link>
-        <Link href="/connect" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        <Link href="/connect" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
           <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
             <Sparkles className="h-6 w-6 text-emerald-600" />
           </div>
           <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Find contractors</div>
           <div className="text-sm text-slate-500 mt-1">Move from planning into real quotes.</div>
         </Link>
-        <Link href="/shield/check" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        <Link href="/shield/check" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
           <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
             <ClipboardCheck className="h-6 w-6 text-slate-700" />
           </div>
           <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Check a contractor</div>
           <div className="text-sm text-slate-500 mt-1">Verify before sending a deposit.</div>
         </Link>
-        <Link href="/shield/scan" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        <Link href="/shield/scan" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
           <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center mb-4">
             <FileText className="h-6 w-6 text-amber-600" />
           </div>

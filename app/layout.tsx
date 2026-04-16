@@ -50,7 +50,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-slate-50 min-h-screen flex flex-col`}>
+      <body className={`${inter.className} min-h-screen bg-[#f8f9fc] text-[#0d0d1a] flex flex-col`}>
         <PostHogProvider>
           <QueryProvider>
             <Header />
