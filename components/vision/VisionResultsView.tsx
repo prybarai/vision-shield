@@ -158,8 +158,8 @@ export default function VisionResultsView({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] px-6 py-8 text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.26),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-8 text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
         <div className="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
             <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -193,7 +193,7 @@ export default function VisionResultsView({
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-white/10 p-4">
                 <div className="text-xs font-semibold uppercase tracking-wide text-white/60">Most likely cost</div>
-                <div className="mt-2 text-2xl font-bold text-[#ffd27a]">{estimate ? formatCurrency(estimate.mid_estimate) : 'Pending'}</div>
+                <div className="mt-2 text-2xl font-bold text-[#a8eb57]">{estimate ? formatCurrency(estimate.mid_estimate) : 'Pending'}</div>
               </div>
               <div className="rounded-2xl bg-white/10 p-4">
                 <div className="text-xs font-semibold uppercase tracking-wide text-white/60">Share-ready brief</div>
@@ -204,7 +204,7 @@ export default function VisionResultsView({
             <div className="mt-4 space-y-3">
               <ShareButton shareUrl={shareUrl} variant="dark" />
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button className="w-full border-0 bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] shadow-[0_14px_40px_rgba(233,69,96,0.32)] hover:opacity-95" onClick={() => window.print()}>
+                <Button className="w-full border-0 bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] shadow-[0_14px_40px_rgba(31,124,247,0.28)] hover:opacity-95" onClick={() => window.print()}>
                   <Download className="mr-2 h-4 w-4" /> Download / print brief
                 </Button>
                 <Link href="/shield/check" className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/15">
@@ -218,17 +218,17 @@ export default function VisionResultsView({
 
       <section className="mt-8 grid gap-4 md:grid-cols-3">
         <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><Wallet className="h-4 w-4 text-[#e94560]" /> Smart estimate</div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><Wallet className="h-4 w-4 text-[#1f7cf7]" /> Smart estimate</div>
           <div className="mt-3 text-lg font-semibold text-slate-900">{estimate ? formatCurrencyRange(estimate.low_estimate, estimate.high_estimate) : 'Still preparing'}</div>
           <p className="mt-2 text-sm text-slate-600">Photo-aware cost planning grounded in your finish tier and ZIP code.</p>
         </div>
         <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><FileText className="h-4 w-4 text-[#533483]" /> Contractor brief</div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><FileText className="h-4 w-4 text-[#48c7f1]" /> Contractor brief</div>
           <div className="mt-3 text-lg font-semibold text-slate-900">{brief ? 'Ready to share before quotes' : 'Still drafting'}</div>
           <p className="mt-2 text-sm text-slate-600">A cleaner walk-through summary, scope notes, and quote questions.</p>
         </div>
         <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><TrendingUp className="h-4 w-4 text-[#f5a623]" /> Local context</div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><TrendingUp className="h-4 w-4 text-[#a8eb57]" /> Local context</div>
           <div className="mt-3 text-lg font-semibold text-slate-900">{regionSummary(estimate?.region_multiplier)}</div>
           <p className="mt-2 text-sm text-slate-600">{qualityTierCopy(project.quality_tier)}</p>
         </div>
@@ -241,7 +241,7 @@ export default function VisionResultsView({
             <p className="mt-1 text-sm text-slate-500">Three visual directions grounded in the original photo, not generic style templates.</p>
           </div>
           {hasAnyConcepts && selectedConceptUrl && (
-            <a href={selectedConceptUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#533483] hover:text-[#e94560]">
+            <a href={selectedConceptUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
               <Eye className="h-4 w-4" /> Open selected concept
             </a>
           )}
@@ -257,8 +257,8 @@ export default function VisionResultsView({
                   type="button"
                   onClick={() => setSelectedConcept(index)}
                   className={cn(
-                    'overflow-hidden rounded-[1.5rem] border bg-white text-left shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(83,52,131,0.18)]',
-                    selectedConcept === index ? 'border-[#e94560] ring-2 ring-[#ffd2d9]' : 'border-slate-200'
+                    'overflow-hidden rounded-[1.5rem] border bg-white text-left shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(72,199,241,0.18)]',
+                    selectedConcept === index ? 'border-[#1f7cf7] ring-2 ring-[#d7f4ff]' : 'border-slate-200'
                   )}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -268,7 +268,7 @@ export default function VisionResultsView({
                       <div className="text-sm font-semibold text-slate-900">Concept {index + 1}</div>
                       <div className="text-xs text-slate-500">Same layout, new finish direction</div>
                     </div>
-                    {selectedConcept === index && <CheckCircle2 className="h-5 w-5 text-[#e94560]" />}
+                    {selectedConcept === index && <CheckCircle2 className="h-5 w-5 text-[#1f7cf7]" />}
                   </div>
                 </button>
               ))}
@@ -286,8 +286,8 @@ export default function VisionResultsView({
           </div>
         ) : (
           <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-            <div className="mb-4 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-900">
-              <ImageIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
+            <div className="mb-4 flex items-start gap-3 rounded-2xl border border-[#d7f4ff] bg-[#eef8ff] p-4 text-sm text-[#0d2340]">
+              <ImageIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#1f7cf7]" />
               <p>Your estimate and brief are ready first. Concepts can take a bit longer, so you can keep planning while these finish in the background.</p>
             </div>
             <ConceptsLoader
@@ -319,8 +319,8 @@ export default function VisionResultsView({
                 <div className="text-sm font-medium text-slate-500">Low</div>
                 <div className="mt-2 text-3xl font-bold text-slate-900">{formatCurrency(estimate.low_estimate)}</div>
               </div>
-              <div className="rounded-[1.5rem] border border-[#ffd2d9] bg-[linear-gradient(135deg,rgba(233,69,96,0.12),rgba(83,52,131,0.12))] p-5 text-center shadow-[0_12px_30px_rgba(233,69,96,0.12)]">
-                <div className="text-sm font-semibold text-[#b02c4c]">Mid, most likely</div>
+              <div className="rounded-[1.5rem] border border-[#d7f4ff] bg-[linear-gradient(135deg,rgba(31,124,247,0.12),rgba(72,199,241,0.12))] p-5 text-center shadow-[0_12px_30px_rgba(31,124,247,0.12)]">
+                <div className="text-sm font-semibold text-[#0f5fc6]">Mid, most likely</div>
                 <div className="mt-2 text-3xl font-bold text-slate-950">{formatCurrency(estimate.mid_estimate)}</div>
               </div>
               <div className="rounded-[1.5rem] bg-slate-50 p-5 text-center">
@@ -335,8 +335,8 @@ export default function VisionResultsView({
                 <span>{formatCurrency(estimate.high_estimate)}</span>
               </div>
               <div className="relative h-4 overflow-hidden rounded-full bg-white shadow-inner">
-                <div className="absolute inset-0 bg-[linear-gradient(90deg,#16a34a_0%,#f5a623_50%,#e94560_100%)]" />
-                <div className="absolute top-1/2 h-8 w-8 -translate-y-1/2 rounded-full border-4 border-white bg-[#533483] shadow-lg" style={{ left: 'calc(50% - 16px)' }} />
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,#16a34a_0%,#a8eb57_50%,#1f7cf7_100%)]" />
+                <div className="absolute top-1/2 h-8 w-8 -translate-y-1/2 rounded-full border-4 border-white bg-[#48c7f1] shadow-lg" style={{ left: 'calc(50% - 16px)' }} />
               </div>
               <p className="mt-3 text-sm text-slate-600">Regional adjustment: {regionSummary(estimate.region_multiplier)}</p>
             </div>
@@ -367,7 +367,7 @@ export default function VisionResultsView({
                   <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Assumptions</h3>
                   <ul className="space-y-2 text-sm text-slate-700">
                     {estimateAssumptions.map((item, index) => (
-                      <li key={index} className="flex gap-2"><span className="text-[#533483]">•</span><span>{item}</span></li>
+                      <li key={index} className="flex gap-2"><span className="text-[#48c7f1]">•</span><span>{item}</span></li>
                     ))}
                   </ul>
                 </div>
@@ -411,7 +411,7 @@ export default function VisionResultsView({
             <p className="mt-1 text-sm text-slate-500">Share this with any contractor before they quote you.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button className="border-0 bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] shadow-[0_14px_40px_rgba(233,69,96,0.32)] hover:opacity-95" onClick={() => window.print()}>
+            <Button className="border-0 bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] shadow-[0_14px_40px_rgba(31,124,247,0.28)] hover:opacity-95" onClick={() => window.print()}>
               <Download className="mr-2 h-4 w-4" /> Download as PDF
             </Button>
             <ShareButton shareUrl={shareUrl} variant="light" />
@@ -450,7 +450,7 @@ export default function VisionResultsView({
                 <ul className="mt-3 space-y-3">
                   {siteQuestions.map((question, index) => (
                     <li key={index} className="flex items-start gap-3 text-sm text-slate-700">
-                      <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#eef0ff] font-semibold text-[#533483]">{index + 1}</span>
+                      <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#eef8ff] font-semibold text-[#48c7f1]">{index + 1}</span>
                       <span>{question}</span>
                     </li>
                   ))}
@@ -470,29 +470,29 @@ export default function VisionResultsView({
         </div>
         <div className="grid gap-4 lg:grid-cols-4">
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-            <ShieldCheck className="h-5 w-5 text-[#533483]" />
+            <ShieldCheck className="h-5 w-5 text-[#48c7f1]" />
             <h3 className="mt-3 font-semibold text-slate-900">Before you hire</h3>
             <p className="mt-2 text-sm text-slate-600">Run a shield check before you sign anything, especially if the quote or payment schedule feels rushed.</p>
           </div>
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-            <Wrench className="h-5 w-5 text-[#e94560]" />
+            <Wrench className="h-5 w-5 text-[#1f7cf7]" />
             <h3 className="mt-3 font-semibold text-slate-900">Homeowners also add</h3>
             <p className="mt-2 text-sm text-slate-600">{relatedProjectLabel(project.project_category)}</p>
           </div>
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-            <CalendarClock className="h-5 w-5 text-[#f5a623]" />
+            <CalendarClock className="h-5 w-5 text-[#a8eb57]" />
             <h3 className="mt-3 font-semibold text-slate-900">Best time to book</h3>
             <p className="mt-2 text-sm text-slate-600">{seasonalRecommendation(project.project_category)}</p>
           </div>
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-            <TrendingUp className="h-5 w-5 text-emerald-600" />
+            <TrendingUp className="h-5 w-5 text-[#6db93c]" />
             <h3 className="mt-3 font-semibold text-slate-900">Trending in your area</h3>
             <p className="mt-2 text-sm text-slate-600">Projects with clear scope and a shareable brief usually get cleaner, faster bid comparisons.</p>
           </div>
         </div>
       </section>
 
-      <section className="mt-10 overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] sm:p-8">
+      <section className="mt-10 overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">Ready to make this happen?</p>
@@ -500,7 +500,7 @@ export default function VisionResultsView({
             <p className="mt-3 max-w-2xl text-white/75">Use your estimate, materials list, and brief to start with stronger scope, then run shield before you hire anyone.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href={`/vision/results/${projectId}/connect`} className="inline-flex items-center justify-center rounded-xl bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] px-6 py-3 text-base font-semibold text-white shadow-[0_14px_40px_rgba(233,69,96,0.32)] transition-opacity hover:opacity-95">
+            <Link href={`/vision/results/${projectId}/connect`} className="inline-flex items-center justify-center rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95">
               Request contractor match <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <Link href="/shield/check" className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/15">

@@ -12,7 +12,7 @@ export default function Disclaimer({ text, className, variant = 'info' }: Discla
     <div
       className={cn(
         'flex gap-3 rounded-xl border p-4 text-sm',
-        variant === 'info' ? 'bg-blue-50 border-blue-200 text-blue-800' : 'bg-amber-50 border-amber-200 text-amber-800',
+        variant === 'info' ? 'border-[#d7f4ff] bg-[#eef8ff] text-[#123964]' : 'bg-amber-50 border-amber-200 text-amber-800',
         className
       )}
     >

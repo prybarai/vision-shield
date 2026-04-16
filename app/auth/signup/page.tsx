@@ -36,12 +36,12 @@ export default function SignupPage() {
       <div className="min-h-screen bg-[#f8f9fc] px-4 py-10">
         <div className="mx-auto flex max-w-md items-center justify-center">
           <div className="w-full rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)]">
-            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <CheckCircle className="h-8 w-8 text-emerald-600" />
+            <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#ecfbd2]">
+              <CheckCircle className="h-8 w-8 text-[#6db93c]" />
             </div>
             <h2 className="text-2xl font-bold text-[#0d0d1a] mb-2">Check your email</h2>
             <p className="text-slate-500 leading-relaxed">We sent a confirmation link to <strong>{email}</strong>. Once you confirm, your dashboard will be ready.</p>
-            <Link href="/vision/start" className="mt-6 inline-block text-sm font-medium text-[#533483] hover:text-[#e94560]">
+            <Link href="/vision/start" className="mt-6 inline-block text-sm font-medium text-[#48c7f1] hover:text-[#1f7cf7]">
               Start a project while you wait
             </Link>
           </div>
@@ -60,13 +60,13 @@ export default function SignupPage() {
             Save projects, reopen estimates, and keep your planning and contractor trust tools in one place.
           </p>
           <div className="space-y-3 text-sm text-slate-600">
-            <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#533483]" /><span>Free to start, no credit card required.</span></div>
-            <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 text-[#533483]" /><span>Use shield when you want it, without jumping into contractor calls.</span></div>
+            <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#48c7f1]" /><span>Free to start, no credit card required.</span></div>
+            <div className="flex items-start gap-2"><ShieldCheck className="mt-0.5 h-4 w-4 text-[#48c7f1]" /><span>Use shield when you want it, without jumping into contractor calls.</span></div>
           </div>
         </div>
 
-        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] p-6 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-8">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] p-6 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(31,124,247,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
           <div className="relative">
             <div className="mb-8">
               <h2 className="text-2xl font-bold">Get started</h2>
@@ -92,14 +92,14 @@ export default function SignupPage() {
                 minLength={8}
               />
               {error && <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-3 text-sm text-red-100">{error}</div>}
-              <Button type="submit" className="w-full border-0 bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] shadow-[0_14px_40px_rgba(233,69,96,0.24)] hover:opacity-95" loading={loading}>
+              <Button type="submit" className="w-full border-0 bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] shadow-[0_14px_40px_rgba(31,124,247,0.24)] hover:opacity-95" loading={loading}>
                 Create account
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm text-white/70">
               Already have an account?{' '}
-              <Link href="/auth/login" className="font-medium text-white hover:text-[#ffd27a]">Sign in</Link>
+              <Link href="/auth/login" className="font-medium text-white hover:text-[#a8eb57]">Sign in</Link>
             </div>
 
             <p className="mt-4 text-center text-xs leading-relaxed text-white/55">

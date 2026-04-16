@@ -81,9 +81,9 @@ export default async function SharePage({ params }: PageProps) {
               <div className="text-xs text-slate-500 mb-1">Low</div>
               <div className="text-xl font-bold text-slate-700">${e.low_estimate.toLocaleString()}</div>
             </div>
-            <div className="text-center p-3 bg-blue-50 rounded-xl border-2 border-blue-200">
-              <div className="text-xs text-blue-600 font-medium mb-1">Mid</div>
-              <div className="text-xl font-bold text-blue-700">${e.mid_estimate.toLocaleString()}</div>
+            <div className="text-center p-3 bg-[#eef8ff] rounded-xl border-2 border-[#bdefff]">
+              <div className="text-xs text-[#1f7cf7] font-medium mb-1">Mid</div>
+              <div className="text-xl font-bold text-[#0f5fc6]">${e.mid_estimate.toLocaleString()}</div>
             </div>
             <div className="text-center p-3 bg-slate-50 rounded-xl">
               <div className="text-xs text-slate-500 mb-1">High</div>
@@ -99,12 +99,12 @@ export default async function SharePage({ params }: PageProps) {
       <Disclaimer text={DISCLAIMERS.estimate} className="mb-6" />
 
       {/* CTA */}
-      <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">
+      <div className="bg-[#1f7cf7] rounded-2xl p-8 text-white text-center">
         <h2 className="text-2xl font-bold mb-2">Plan your own project with naili</h2>
-        <p className="text-blue-100 mb-6">Get AI design concepts and a cost estimate for your home project — free to start.</p>
+        <p className="text-[#eef8ff] mb-6">Get AI design concepts and a cost estimate for your home project — free to start.</p>
         <Link
           href="/vision/start"
-          className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3 rounded-xl transition-colors"
+          className="inline-flex items-center gap-2 bg-white text-[#1f7cf7] hover:bg-[#eef8ff] font-semibold px-8 py-3 rounded-xl transition-colors"
         >
           Start my project
           <ArrowRight className="h-4 w-4" />

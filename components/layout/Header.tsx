@@ -58,11 +58,11 @@ export default function Header() {
                   className={cn(
                     'flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all',
                     active
-                      ? 'bg-[linear-gradient(135deg,#eef0ff_0%,#ffe6eb_100%)] text-slate-950 shadow-sm'
+                      ? 'bg-[linear-gradient(135deg,#eef8ff_0%,#f4fde8_100%)] text-slate-950 shadow-sm'
                       : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
                   )}
                 >
-                  <Icon className={cn('h-4 w-4', active ? 'text-[#533483]' : '')} />
+                  <Icon className={cn('h-4 w-4', active ? 'text-[#48c7f1]' : '')} />
                   {label}
                 </Link>
               );
@@ -78,7 +78,7 @@ export default function Header() {
             </Link>
             <Link
               href="/vision/start"
-              className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(233,69,96,0.24)] transition-opacity hover:opacity-95"
+              className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95"
             >
               {signedIn ? 'New project' : 'Start free'}
             </Link>
@@ -105,7 +105,7 @@ export default function Header() {
                 className={cn(
                   'flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors',
                   pathname.startsWith(href)
-                    ? 'bg-[linear-gradient(135deg,#eef0ff_0%,#ffe6eb_100%)] text-slate-950'
+                    ? 'bg-[linear-gradient(135deg,#eef8ff_0%,#f4fde8_100%)] text-slate-950'
                     : 'text-slate-700 hover:bg-slate-100'
                 )}
               >
@@ -118,7 +118,7 @@ export default function Header() {
             <Link href={signedIn ? '/dashboard' : '/auth/login'} onClick={closeMenu} className="rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100">
               {signedIn ? 'Go to dashboard' : 'Sign in'}
             </Link>
-            <Link href="/vision/start" onClick={closeMenu} className="rounded-2xl bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_12px_30px_rgba(233,69,96,0.24)]">
+            <Link href="/vision/start" onClick={closeMenu} className="rounded-2xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_12px_30px_rgba(31,124,247,0.24)]">
               {signedIn ? 'Start new project' : 'Start free'}
             </Link>
           </div>

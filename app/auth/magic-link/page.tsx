@@ -21,7 +21,7 @@ export default function MagicLinkPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
       <div className="text-center">
-        <Loader2 className="h-8 w-8 text-blue-600 animate-spin mx-auto mb-4" />
+        <Loader2 className="h-8 w-8 text-[#1f7cf7] animate-spin mx-auto mb-4" />
         <p className="text-slate-600">Signing you in...</p>
       </div>
     </div>

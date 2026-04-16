@@ -217,7 +217,7 @@ export default function ContractorCheckFlow() {
           {license.boardName && <div><span className="font-semibold text-slate-900">Board:</span> {license.boardName}</div>}
           {license.boardUrl && (
             <div>
-              <a href={license.boardUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:underline">
+              <a href={license.boardUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[#1f7cf7] hover:underline">
                 Verify on board website
                 <ExternalLink className="h-4 w-4" />
               </a>
@@ -280,7 +280,7 @@ export default function ContractorCheckFlow() {
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">State <span className="text-red-500">*</span></label>
               <select
-                className="block w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="block w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#48c7f1]"
                 value={form.state}
                 onChange={e => updateForm('state', e.target.value)}
                 required
@@ -438,7 +438,7 @@ export default function ContractorCheckFlow() {
         )}
 
         <Card className="bg-slate-900 text-white p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-blue-200 mb-2">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#d7f4ff] mb-2">
             <ShieldCheck className="h-4 w-4" />
             Recommended next move
           </div>

@@ -53,7 +53,7 @@ export default function BeforeAfterSlider({
           max={88}
           value={position}
           onChange={(event) => setPosition(Number(event.target.value))}
-          className="w-full accent-[#e94560]"
+          className="w-full accent-[#1f7cf7]"
           aria-label="Compare before and after images"
         />
       </div>

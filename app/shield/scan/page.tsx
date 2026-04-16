@@ -161,7 +161,7 @@ export default function ShieldScanPage() {
               <ul className="space-y-3">
                 {result.questions_to_ask.map((q, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                    <span className="text-blue-500 font-bold flex-shrink-0">{i + 1}.</span>
+                    <span className="text-[#1f7cf7] font-bold flex-shrink-0">{i + 1}.</span>
                     {q}
                   </li>
                 ))}
@@ -171,7 +171,7 @@ export default function ShieldScanPage() {
         </div>
 
         <Card className="bg-slate-900 text-white p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-blue-200 mb-2">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#d7f4ff] mb-2">
             <ShieldCheck className="h-4 w-4" />
             Recommended next step
           </div>
@@ -202,17 +202,17 @@ export default function ShieldScanPage() {
 
       <Card className="mb-6 p-5 sm:p-6">
         <div className="flex gap-2 mb-6">
-          <button onClick={() => setMode('paste')} className={cn('flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors', mode === 'paste' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')}>
+          <button onClick={() => setMode('paste')} className={cn('flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors', mode === 'paste' ? 'bg-[#1f7cf7] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')}>
             Paste text
           </button>
-          <button onClick={() => setMode('upload')} className={cn('flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors', mode === 'upload' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')}>
+          <button onClick={() => setMode('upload')} className={cn('flex-1 py-2.5 rounded-xl text-sm font-semibold transition-colors', mode === 'upload' ? 'bg-[#1f7cf7] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200')}>
             Upload file
           </button>
         </div>
 
         {mode === 'paste' ? (
           <textarea
-            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none font-mono text-sm"
+            className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none font-mono text-sm"
             rows={14}
             placeholder="Paste the important parts of your quote or contract here, including payment schedule, scope, warranty language, change orders, and cancellation terms..."
             value={text}
@@ -220,7 +220,7 @@ export default function ShieldScanPage() {
           />
         ) : (
           <div>
-            <div {...getRootProps()} className={cn('border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors', isDragActive ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400')}>
+            <div {...getRootProps()} className={cn('border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-colors', isDragActive ? 'border-[#1f7cf7] bg-[#eef8ff]' : 'border-slate-300 hover:border-[#48c7f1]')}>
               <input {...getInputProps()} />
               <Upload className="h-10 w-10 text-slate-400 mx-auto mb-3" />
               <p className="text-slate-700 font-medium">Drag and drop or click to upload</p>

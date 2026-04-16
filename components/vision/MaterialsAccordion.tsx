@@ -56,7 +56,7 @@ export default function MaterialsAccordion({ materials }: Props) {
                         <div className="text-base font-semibold text-slate-900">{item.item}</div>
                         <div className="mt-1 text-sm text-slate-500">{item.quantity} {item.unit} • {item.finish_tier} tier</div>
                       </div>
-                      <div className="rounded-full bg-[#fff4d9] px-3 py-1 text-xs font-semibold text-[#8b5b00]">
+                      <div className="rounded-full bg-[#f4fde8] px-3 py-1 text-xs font-semibold text-[#8b5b00]">
                         {formatCurrencyRange(item.estimated_cost_low, item.estimated_cost_high)}
                       </div>
                     </div>

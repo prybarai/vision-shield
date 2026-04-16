@@ -69,25 +69,25 @@ export default function ConceptsLoader({
   if (hasImages) return null;
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 space-y-4">
+    <div className="bg-[#eef8ff] border border-[#bdefff] rounded-2xl p-6 space-y-4">
       <div className="flex items-start gap-3">
         {loading ? (
-          <Loader2 className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5 animate-spin" />
+          <Loader2 className="h-5 w-5 text-[#1f7cf7] flex-shrink-0 mt-0.5 animate-spin" />
         ) : (
-          <Sparkles className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <Sparkles className="h-5 w-5 text-[#1f7cf7] flex-shrink-0 mt-0.5" />
         )}
         <div>
-          <p className="text-blue-900 text-sm font-medium">Your planning results are ready.</p>
-          <p className="text-blue-800 text-sm mt-1">
+          <p className="text-[#0d2340] text-sm font-medium">Your planning results are ready.</p>
+          <p className="text-[#123964] text-sm mt-1">
             We&apos;re generating three design concepts in the background so you don&apos;t have to wait on this page.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="bg-white/70 border border-blue-100 rounded-xl p-3 flex items-start gap-2">
-          <AlertCircle className="h-4 w-4 text-blue-700 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-900">{error}</p>
+        <div className="bg-white/70 border border-[#d7f4ff] rounded-xl p-3 flex items-start gap-2">
+          <AlertCircle className="h-4 w-4 text-[#0f5fc6] flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-[#0d2340]">{error}</p>
         </div>
       )}
 

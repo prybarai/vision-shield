@@ -99,20 +99,20 @@ export default function ConnectPage({ params }: PageProps) {
         </div>
         <h1 className="text-3xl font-bold text-slate-900 mb-3">Request saved</h1>
         <p className="text-slate-600 text-lg mb-8">{confirmationMessage}</p>
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 text-left space-y-4">
+        <div className="bg-[#eef8ff] border border-[#d7f4ff] rounded-2xl p-6 mb-8 text-left space-y-4">
           <div>
             <h2 className="font-semibold text-slate-900 mb-2">What happens next</h2>
             <ul className="space-y-2 text-sm text-slate-700">
-              <li className="flex items-start gap-2"><span className="text-blue-500">1.</span> Your project and contact details are saved.</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500">2.</span> You can still use your estimate, materials plan, and brief right away.</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500">3.</span> Use Shield before hiring anyone, even if someone comes recommended.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">1.</span> Your project and contact details are saved.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">2.</span> You can still use your estimate, materials plan, and brief right away.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">3.</span> Use Shield before hiring anyone, even if someone comes recommended.</li>
             </ul>
           </div>
           <div className="rounded-xl bg-white/70 p-4 text-sm text-slate-700 flex items-start gap-3">
             {confirmationMode === 'dispatched' ? (
-              <Clock3 className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <Clock3 className="h-4 w-4 text-[#1f7cf7] mt-0.5 flex-shrink-0" />
             ) : (
-              <ShieldCheck className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <ShieldCheck className="h-4 w-4 text-[#1f7cf7] mt-0.5 flex-shrink-0" />
             )}
             <span>
               {confirmationMode === 'dispatched'
@@ -168,7 +168,7 @@ export default function ConnectPage({ params }: PageProps) {
                 key={opt.value}
                 type="button"
                 onClick={() => update('preferred_timing', opt.value)}
-                className={`p-4 rounded-xl border-2 text-left transition-colors ${form.preferred_timing === opt.value ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
+                className={`p-4 rounded-xl border-2 text-left transition-colors ${form.preferred_timing === opt.value ? 'border-[#1f7cf7] bg-[#eef8ff]' : 'border-slate-200 hover:border-slate-300'}`}
               >
                 <div className="font-semibold text-slate-900 text-sm">{opt.label}</div>
                 <div className="text-xs text-slate-500 mt-1">{opt.desc}</div>
@@ -185,7 +185,7 @@ export default function ConnectPage({ params }: PageProps) {
                 key={opt.value}
                 type="button"
                 onClick={() => update('budget_range', opt.value)}
-                className={`p-3 rounded-xl border-2 text-center text-sm font-medium transition-colors ${form.budget_range === opt.value ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
+                className={`p-3 rounded-xl border-2 text-center text-sm font-medium transition-colors ${form.budget_range === opt.value ? 'border-[#1f7cf7] bg-[#eef8ff] text-[#0f5fc6]' : 'border-slate-200 text-slate-700 hover:border-slate-300'}`}
               >
                 {opt.label}
               </button>
@@ -201,7 +201,7 @@ export default function ConnectPage({ params }: PageProps) {
                 key={opt.value}
                 type="button"
                 onClick={() => update('priority', opt.value)}
-                className={`p-4 rounded-xl border-2 text-left sm:text-center transition-colors ${form.priority === opt.value ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
+                className={`p-4 rounded-xl border-2 text-left sm:text-center transition-colors ${form.priority === opt.value ? 'border-[#1f7cf7] bg-[#eef8ff]' : 'border-slate-200 hover:border-slate-300'}`}
               >
                 <div className="font-semibold text-slate-900 text-sm">{opt.label}</div>
                 <div className="text-xs text-slate-500 mt-1">{opt.desc}</div>
@@ -213,7 +213,7 @@ export default function ConnectPage({ params }: PageProps) {
         <Card className="p-5 sm:p-6">
           <label className="block text-sm font-medium text-slate-700 mb-2">Anything a contractor should know? <span className="text-slate-400">(optional)</span></label>
           <textarea
-            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none"
             rows={4}
             placeholder="Examples: narrow work hours, existing damage, preferred materials, or anything you want included in the first conversation."
             value={form.notes}

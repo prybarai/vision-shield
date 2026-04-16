@@ -79,8 +79,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] p-5 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-7 mb-8">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] p-5 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-7 mb-8">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(31,124,247,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60 mb-2">Dashboard</p>
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
               href="/vision/start"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#e94560_0%,#533483_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(233,69,96,0.24)] transition-opacity hover:opacity-95"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95"
             >
               <Plus className="h-4 w-4" />
               New project
@@ -108,32 +108,32 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <Link href="/vision/start" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
-          <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-4">
-            <Camera className="h-6 w-6 text-blue-600" />
+        <Link href="/vision/start" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
+          <div className="w-12 h-12 bg-[#eef8ff] rounded-2xl flex items-center justify-center mb-4">
+            <Camera className="h-6 w-6 text-[#1f7cf7]" />
           </div>
-          <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Start a Vision project</div>
+          <div className="font-bold text-slate-900 group-hover:text-[#1f7cf7] transition-colors">Start a Vision project</div>
           <div className="text-sm text-slate-500 mt-1">Upload a photo and get planning outputs.</div>
         </Link>
-        <Link href="/connect" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
-          <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4">
-            <Sparkles className="h-6 w-6 text-emerald-600" />
+        <Link href="/connect" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
+          <div className="w-12 h-12 bg-[#f4fde8] rounded-2xl flex items-center justify-center mb-4">
+            <Sparkles className="h-6 w-6 text-[#6db93c]" />
           </div>
-          <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Find contractors</div>
+          <div className="font-bold text-slate-900 group-hover:text-[#1f7cf7] transition-colors">Find contractors</div>
           <div className="text-sm text-slate-500 mt-1">Move from planning into real quotes.</div>
         </Link>
-        <Link href="/shield/check" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
+        <Link href="/shield/check" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
           <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
             <ClipboardCheck className="h-6 w-6 text-slate-700" />
           </div>
-          <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Check a contractor</div>
+          <div className="font-bold text-slate-900 group-hover:text-[#1f7cf7] transition-colors">Check a contractor</div>
           <div className="text-sm text-slate-500 mt-1">Verify before sending a deposit.</div>
         </Link>
-        <Link href="/shield/scan" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]">
+        <Link href="/shield/scan" className="group rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
           <div className="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center mb-4">
             <FileText className="h-6 w-6 text-amber-600" />
           </div>
-          <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">Scan a quote</div>
+          <div className="font-bold text-slate-900 group-hover:text-[#1f7cf7] transition-colors">Scan a quote</div>
           <div className="text-sm text-slate-500 mt-1">Catch risky terms before you sign.</div>
         </Link>
       </section>
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
             <p className="text-sm text-slate-500 mt-1">Saved plans, estimates, and next steps.</p>
           </div>
           {projects.length > 0 && (
-            <Link href="/vision/start" className="text-sm font-semibold text-blue-600 hover:text-blue-700">Start another project</Link>
+            <Link href="/vision/start" className="text-sm font-semibold text-[#1f7cf7] hover:text-[#0f5fc6]">Start another project</Link>
           )}
         </div>
 
@@ -159,7 +159,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/vision/start"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#1f7cf7] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0f5fc6]"
               >
                 <Plus className="h-4 w-4" /> Start a project
               </Link>
@@ -200,11 +200,11 @@ export default async function DashboardPage() {
                       <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
                         {statusLabels[project.status] || project.status.replace(/_/g, ' ')}
                       </span>
-                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${project.generated_image_urls?.length ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${project.generated_image_urls?.length ? 'bg-[#ecfbd2] text-[#518d2b]' : 'bg-slate-100 text-slate-500'}`}>
                         {project.generated_image_urls?.length ? `${project.generated_image_urls.length} concept${project.generated_image_urls.length > 1 ? 's' : ''}` : 'Concepts pending'}
                       </span>
                     </div>
-                    <h3 className="font-bold text-slate-900 capitalize text-lg group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-bold text-slate-900 capitalize text-lg group-hover:text-[#1f7cf7] transition-colors">
                       {project.project_category.replace(/_/g, ' ')}
                     </h3>
                     <p className="text-sm text-slate-500 mt-1">ZIP {project.zip_code} · {new Date(project.created_at).toLocaleDateString()}</p>
@@ -217,7 +217,7 @@ export default async function DashboardPage() {
                       </div>
                       <div className="flex items-center justify-between text-sm text-slate-600">
                         <span>Open results</span>
-                        <ArrowRight className="h-4 w-4 text-blue-600" />
+                        <ArrowRight className="h-4 w-4 text-[#1f7cf7]" />
                       </div>
                     </div>
                   </div>
@@ -235,7 +235,7 @@ export default async function DashboardPage() {
               <h2 className="text-xl font-bold text-slate-900">Recent Shield checks</h2>
               <p className="text-sm text-slate-500 mt-1">A quick way to revisit contractor trust work.</p>
             </div>
-            <Link href="/shield" className="text-sm font-semibold text-blue-600 hover:text-blue-700">Open Shield</Link>
+            <Link href="/shield" className="text-sm font-semibold text-[#1f7cf7] hover:text-[#0f5fc6]">Open Shield</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             {shieldScanSummaries.map((scan) => (

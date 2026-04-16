@@ -10,7 +10,7 @@ export default function Badge({ className, variant = 'gray', children, ...props 
     green: 'bg-green-100 text-green-800 border border-green-200',
     amber: 'bg-amber-100 text-amber-800 border border-amber-200',
     red: 'bg-red-100 text-red-800 border border-red-200',
-    blue: 'bg-blue-100 text-blue-800 border border-blue-200',
+    blue: 'bg-[#d7f4ff] text-[#123964] border border-[#bdefff]',
     gray: 'bg-slate-100 text-slate-700 border border-slate-200',
   };
 

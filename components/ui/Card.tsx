@@ -12,7 +12,7 @@ export default function Card({ className, hover, selected, children, ...props }:
       className={cn(
         'bg-white rounded-2xl border p-6',
         hover && 'transition-shadow cursor-pointer hover:shadow-md',
-        selected ? 'border-blue-500 ring-2 ring-blue-200 shadow-md' : 'border-slate-100 shadow-sm',
+        selected ? 'border-[#1f7cf7] ring-2 ring-[#d7f4ff] shadow-md' : 'border-slate-100 shadow-sm',
         className
       )}
       {...props}

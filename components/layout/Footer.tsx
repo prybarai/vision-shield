@@ -69,7 +69,7 @@ export default function Footer() {
             <p>© 2026 naili. All rights reserved.</p>
             <Link
               href="https://prybar.ai"
-              className="font-medium text-[#ffd27a] transition-colors hover:text-white"
+              className="font-medium text-[#a8eb57] transition-colors hover:text-white"
               target="_blank"
               rel="noopener noreferrer"
             >

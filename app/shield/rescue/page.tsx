@@ -141,7 +141,7 @@ export default function ShieldRescuePage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${activeTab === tab.key ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${activeTab === tab.key ? 'bg-[#1f7cf7] text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'}`}
             >
               {tab.label}
             </button>
@@ -154,7 +154,7 @@ export default function ShieldRescuePage() {
               <h2 className="font-bold text-slate-900">{TABS.find(tab => tab.key === activeTab)?.label}</h2>
               <p className="text-sm text-slate-500">{TABS.find(tab => tab.key === activeTab)?.desc}</p>
             </div>
-            <button onClick={() => copyText(String(activeContent || ''))} className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium">
+            <button onClick={() => copyText(String(activeContent || ''))} className="inline-flex items-center gap-1 text-sm text-[#1f7cf7] hover:text-[#0f5fc6] font-medium">
               <Copy className="h-4 w-4" /> Copy
             </button>
           </div>
@@ -165,7 +165,7 @@ export default function ShieldRescuePage() {
         </Card>
 
         <Card className="mb-4 bg-slate-900 text-white p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-blue-200 mb-2">
+          <div className="flex items-center gap-2 text-sm font-semibold text-[#d7f4ff] mb-2">
             <ShieldCheck className="h-4 w-4" />
             After you send this
           </div>
@@ -200,11 +200,11 @@ export default function ShieldRescuePage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">What type of issue? <span className="text-red-500">*</span></label>
-              <textarea className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" rows={2} placeholder="e.g. Contractor took deposit and never started work" value={form.situation_description} onChange={e => update('situation_description', e.target.value)} required />
+              <textarea className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none" rows={2} placeholder="e.g. Contractor took deposit and never started work" value={form.situation_description} onChange={e => update('situation_description', e.target.value)} required />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Describe what happened <span className="text-red-500">*</span></label>
-              <textarea className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" rows={6} placeholder="Include dates, what was promised, what was paid, what is unfinished, and any communication issues..." value={form.what_happened} onChange={e => update('what_happened', e.target.value)} required />
+              <textarea className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none" rows={6} placeholder="Include dates, what was promised, what was paid, what is unfinished, and any communication issues..." value={form.what_happened} onChange={e => update('what_happened', e.target.value)} required />
             </div>
           </div>
         </Card>
@@ -226,7 +226,7 @@ export default function ShieldRescuePage() {
             <Input label="Amount paid ($)" type="number" min="0" placeholder="5000" value={form.amount_paid} onChange={e => update('amount_paid', e.target.value)} required />
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">State <span className="text-red-500">*</span></label>
-              <select className="block w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" value={form.state} onChange={e => update('state', e.target.value)} required>
+              <select className="block w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#48c7f1]" value={form.state} onChange={e => update('state', e.target.value)} required>
                 <option value="">Select state...</option>
                 {US_STATES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
@@ -237,7 +237,7 @@ export default function ShieldRescuePage() {
         <Disclaimer text={DISCLAIMERS.dispute_letter} variant="warning" />
 
         <label className="flex items-start gap-3 cursor-pointer rounded-2xl border border-slate-200 bg-white p-4">
-          <input type="checkbox" checked={acknowledged} onChange={e => setAcknowledged(e.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+          <input type="checkbox" checked={acknowledged} onChange={e => setAcknowledged(e.target.checked)} className="mt-1 h-4 w-4 rounded border-slate-300 text-[#1f7cf7] focus:ring-[#48c7f1]" />
           <span className="text-sm text-slate-700">I understand these documents are AI-generated for informational purposes only and do not constitute legal advice. I will review them carefully before sending.</span>
         </label>
 

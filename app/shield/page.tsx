@@ -44,11 +44,11 @@ export default function ShieldPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] px-6 py-10 text-white shadow-[0_24px_90px_rgba(15,23,42,0.22)] sm:px-8 sm:py-12 lg:px-12 mb-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.12),transparent_24%)]" />
+      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-10 text-white shadow-[0_24px_90px_rgba(15,23,42,0.22)] sm:px-8 sm:py-12 lg:px-12 mb-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(31,124,247,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
         <div className="relative max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/90 mb-5">
-            <ShieldCheck className="h-4 w-4 text-[#ffd27a]" />
+            <ShieldCheck className="h-4 w-4 text-[#a8eb57]" />
             naili shield
           </div>
           <h1 className="text-4xl font-bold text-balance md:text-5xl">Hire with confidence. Never get burned.</h1>
@@ -79,15 +79,15 @@ export default function ShieldPage() {
             <Link
               key={tool.href}
               href={tool.href}
-              className="group rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(83,52,131,0.14)]"
+              className="group rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]"
             >
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef0ff] text-[#533483]">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef8ff] text-[#48c7f1]">
                 <tool.icon className="h-6 w-6" />
               </div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{tool.eyebrow}</p>
-              <h2 className="text-xl font-bold text-[#0d0d1a] transition-colors group-hover:text-[#533483]">{tool.title}</h2>
+              <h2 className="text-xl font-bold text-[#0d0d1a] transition-colors group-hover:text-[#48c7f1]">{tool.title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-600 mb-5">{tool.desc}</p>
-              <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#533483]">
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1]">
                 Open tool
                 <ArrowRight className="h-4 w-4" />
               </div>

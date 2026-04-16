@@ -542,7 +542,7 @@ export default function VisionStartFlow() {
         <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-blue-600 mb-1">naili vision</p>
+              <p className="text-sm font-semibold text-[#1f7cf7] mb-1">naili vision</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Start your project from a real photo</h1>
               <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
                 naili reads the actual photo with your request first, then turns that analysis into a cost range, materials plan, contractor brief, and design concepts.
@@ -561,16 +561,16 @@ export default function VisionStartFlow() {
                   className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors',
                     currentVisibleStepIndex > i
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-[#1f7cf7] text-white'
                       : currentVisibleStepIndex === i
-                      ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                      ? 'bg-[#1f7cf7] text-white ring-4 ring-[#d7f4ff]'
                       : 'bg-slate-200 text-slate-500'
                   )}
                 >
                   {currentVisibleStepIndex > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
                 </div>
                 {i < visibleSteps.length - 1 && (
-                  <div className={cn('h-0.5 w-8 sm:w-12', currentVisibleStepIndex > i ? 'bg-blue-600' : 'bg-slate-200')} />
+                  <div className={cn('h-0.5 w-8 sm:w-12', currentVisibleStepIndex > i ? 'bg-[#1f7cf7]' : 'bg-slate-200')} />
                 )}
               </div>
             ))}
@@ -590,7 +590,7 @@ export default function VisionStartFlow() {
               {...getRootProps()}
               className={cn(
                 'border-2 border-dashed rounded-3xl p-5 sm:p-7 text-center cursor-pointer transition-colors',
-                isDragActive ? 'border-blue-500 bg-blue-50' : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
+                isDragActive ? 'border-[#1f7cf7] bg-[#eef8ff]' : 'border-slate-300 hover:border-[#48c7f1] hover:bg-slate-50'
               )}
             >
               <input {...getInputProps()} />
@@ -627,7 +627,7 @@ export default function VisionStartFlow() {
                 </div>
               ) : (
                 <>
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#eef8ff] text-[#1f7cf7]">
                     <Upload className="h-8 w-8" />
                   </div>
                   <p className="text-slate-900 font-semibold text-lg">Drag and drop a photo, or click to browse</p>
@@ -659,13 +659,13 @@ export default function VisionStartFlow() {
           <div className="space-y-4">
             <Card className="p-5 sm:p-6">
               <div className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
-                <Info className="h-4 w-4 text-blue-600" />
+                <Info className="h-4 w-4 text-[#1f7cf7]" />
                 Best photo tips
               </div>
               <ul className="space-y-3 text-sm text-slate-600">
                 {PHOTO_TIPS.map((tip) => (
                   <li key={tip} className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-[#7ccf43] mt-0.5 flex-shrink-0" />
                     <span>{tip}</span>
                   </li>
                 ))}
@@ -674,7 +674,7 @@ export default function VisionStartFlow() {
 
             <Card className="p-5 sm:p-6 bg-slate-900 text-white">
               <div className="flex items-center gap-2 font-semibold mb-3">
-                <Sparkles className="h-4 w-4 text-blue-300" />
+                <Sparkles className="h-4 w-4 text-[#8be0f7]" />
                 What you&apos;ll get first
               </div>
               <ul className="space-y-2 text-sm text-slate-300">
@@ -826,7 +826,7 @@ export default function VisionStartFlow() {
                 <div className="text-2xl mb-2">{tier.emoji}</div>
                 <div className="font-bold text-slate-900 text-lg mb-1">{tier.label}</div>
                 <div className="text-sm text-slate-600 mb-4 leading-relaxed">{tier.desc}</div>
-                <div className="text-xs font-medium text-blue-700 bg-blue-50 rounded-lg px-2.5 py-1.5 inline-block">{tier.modifier}</div>
+                <div className="text-xs font-medium text-[#0f5fc6] bg-[#eef8ff] rounded-lg px-2.5 py-1.5 inline-block">{tier.modifier}</div>
               </Card>
             ))}
           </div>
@@ -842,7 +842,7 @@ export default function VisionStartFlow() {
                 : 'Useful details include pets, existing damage, finish preferences, materials you want to avoid, or anything a contractor should notice fast.'}
             </p>
             <textarea
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none"
               rows={isCustomProject ? 5 : 4}
               placeholder={isCustomProject ? 'e.g. Replace the old pergola with a covered outdoor kitchen, improve lighting near the patio, and make it easier to entertain.' : 'e.g. Need durable flooring because of a dog, want warmer tones, and current trim has a lot of visible wear.'}
               value={notes}
@@ -860,10 +860,10 @@ export default function VisionStartFlow() {
       )}
 
       {step === 'loading' && (
-        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] px-6 py-10 text-center text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-14">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.26),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.14),transparent_24%)]" />
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-10 text-center text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-14">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.16),transparent_24%)]" />
           <div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
-          <div className="absolute bottom-0 right-0 h-56 w-56 rounded-full bg-[#e94560]/10 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-56 w-56 rounded-full bg-[#1f7cf7]/10 blur-3xl" />
 
           <div className="relative mx-auto max-w-5xl">
             <div className="inline-flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur mb-8">
@@ -884,16 +884,16 @@ export default function VisionStartFlow() {
                     className={cn(
                       'flex items-center gap-3 rounded-[1.5rem] border px-4 py-4 backdrop-blur transition-all',
                       i < progressStep
-                        ? 'border-emerald-300/30 bg-emerald-400/10 text-emerald-100'
+                        ? 'border-[#b6ef72]/30 bg-[#a8eb57]/12 text-[#effdd8]'
                         : i === progressStep
                         ? 'border-white/20 bg-white/12 text-white'
                         : 'border-white/10 bg-white/6 text-white/45'
                     )}
                   >
                     {i < progressStep ? (
-                      <CheckCircle className="h-5 w-5 flex-shrink-0 text-emerald-300" />
+                      <CheckCircle className="h-5 w-5 flex-shrink-0 text-[#b6ef72]" />
                     ) : i === progressStep ? (
-                      <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin text-[#ffd27a]" />
+                      <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin text-[#a8eb57]" />
                     ) : (
                       <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-white/30" />
                     )}
@@ -908,7 +908,7 @@ export default function VisionStartFlow() {
                   <div className="space-y-3">
                     {analysisHighlights.map((item, index) => (
                       <div key={`${item}-${index}`} className="flex items-start gap-2 text-sm text-white/80">
-                        <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#ffd27a]" />
+                        <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#a8eb57]" />
                         <span>{item}</span>
                       </div>
                     ))}
