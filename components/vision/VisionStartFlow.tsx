@@ -455,7 +455,7 @@ export default function VisionStartFlow() {
       };
 
       setProgressStep(2);
-      const materialsRes = await fetch('/api/vision/materials', {
+      const materialsPromise = fetch('/api/vision/materials', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -469,10 +469,8 @@ export default function VisionStartFlow() {
         }),
       });
 
-      if (!materialsRes.ok) throw new Error('Failed to generate materials list');
-
       setProgressStep(3);
-      const briefRes = await fetch('/api/vision/brief', {
+      const briefPromise = fetch('/api/vision/brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -487,37 +485,45 @@ export default function VisionStartFlow() {
         }),
       });
 
+      const conceptPromise = (async () => {
+        try {
+          const controller = new AbortController();
+          const timeout = window.setTimeout(() => controller.abort(), 15000);
+
+          const conceptsRes = await fetch('/api/vision/generate-concepts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+              project_id: projectId,
+              category,
+              style,
+              quality_tier: qualityTier,
+              notes: notesWithScope,
+              reference_image_url: referenceImageUrl,
+              analysis,
+              count: 1,
+            }),
+          });
+
+          window.clearTimeout(timeout);
+
+          if (!conceptsRes.ok) {
+            throw new Error(`Concept generation returned ${conceptsRes.status}`);
+          }
+        } catch (conceptError) {
+          console.error('Concept generation failed', conceptError);
+        }
+      })();
+
+      const [materialsRes, briefRes] = await Promise.all([materialsPromise, briefPromise]);
+
+      if (!materialsRes.ok) throw new Error('Failed to generate materials list');
+
       if (!briefRes.ok) throw new Error('Failed to generate project brief');
 
       setProgressStep(4);
-      try {
-        const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 25000);
-
-        const conceptsRes = await fetch('/api/vision/generate-concepts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({
-            project_id: projectId,
-            category,
-            style,
-            quality_tier: qualityTier,
-            notes: notesWithScope,
-            reference_image_url: referenceImageUrl,
-            analysis,
-            count: 1,
-          }),
-        });
-
-        window.clearTimeout(timeout);
-
-        if (!conceptsRes.ok) {
-          throw new Error(`Concept generation returned ${conceptsRes.status}`);
-        }
-      } catch (conceptError) {
-        console.error('Concept generation failed', conceptError);
-      }
+      await conceptPromise;
 
       setProgressStep(5);
 
