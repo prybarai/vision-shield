@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { parseClaudeVisionJSONFromUrl } from '@/lib/anthropic';
+import { parseOpenAIVisionJSONFromUrl } from '@/lib/openaiVision';
 import { FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
@@ -129,11 +129,11 @@ export async function POST(req: NextRequest) {
     const params = schema.parse(body);
 
     try {
-      const analysis = sanitizeAnalysis(await parseClaudeVisionJSONFromUrl<VisionAnalysis>({
+      const analysis = sanitizeAnalysis(await parseOpenAIVisionJSONFromUrl<VisionAnalysis>({
         systemPrompt: SYSTEM_PROMPT,
         userPrompt: `${USER_PROMPT_TEMPLATE}\n\nProject category: ${params.category}${params.zip_code ? `\nZIP code: ${params.zip_code}` : ''}${params.notes ? `\nHomeowner request: ${params.notes}` : '\nHomeowner request: none provided'}`,
         imageUrl: params.image_url,
-        maxTokens: 2200,
+        maxTokens: 1200,
       }));
 
       return NextResponse.json({ analysis });

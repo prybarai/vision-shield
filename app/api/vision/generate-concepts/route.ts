@@ -45,6 +45,7 @@ export async function POST(req: NextRequest) {
       category: params.category,
       style: params.style,
       hasNotes: Boolean(params.notes),
+      requestedCount: params.count ?? 1,
       constraintSummary,
     });
 
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
       referenceImageUrl: params.reference_image_url,
       analysis: getAnalysis(params.analysis),
       projectId: params.project_id,
-      count: params.count ?? 3,
+      count: params.count ?? 1,
     });
 
     if (imageUrls.length > 0) {

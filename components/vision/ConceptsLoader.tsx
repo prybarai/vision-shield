@@ -46,7 +46,7 @@ export default function ConceptsLoader({
           quality_tier: qualityTier,
           notes: notes || undefined,
           reference_image_url: referenceImageUrl || undefined,
-          count: 3,
+          count: 1,
         }),
       });
 
@@ -55,7 +55,7 @@ export default function ConceptsLoader({
       router.refresh();
     } catch (e) {
       console.error(e);
-      setError('Design concepts are taking longer than expected. You can refresh later to try again.');
+      setError('Your concept is taking longer than expected. You can refresh later to try again.');
       startedRef.current = false;
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ export default function ConceptsLoader({
         <div>
           <p className="text-[#0d2340] text-sm font-medium">Your planning results are ready.</p>
           <p className="text-[#123964] text-sm mt-1">
-            We&apos;re generating three design concepts in the background so you don&apos;t have to wait on this page.
+            We&apos;re generating a photo-grounded concept in the background so you don&apos;t have to wait on this page.
           </p>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function ConceptsLoader({
 
       {!loading && !done && (
         <div>
-          <Button size="sm" onClick={runGeneration}>Generate concepts</Button>
+          <Button size="sm" onClick={runGeneration}>Generate concept</Button>
         </div>
       )}
     </div>

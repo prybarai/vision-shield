@@ -230,7 +230,7 @@ const PROGRESS_STEPS = [
   'Building your local cost range...',
   'Drafting your materials plan...',
   'Writing your contractor brief...',
-  'Rendering your design concepts...',
+  'Rendering your first design concept...',
   'Finalizing your plan...',
 ];
 
@@ -491,9 +491,13 @@ export default function VisionStartFlow() {
 
       setProgressStep(4);
       try {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 25000);
+
         const conceptsRes = await fetch('/api/vision/generate-concepts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
           body: JSON.stringify({
             project_id: projectId,
             category,
@@ -502,9 +506,11 @@ export default function VisionStartFlow() {
             notes: notesWithScope,
             reference_image_url: referenceImageUrl,
             analysis,
-            count: 3,
+            count: 1,
           }),
         });
+
+        window.clearTimeout(timeout);
 
         if (!conceptsRes.ok) {
           throw new Error(`Concept generation returned ${conceptsRes.status}`);
@@ -545,7 +551,7 @@ export default function VisionStartFlow() {
               <p className="text-sm font-semibold text-[#1f7cf7] mb-1">naili vision</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Start your project from a real photo</h1>
               <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
-                naili reads the actual photo with your request first, then turns that analysis into a cost range, materials plan, contractor brief, and design concepts.
+                naili reads the actual photo with your request first, then turns that analysis into a cost range, materials plan, contractor brief, and a fast first concept.
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -681,7 +687,7 @@ export default function VisionStartFlow() {
                 <li>Rough budget range</li>
                 <li>Materials list and allowances</li>
                 <li>Contractor-ready brief</li>
-                <li>Optional concepts may keep loading after results open</li>
+                <li>Extra concepts can keep loading after results open</li>
               </ul>
             </Card>
           </div>
@@ -779,7 +785,7 @@ export default function VisionStartFlow() {
           </button>
           <div className="mb-6">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">Pick the overall style direction</h2>
-            <p className="text-slate-600">This mostly shapes the brief and optional concepts. You can still use the planning outputs even if your style evolves later.</p>
+            <p className="text-slate-600">This mostly shapes the brief and concept direction. You can still use the planning outputs even if your style evolves later.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
@@ -872,7 +878,7 @@ export default function VisionStartFlow() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60">naili vision</p>
             <h2 className="mt-3 text-3xl font-bold sm:text-5xl">Nail the vision. Know the cost.</h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-              We&apos;re reading your actual photo and request first, then turning that analysis into your estimate, materials list, contractor brief, and concepts.
+              We&apos;re reading your actual photo and request first, then turning that analysis into your estimate, materials list, contractor brief, and a fast first concept.
             </p>
             <p className="mt-3 text-sm text-white/60">Design concepts may keep rendering in the background after your results page opens.</p>
 

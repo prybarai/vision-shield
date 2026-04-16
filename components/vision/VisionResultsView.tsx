@@ -181,7 +181,7 @@ export default function VisionResultsView({
                 <MapPin className="h-4 w-4" /> ZIP {project.zip_code}
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 backdrop-blur">
-                <Sparkles className="h-4 w-4" /> {sectionCounts.concepts || 3} concept{(sectionCounts.concepts || 3) !== 1 ? 's' : ''}
+                <Sparkles className="h-4 w-4" /> {sectionCounts.concepts || 1} concept{(sectionCounts.concepts || 1) !== 1 ? 's' : ''}
               </div>
               <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-2 backdrop-blur">
                 <Wrench className="h-4 w-4" /> {sectionCounts.materialItems} material items
@@ -238,7 +238,7 @@ export default function VisionResultsView({
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Concept images</h2>
-            <p className="mt-1 text-sm text-slate-500">Three visual directions grounded in the original photo, not generic style templates.</p>
+            <p className="mt-1 text-sm text-slate-500">A visual direction grounded in the original photo, not a generic style template.</p>
           </div>
           {hasAnyConcepts && selectedConceptUrl && (
             <a href={selectedConceptUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
