@@ -43,7 +43,7 @@ export default async function SharePage({ params }: PageProps) {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-1 text-xs text-slate-400 mb-4">
-          Shared via Prybar Vision
+          Shared via Naili Vision
         </div>
         <div className="flex justify-center gap-2 mb-3">
           <Badge variant="blue" className="capitalize">{p.quality_tier} tier</Badge>
@@ -75,7 +75,7 @@ export default async function SharePage({ params }: PageProps) {
       {/* Estimate */}
       {e && (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">Rough Cost Estimate</h2>
+          <h2 className="text-lg font-bold text-slate-900 mb-4">What this should cost</h2>
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="text-center p-3 bg-slate-50 rounded-xl">
               <div className="text-xs text-slate-500 mb-1">Low</div>
@@ -100,8 +100,8 @@ export default async function SharePage({ params }: PageProps) {
 
       {/* CTA */}
       <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">
-        <h2 className="text-2xl font-bold mb-2">Plan your own project</h2>
-        <p className="text-blue-100 mb-6">Get AI design concepts and a cost estimate for your home project — free.</p>
+        <h2 className="text-2xl font-bold mb-2">Plan your own project with Naili</h2>
+        <p className="text-blue-100 mb-6">Get AI design concepts and a cost estimate for your home project — free to start.</p>
         <Link
           href="/vision/start"
           className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3 rounded-xl transition-colors"

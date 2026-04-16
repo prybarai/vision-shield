@@ -86,6 +86,10 @@ export default function ContractorCheckFlow() {
     setError(null);
 
     try {
+      posthog.capture('naili_shield_started', {
+        state: form.state,
+      });
+
       const res = await fetch('/api/shield/check-contractor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,7 +156,7 @@ export default function ContractorCheckFlow() {
 
   const licenseStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return <Badge variant="green">Verified license found</Badge>;
+      case 'active': return <Badge variant="green">License verified ✓</Badge>;
       case 'expired': return <Badge variant="amber">License found but not active</Badge>;
       case 'fallback': return <Badge variant="gray">Manual verification needed</Badge>;
       case 'not_found': return <Badge variant="red">No license found</Badge>;
@@ -228,9 +232,9 @@ export default function ContractorCheckFlow() {
     return (
       <div className="space-y-5">
         <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Check a contractor before you commit</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Naili Shield</h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-            Start with the business name and state. If you have a license number, include it, but you do not need every field filled in to get a useful result.
+            Before you hire, let&apos;s check.
           </p>
         </div>
 
@@ -370,10 +374,10 @@ export default function ContractorCheckFlow() {
           </div>
           <p className="text-sm text-slate-700 mb-4 leading-relaxed">
             {riskLevel === 'low'
-              ? 'This contractor currently shows fewer obvious warning signs based on what you shared. Keep using normal diligence before signing.'
+              ? 'Looks reasonable.'
               : riskLevel === 'medium'
-              ? 'There are meaningful caution signs here. Slow down, tighten the paperwork, and verify the open questions before paying or signing.'
-              : 'There are serious warning signs here. I would not send more money until licensing, insurance, scope, and payment terms are independently verified.'}
+              ? 'A few things to clarify.'
+              : 'We’d recommend getting a second opinion.'}
           </p>
           <div className="flex items-center gap-4">
             <div className="relative w-20 h-20 flex-shrink-0">

@@ -15,11 +15,14 @@ export default function Header() {
   useEffect(() => {
     const supabase = createClient();
 
-    supabase.auth.getUser().then(({ data }) => {
-      setSignedIn(Boolean(data.user));
-    }).catch(() => {
-      setSignedIn(false);
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        setSignedIn(Boolean(data.user));
+      })
+      .catch(() => {
+        setSignedIn(false);
+      });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setSignedIn(Boolean(session?.user));
@@ -42,11 +45,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 sm:h-[72px] gap-4">
           <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
             <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-sm">P</span>
+              <span className="text-white font-bold text-sm">N</span>
             </div>
             <div className="min-w-0">
-              <div className="text-lg font-bold text-slate-900 leading-none">Prybar</div>
-              <div className="hidden sm:block text-xs text-slate-500 leading-none mt-1">Plan first, hire smarter</div>
+              <div className="text-lg font-bold text-slate-900 leading-none">Naili</div>
+              <div className="hidden sm:block text-xs text-slate-500 leading-none mt-1">Nail the vision. Know the cost.</div>
             </div>
           </Link>
 
@@ -76,7 +79,7 @@ export default function Header() {
               {signedIn ? 'Dashboard' : 'Sign in'}
             </Link>
             <Link
-              href={signedIn ? '/vision/start' : '/vision/start'}
+              href="/vision/start"
               className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2.5 transition-colors"
             >
               {signedIn ? 'New project' : 'Start free'}

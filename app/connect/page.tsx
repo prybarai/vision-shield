@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 const TIMING_OPTIONS = [
   { value: 'asap', label: 'ASAP', desc: 'I want to move quickly' },
@@ -72,6 +73,11 @@ export default function ConnectPage() {
 
       setConfirmationMessage(data.dispatch?.message || 'We saved your request.');
       setConfirmationMode(data.dispatch?.mode || 'saved_only');
+      posthog.capture('naili_lead_submitted', {
+        source: 'shield',
+        preferred_timing: form.preferred_timing,
+        budget_range: form.budget_range,
+      });
       setSubmitted(true);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Something went wrong. Please try again.');
@@ -182,7 +188,7 @@ export default function ConnectPage() {
         <Button type="submit" className="w-full" size="lg" loading={loading}>Save request</Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
-          If contractor routing is not configured yet, Prybar still saves your request without sending your details anywhere.
+          If contractor routing is not configured yet, Naili still saves your request without sending your details anywhere.
         </p>
       </form>
     </div>

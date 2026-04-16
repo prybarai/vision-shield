@@ -9,12 +9,37 @@ import PostHogProvider from '@/components/providers/PostHogProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Prybar — AI Home Project Planning & Contractor Verification',
-  description: 'See what your home project could look like and what it might cost. Verify contractors before you hire.',
+  title: {
+    default: 'Naili — Nail the vision. Know the cost.',
+    template: '%s | Naili',
+  },
+  description:
+    'Naili helps homeowners plan home projects with confidence — AI-powered estimates, contractor verification, and contract protection. Nail it before anyone shows up.',
+  keywords: [
+    'home renovation estimate',
+    'contractor verification',
+    'home project planning',
+    'AI home estimate',
+    'how much does renovation cost',
+    'find trusted contractor',
+    'naili',
+  ],
+  metadataBase: new URL('https://naili.ai'),
+  alternates: {
+    canonical: 'https://naili.ai',
+  },
   openGraph: {
-    title: 'Prybar — AI Home Project Planning',
-    description: 'AI-powered home improvement planning and contractor trust verification.',
-    siteName: 'Prybar',
+    siteName: 'Naili',
+    title: 'Naili — Nail the vision. Know the cost.',
+    description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
+    url: 'https://naili.ai',
+    images: ['/og-naili.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Naili — Nail the vision. Know the cost.',
+    description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
+    images: ['/og-naili.png'],
   },
 };
 
@@ -29,9 +54,7 @@ export default function RootLayout({
         <PostHogProvider>
           <QueryProvider>
             <Header />
-            <main className="flex-1">
-              {children}
-            </main>
+            <main className="flex-1">{children}</main>
             <Footer />
           </QueryProvider>
         </PostHogProvider>

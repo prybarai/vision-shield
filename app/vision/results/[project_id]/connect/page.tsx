@@ -6,6 +6,7 @@ import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Link from 'next/link';
+import posthog from 'posthog-js';
 
 interface PageProps {
   params: Promise<{ project_id: string }>;
@@ -77,6 +78,11 @@ export default function ConnectPage({ params }: PageProps) {
 
       setConfirmationMessage(data.dispatch?.message || 'We saved your request and project details.');
       setConfirmationMode(data.dispatch?.mode || 'saved_only');
+      posthog.capture('naili_lead_submitted', {
+        source: 'vision',
+        preferred_timing: form.preferred_timing,
+        budget_range: form.budget_range,
+      });
       setSubmitted(true);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : 'Something went wrong. Please try again.');
@@ -222,7 +228,7 @@ export default function ConnectPage({ params }: PageProps) {
         </Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
-          Submitting saves your request and preferences. Prybar only triggers contractor outreach when routing is actually available.
+          Submitting saves your request and preferences. Naili only triggers contractor outreach when routing is actually available.
         </p>
       </form>
     </div>

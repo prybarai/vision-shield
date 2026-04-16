@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
@@ -5,6 +6,14 @@ import { ArrowRight, Camera, ClipboardCheck, FileText, Plus, Shield, Sparkles } 
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { formatCurrency } from '@/lib/utils';
 import type { Project } from '@/types';
+
+export const metadata: Metadata = {
+  title: 'Dashboard',
+  description: 'Review your Naili plans, estimates, and Shield checks in one place.',
+  alternates: {
+    canonical: 'https://naili.ai/dashboard',
+  },
+};
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -74,7 +83,7 @@ export default async function DashboardPage() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-semibold text-blue-600 mb-2">Dashboard</p>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Your Prybar workspace</h1>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Your Naili workspace</h1>
             <p className="text-slate-600 max-w-2xl leading-relaxed">Reopen project plans, review estimates, and move into contractor vetting only when you&apos;re ready.</p>
             <p className="text-sm text-slate-500 mt-3">Signed in as {user.email}</p>
           </div>

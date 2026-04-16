@@ -349,7 +349,7 @@ export default function VisionStartFlow() {
     const notesWithScope = buildNotesWithScope(notes, scopeAnswers);
 
     try {
-      posthog.capture('vision_start_submitted', {
+      posthog.capture('naili_vision_started', {
         category,
         style,
         quality_tier: qualityTier,
@@ -524,7 +524,7 @@ export default function VisionStartFlow() {
         <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-blue-600 mb-1">Prybar Vision</p>
+              <p className="text-sm font-semibold text-blue-600 mb-1">Naili Vision</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Start your project from a real photo</h1>
               <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
                 We&apos;ll build your estimate, materials plan, and contractor brief first. Design concepts are optional and can keep rendering after your results page is ready.
@@ -564,7 +564,7 @@ export default function VisionStartFlow() {
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <Card className="p-5 sm:p-6">
             <div className="mb-5">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Upload a photo of your space</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Show Naili your space</h2>
               <p className="text-slate-600">One clear photo is enough to start. Add your ZIP code so the estimate uses local pricing, not a generic national average.</p>
             </div>
 
@@ -815,7 +815,7 @@ export default function VisionStartFlow() {
             </label>
             <p className="text-sm text-slate-500 mb-3">
               {isCustomProject
-                ? 'Tell Prybar what you want updated, repaired, redesigned, or added. Specific notes help both the estimate and contractor brief.'
+                ? 'Tell Naili what you want updated, repaired, redesigned, or added. Specific notes help both the estimate and contractor brief.'
                 : 'Useful details include pets, existing damage, finish preferences, materials you want to avoid, or anything a contractor should notice fast.'}
             </p>
             <textarea
@@ -841,7 +841,7 @@ export default function VisionStartFlow() {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-8">
             <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Building your project plan</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Naili is building your vision…</h2>
           <p className="text-slate-600 mb-3 max-w-2xl mx-auto">
             We&apos;re generating your estimate, materials list, and contractor brief first so your planning results are ready even if design concepts take longer.
           </p>

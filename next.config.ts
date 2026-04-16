@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'replicate.delivery' },
       { protocol: 'https', hostname: 'pbxt.replicate.delivery' },
       { protocol: 'https', hostname: 'maps.googleapis.com' },
+      { protocol: 'https', hostname: 'naili.ai' },
+      { protocol: 'https', hostname: 'vision-shield-wheat.vercel.app' },
     ],
   },
 };

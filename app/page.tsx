@@ -3,35 +3,12 @@ import {
   ArrowRight,
   Camera,
   CheckCircle2,
+  ClipboardCheck,
   DollarSign,
   FileText,
   ShieldCheck,
   Sparkles,
-  Upload,
-  Wand2,
 } from 'lucide-react';
-import { PROJECT_CATEGORIES } from '@/types';
-
-const HOW_IT_WORKS = [
-  {
-    step: '01',
-    icon: Upload,
-    title: 'Upload one clear photo',
-    desc: 'Start with the space you want to change. Prybar reads the photo, your ZIP code, and your project choices.',
-  },
-  {
-    step: '02',
-    icon: Wand2,
-    title: 'Set scope, style, and finish level',
-    desc: 'Choose the project type, answer a few smart scope questions, and pick the quality tier that matches your budget.',
-  },
-  {
-    step: '03',
-    icon: FileText,
-    title: 'Get planning outputs you can actually use',
-    desc: 'See a rough budget range, materials plan, contractor brief, and optional concepts without waiting for sales calls.',
-  },
-];
 
 const TRUST_POINTS = [
   'Free to start',
@@ -39,21 +16,30 @@ const TRUST_POINTS = [
   'No contractor calls until you ask',
 ];
 
-const SHIELD_TOOLS = [
+const HOW_IT_WORKS = [
   {
-    href: '/shield/check',
-    title: 'Check a contractor',
-    desc: 'Verify license status and get a plain-English risk read before you send a deposit.',
+    step: '01',
+    title: 'Nail the vision',
+    desc: 'Upload a photo or describe your project. Naili generates concept images and a real cost range.',
+    icon: Camera,
   },
   {
-    href: '/shield/scan',
-    title: 'Scan a quote',
-    desc: 'Spot risky payment terms, vague scope, and missing protections before you sign.',
+    step: '02',
+    title: 'Know the cost',
+    desc: 'Get an honest estimate with a full materials breakdown. No contractor needed to figure out what something should cost.',
+    icon: DollarSign,
   },
   {
-    href: '/shield/rescue',
-    title: 'Get dispute help',
-    desc: 'Generate cleaner demand letters and complaint drafts if a job goes sideways.',
+    step: '03',
+    title: 'Trust who you hire',
+    desc: 'Run a Naili Shield check before the first phone call. License verified. Quote scanned. Contract reviewed.',
+    icon: ShieldCheck,
+  },
+  {
+    step: '04',
+    title: 'Walk in ready',
+    desc: 'Share your project brief with contractors. You show up with a plan, a number, and zero guesswork.',
+    icon: ClipboardCheck,
   },
 ];
 
@@ -66,13 +52,13 @@ export default function HomePage() {
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-sm font-medium text-blue-200 mb-6">
                 <Sparkles className="h-4 w-4" />
-                Prybar Vision with Shield built in
+                Naili Vision + Naili Shield
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-balance mb-5">
-                Plan your home project from one photo, before you spend real money.
+                Nail the vision. Know the cost.
               </h1>
-              <p className="text-lg sm:text-xl text-slate-300 leading-relaxed mb-8 max-w-xl">
-                Prybar Vision gives you a rough budget range, materials plan, contractor-ready brief, and optional design concepts. Prybar Shield helps you vet who you hire next.
+              <p className="text-lg sm:text-xl text-slate-300 leading-relaxed mb-8 max-w-2xl">
+                AI-powered home project planning. See what your project could look like, know what it should cost, and hire with total confidence — before any contractor shows up.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
                 <Link
@@ -80,14 +66,14 @@ export default function HomePage() {
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-blue-500"
                 >
                   <Camera className="h-5 w-5" />
-                  Upload a photo
+                  Nail my project
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/shield"
+                  href="#how-it-works"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
                 >
-                  Explore Shield
+                  See how it works
                 </Link>
               </div>
               <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-slate-300">
@@ -105,39 +91,28 @@ export default function HomePage() {
                 <div className="mb-3 inline-flex rounded-2xl bg-blue-500/15 p-3 text-blue-200">
                   <DollarSign className="h-6 w-6" />
                 </div>
-                <h2 className="text-lg font-semibold mb-2">Planning-grade estimate</h2>
+                <h2 className="text-lg font-semibold mb-2">What this should cost</h2>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  See a realistic rough range, key cost drivers, and what to confirm before a contractor visit.
+                  See a planning-grade range, cost drivers, and a materials breakdown before quote season starts.
                 </p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <div className="mb-3 inline-flex rounded-2xl bg-violet-500/15 p-3 text-violet-200">
                   <FileText className="h-6 w-6" />
                 </div>
-                <h2 className="text-lg font-semibold mb-2">Briefs and materials</h2>
+                <h2 className="text-lg font-semibold mb-2">Your contractor-ready brief</h2>
                 <p className="text-sm text-slate-300 leading-relaxed">
-                  Walk into quote conversations with cleaner scope notes, material ideas, and better questions.
+                  Walk in with scope notes, material direction, and better questions instead of guesswork.
                 </p>
               </div>
               <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur sm:col-span-2">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <div className="mb-3 inline-flex rounded-2xl bg-emerald-500/15 p-3 text-emerald-200">
-                      <ShieldCheck className="h-6 w-6" />
-                    </div>
-                    <h2 className="text-lg font-semibold mb-2">Shield is your trust layer</h2>
-                    <p className="text-sm text-slate-300 leading-relaxed max-w-md">
-                      Verify licenses, scan quotes, and pressure-test contractors before you move from inspiration to deposits.
-                    </p>
-                  </div>
-                  <Link
-                    href="/shield/check"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-white hover:text-blue-200"
-                  >
-                    Check a contractor
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+                <div className="mb-3 inline-flex rounded-2xl bg-emerald-500/15 p-3 text-emerald-200">
+                  <ShieldCheck className="h-6 w-6" />
                 </div>
+                <h2 className="text-lg font-semibold mb-2">Hire with confidence</h2>
+                <p className="text-sm text-slate-300 leading-relaxed max-w-md">
+                  Verify licenses, scan quotes for red flags, review contracts, and slow bad decisions down before money moves.
+                </p>
               </div>
             </div>
           </div>
@@ -146,17 +121,45 @@ export default function HomePage() {
 
       <section className="bg-white py-14 sm:py-18">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-8">
+              <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700 mb-4">
+                <Sparkles className="h-4 w-4" />
+                Naili Vision
+              </div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">See the project before it starts.</h2>
+              <p className="text-lg leading-relaxed text-slate-600">
+                Upload a photo of your space, tell us what you&apos;re dreaming about, and Naili builds you a complete picture — AI concept images, real cost ranges, a materials list, and a contractor-ready brief. All before you talk to a single contractor.
+              </p>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-medium text-slate-700 mb-4">
+                <ShieldCheck className="h-4 w-4 text-slate-900" />
+                Naili Shield
+              </div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Hire with confidence. Never get burned.</h2>
+              <p className="text-lg leading-relaxed text-slate-600">
+                Before you hand over a deposit, run a Naili Shield check. Verify contractor licenses, scan quotes for red flags, review contracts for risky clauses, and generate dispute letters if something goes wrong.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="bg-slate-50 py-14 sm:py-18">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mb-10">
-            <h2 className="text-3xl font-bold text-slate-900 mb-3">How Prybar works</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-3">How it works</h2>
             <p className="text-slate-600 text-lg">
-              Built for the moment before quotes, when you want clarity without committing to contractor outreach yet.
+              Naili helps homeowners show up prepared, informed, and hard to pressure.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {HOW_IT_WORKS.map((item) => (
-              <div key={item.step} className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+              <div key={item.step} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-5">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 shadow-sm">
                     <item.icon className="h-6 w-6" />
                   </div>
                   <span className="text-sm font-semibold text-blue-600">Step {item.step}</span>
@@ -169,96 +172,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-slate-50 py-14 sm:py-18">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">Project types Prybar can help frame</h2>
-              <p className="text-slate-600 text-lg">Common upgrades, repairs, remodels, and a custom path for everything else.</p>
-            </div>
-            <Link href="/vision/start" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
-              Start a project
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {Object.entries(PROJECT_CATEGORIES).map(([key, cat]) => (
-              <Link
-                key={key}
-                href="/vision/start"
-                className="group rounded-3xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
-              >
-                <div className="mb-4 text-3xl">{cat.emoji}</div>
-                <h3 className="font-semibold text-slate-900 transition-colors group-hover:text-blue-600">{cat.label}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-slate-500">{cat.description}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-14 sm:py-18">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-medium text-slate-700 mb-4">
-                <ShieldCheck className="h-4 w-4 text-slate-900" />
-                Prybar Shield
-              </div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                Don&apos;t just plan the project. Pressure-test who touches it.
-              </h2>
-              <p className="text-lg leading-relaxed text-slate-600 mb-6 max-w-xl">
-                Shield keeps the trust layer simple: verify the contractor, scan the paperwork, and get help if a job starts slipping.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link
-                  href="/shield"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-slate-800"
-                >
-                  Explore Shield
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/shield/check"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-6 py-3.5 text-base font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-                >
-                  Check a contractor first
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid gap-3">
-              {SHIELD_TOOLS.map((tool) => (
-                <Link
-                  key={tool.href}
-                  href={tool.href}
-                  className="group rounded-3xl border border-slate-200 bg-slate-50 p-5 transition-colors hover:border-slate-300 hover:bg-white"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600">{tool.title}</h3>
-                      <p className="text-sm leading-relaxed text-slate-600">{tool.desc}</p>
-                    </div>
-                    <ArrowRight className="mt-1 h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-blue-600" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="bg-slate-950 py-14 text-white sm:py-18">
         <div className="max-w-4xl mx-auto px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Start with clarity, then decide what to do next.</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Walk into the job with a plan, a number, and zero guesswork.</h2>
           <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
-            Prybar is designed to help you think clearly before spending, hiring, or getting rushed into a quote.
+            Naili gives you the clarity to plan the project, sanity-check the cost, and hire on your terms.
           </p>
           <Link
             href="/vision/start"
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-blue-500"
           >
-            Start with a photo
+            Nail my project
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

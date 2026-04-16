@@ -21,7 +21,7 @@ export async function GET(
   const categoryLabel = project?.project_category?.replace(/_/g, ' ') || 'Home Project';
   const estimateText = estimate
     ? `$${estimate.low_estimate.toLocaleString()} – $${estimate.high_estimate.toLocaleString()}`
-    : 'Get your estimate';
+    : 'What this should cost';
 
   return new ImageResponse(
     (
@@ -48,17 +48,20 @@ export async function GET(
               justifyContent: 'center',
             }}
           >
-            <span style={{ color: 'white', fontWeight: 'bold', fontSize: '20px' }}>P</span>
+            <span style={{ color: 'white', fontWeight: 'bold', fontSize: '20px' }}>N</span>
           </div>
-          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '28px' }}>Prybar</span>
+          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '28px' }}>Naili</span>
         </div>
 
         <div>
           <div style={{ color: '#93c5fd', fontSize: '22px', marginBottom: '16px', textTransform: 'capitalize' }}>
-            {categoryLabel} Project
+            {categoryLabel} project
           </div>
-          <div style={{ color: 'white', fontSize: '52px', fontWeight: 'bold', lineHeight: 1.2, marginBottom: '24px' }}>
-            See what it could look like
+          <div style={{ color: 'white', fontSize: '52px', fontWeight: 'bold', lineHeight: 1.2, marginBottom: '20px' }}>
+            Nail the vision. Know the cost.
+          </div>
+          <div style={{ color: '#cbd5e1', fontSize: '24px', marginBottom: '28px' }}>
+            Here&apos;s your Naili plan
           </div>
           <div
             style={{
@@ -73,9 +76,7 @@ export async function GET(
           </div>
         </div>
 
-        <div style={{ color: '#64748b', fontSize: '18px' }}>
-          prybar.com · AI-powered home improvement planning
-        </div>
+        <div style={{ color: '#64748b', fontSize: '18px' }}>naili.ai</div>
       </div>
     ),
     { width: 1200, height: 630 }

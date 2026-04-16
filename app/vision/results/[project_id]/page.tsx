@@ -37,7 +37,7 @@ function cleanList(items: unknown): string[] {
 export async function generateMetadata({ params }: PageProps) {
   const { project_id } = await params;
   return {
-    title: 'Project Results | Prybar',
+    title: 'Here’s your Naili plan',
     openGraph: {
       images: [`/api/og/vision/${project_id}`],
     },
@@ -80,9 +80,9 @@ export default async function VisionResultsPage({ params }: PageProps) {
                 {estimate || materials || brief ? 'Planning outputs ready' : 'Still preparing outputs'}
               </Badge>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">{categoryLabel} project plan</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Here&apos;s your Naili plan</h1>
             <p className="text-slate-600 mt-3 max-w-2xl">
-              Your planning results are designed to help you compare quotes, ask better questions, and move forward without waiting on concepts.
+              {categoryLabel} project planning results, ready to help you compare quotes, ask better questions, and move forward with more confidence.
             </p>
           </div>
           <ShareButton shareUrl={shareUrl} />
@@ -90,7 +90,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div className="text-sm font-semibold text-slate-900 mb-1">Estimate</div>
+            <div className="text-sm font-semibold text-slate-900 mb-1">What this should cost</div>
             <div className="text-sm text-slate-600">{estimate ? 'Budget range is ready.' : 'Still generating, check back in a moment.'}</div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -98,7 +98,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
             <div className="text-sm text-slate-600">{materials ? 'Materials plan is ready.' : 'Still preparing material guidance.'}</div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div className="text-sm font-semibold text-slate-900 mb-1">Contractor brief</div>
+            <div className="text-sm font-semibold text-slate-900 mb-1">Your contractor-ready brief</div>
             <div className="text-sm text-slate-600">{brief ? 'Walk-through brief is ready.' : 'Still drafting contractor notes.'}</div>
           </div>
         </div>
@@ -107,7 +107,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
       {estimate ? (
         <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-slate-900">Planning estimate</h2>
+            <h2 className="text-2xl font-bold text-slate-900">What this should cost</h2>
             <p className="text-sm text-slate-500 mt-1">A planning-grade budget range based on your photo, project choices, and local pricing.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -159,7 +159,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
         </section>
       ) : (
         <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Planning estimate</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">What this should cost</h2>
           <p className="text-slate-600 text-sm leading-relaxed">Your estimate is still generating. The rest of the page can still help you move forward, and this section usually fills in shortly after.</p>
         </section>
       )}
@@ -182,7 +182,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
       {brief ? (
         <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-slate-900">Contractor-ready brief</h2>
+            <h2 className="text-2xl font-bold text-slate-900">Your contractor-ready brief</h2>
             <p className="text-sm text-slate-500 mt-1">A more useful way to frame scope, walk-through notes, and quote questions.</p>
           </div>
           <div className="space-y-5">
@@ -235,7 +235,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
         </section>
       ) : (
         <section className="mb-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Contractor-ready brief</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Your contractor-ready brief</h2>
           <p className="text-slate-600 text-sm leading-relaxed">Your brief is still being assembled. Once it lands, this section will help you run a cleaner contractor walk-through.</p>
         </section>
       )}
@@ -291,7 +291,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
 
       <section className="bg-blue-600 rounded-[2rem] p-6 sm:p-8 text-white mb-8">
         <div className="max-w-3xl">
-          <h2 className="text-2xl font-bold mb-2">Ready to turn this into real quotes?</h2>
+          <h2 className="text-2xl font-bold mb-2">Ready to make this happen?</h2>
           <p className="text-blue-100 mb-6">Use your estimate, materials plan, and contractor brief to start from a cleaner scope, then use Shield before you hire.</p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link

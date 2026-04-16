@@ -9,15 +9,15 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-sm">P</span>
+                <span className="text-white font-bold text-sm">N</span>
               </div>
               <div>
-                <div className="text-white font-bold text-lg leading-none">Prybar</div>
-                <div className="text-xs text-slate-500 mt-1">Plan first, hire smarter</div>
+                <div className="text-white font-bold text-lg leading-none">Naili</div>
+                <div className="text-xs text-slate-500 mt-1">Nail the vision. Know the cost.</div>
               </div>
             </div>
             <p className="text-sm leading-relaxed max-w-md text-slate-400">
-              Prybar helps homeowners turn a photo into a clearer project plan, then pressure-test contractor trust before money or signatures move.
+              Naili helps homeowners plan, estimate, vet, and hire with total confidence before any contractor shows up.
             </p>
           </div>
 
@@ -33,7 +33,7 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold text-sm mb-3">Get started</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/vision/start" className="hover:text-white transition-colors">Start with a photo</Link></li>
+              <li><Link href="/vision/start" className="hover:text-white transition-colors">Nail my project</Link></li>
               <li><Link href="/auth/signup" className="hover:text-white transition-colors">Create account</Link></li>
               <li><Link href="/auth/login" className="hover:text-white transition-colors">Sign in</Link></li>
             </ul>
@@ -41,12 +41,18 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-slate-800 pt-6 space-y-3">
-          <p className="text-xs leading-relaxed text-slate-500">
-            {DISCLAIMERS.global_footer}
-          </p>
-          <p className="text-xs text-slate-600">
-            © {new Date().getFullYear()} Prybar. All rights reserved.
-          </p>
+          <p className="text-xs leading-relaxed text-slate-500">{DISCLAIMERS.global_footer}</p>
+          <div className="flex flex-col gap-2 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+            <p>© 2026 Naili. All rights reserved.</p>
+            <Link
+              href="https://prybar.ai"
+              className="text-blue-300 hover:text-white transition-colors"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Are you a contractor? Try Prybar →
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

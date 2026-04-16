@@ -59,9 +59,9 @@ export default function LoginPage() {
       <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div className="rounded-[2rem] bg-[linear-gradient(135deg,#0f172a_0%,#1d4ed8_100%)] p-6 sm:p-8 text-white">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 mb-4">
-            <span className="text-xl font-bold">P</span>
+            <span className="text-xl font-bold">N</span>
           </div>
-          <h1 className="text-3xl font-bold mb-3">Welcome back to Prybar</h1>
+          <h1 className="text-3xl font-bold mb-3">Welcome back to Naili</h1>
           <p className="text-slate-200 leading-relaxed mb-6">
             Reopen saved projects, review estimates, and move into contractor vetting only when you&apos;re ready.
           </p>
