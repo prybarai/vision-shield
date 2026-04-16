@@ -43,7 +43,7 @@ export default async function SharePage({ params }: PageProps) {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-1 text-xs text-slate-400 mb-4">
-          Shared via Naili Vision
+          Shared via naili vision
         </div>
         <div className="flex justify-center gap-2 mb-3">
           <Badge variant="blue" className="capitalize">{p.quality_tier} tier</Badge>
@@ -100,7 +100,7 @@ export default async function SharePage({ params }: PageProps) {
 
       {/* CTA */}
       <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">
-        <h2 className="text-2xl font-bold mb-2">Plan your own project with Naili</h2>
+        <h2 className="text-2xl font-bold mb-2">Plan your own project with naili</h2>
         <p className="text-blue-100 mb-6">Get AI design concepts and a cost estimate for your home project — free to start.</p>
         <Link
           href="/vision/start"

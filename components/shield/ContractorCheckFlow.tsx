@@ -232,7 +232,7 @@ export default function ContractorCheckFlow() {
     return (
       <div className="space-y-5">
         <div className="rounded-[1.75rem] border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Naili Shield</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">naili shield</h2>
           <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
             Before you hire, let&apos;s check.
           </p>

@@ -10,11 +10,11 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Naili — Nail the vision. Know the cost.',
-    template: '%s | Naili',
+    default: 'naili — Nail the vision. Know the cost.',
+    template: '%s | naili',
   },
   description:
-    'Naili helps homeowners plan home projects with confidence — AI-powered estimates, contractor verification, and contract protection. Nail it before anyone shows up.',
+    'naili helps homeowners plan home projects with confidence — AI-powered estimates, contractor verification, and contract protection. Nail it before anyone shows up.',
   keywords: [
     'home renovation estimate',
     'contractor verification',
@@ -29,15 +29,15 @@ export const metadata: Metadata = {
     canonical: 'https://naili.ai',
   },
   openGraph: {
-    siteName: 'Naili',
-    title: 'Naili — Nail the vision. Know the cost.',
+    siteName: 'naili',
+    title: 'naili — Nail the vision. Know the cost.',
     description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
     url: 'https://naili.ai',
     images: ['/og-naili.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Naili — Nail the vision. Know the cost.',
+    title: 'naili — Nail the vision. Know the cost.',
     description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
     images: ['/og-naili.png'],
   },

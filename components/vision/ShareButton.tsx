@@ -32,7 +32,7 @@ export default function ShareButton({ shareUrl }: { shareUrl: string }) {
       className="flex items-center gap-2 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
     >
       {copied ? <Check className="h-4 w-4 text-green-500" /> : <Share2 className="h-4 w-4" />}
-      {copied ? 'Copied!' : 'Share your Naili plan'}
+      {copied ? 'Copied!' : 'Share your naili plan'}
     </button>
   );
 }

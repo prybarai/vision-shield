@@ -37,7 +37,7 @@ function cleanList(items: unknown): string[] {
 export async function generateMetadata({ params }: PageProps) {
   const { project_id } = await params;
   return {
-    title: 'Here’s your Naili plan',
+    title: 'Here’s your naili plan',
     openGraph: {
       images: [`/api/og/vision/${project_id}`],
     },
@@ -80,7 +80,7 @@ export default async function VisionResultsPage({ params }: PageProps) {
                 {estimate || materials || brief ? 'Planning outputs ready' : 'Still preparing outputs'}
               </Badge>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Here&apos;s your Naili plan</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-slate-900">Here&apos;s your naili plan</h1>
             <p className="text-slate-600 mt-3 max-w-2xl">
               {categoryLabel} project planning results, ready to help you compare quotes, ask better questions, and move forward with more confidence.
             </p>

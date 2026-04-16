@@ -20,7 +20,7 @@ const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Nail the vision',
-    desc: 'Upload a photo or describe your project. Naili generates concept images and a real cost range.',
+    desc: 'Upload a photo or describe your project. naili generates concept images and a real cost range.',
     icon: Camera,
   },
   {
@@ -32,7 +32,7 @@ const HOW_IT_WORKS = [
   {
     step: '03',
     title: 'Trust who you hire',
-    desc: 'Run a Naili Shield check before the first phone call. License verified. Quote scanned. Contract reviewed.',
+    desc: 'Run a naili shield check before the first phone call. License verified. Quote scanned. Contract reviewed.',
     icon: ShieldCheck,
   },
   {
@@ -52,7 +52,7 @@ export default function HomePage() {
             <div className="max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-sm font-medium text-blue-200 mb-6">
                 <Sparkles className="h-4 w-4" />
-                Naili Vision + Naili Shield
+                naili vision + naili shield
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight text-balance mb-5">
                 Nail the vision. Know the cost.
@@ -125,22 +125,22 @@ export default function HomePage() {
             <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-6 sm:p-8">
               <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700 mb-4">
                 <Sparkles className="h-4 w-4" />
-                Naili Vision
+                naili vision
               </div>
               <h2 className="text-3xl font-bold text-slate-900 mb-4">See the project before it starts.</h2>
               <p className="text-lg leading-relaxed text-slate-600">
-                Upload a photo of your space, tell us what you&apos;re dreaming about, and Naili builds you a complete picture — AI concept images, real cost ranges, a materials list, and a contractor-ready brief. All before you talk to a single contractor.
+                Upload a photo of your space, tell us what you&apos;re dreaming about, and naili builds you a complete picture — AI concept images, real cost ranges, a materials list, and a contractor-ready brief. All before you talk to a single contractor.
               </p>
             </div>
 
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
               <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-medium text-slate-700 mb-4">
                 <ShieldCheck className="h-4 w-4 text-slate-900" />
-                Naili Shield
+                naili shield
               </div>
               <h2 className="text-3xl font-bold text-slate-900 mb-4">Hire with confidence. Never get burned.</h2>
               <p className="text-lg leading-relaxed text-slate-600">
-                Before you hand over a deposit, run a Naili Shield check. Verify contractor licenses, scan quotes for red flags, review contracts for risky clauses, and generate dispute letters if something goes wrong.
+                Before you hand over a deposit, run a naili shield check. Verify contractor licenses, scan quotes for red flags, review contracts for risky clauses, and generate dispute letters if something goes wrong.
               </p>
             </div>
           </div>
@@ -152,7 +152,7 @@ export default function HomePage() {
           <div className="max-w-2xl mb-10">
             <h2 className="text-3xl font-bold text-slate-900 mb-3">How it works</h2>
             <p className="text-slate-600 text-lg">
-              Naili helps homeowners show up prepared, informed, and hard to pressure.
+              naili helps homeowners show up prepared, informed, and hard to pressure.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -176,7 +176,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 text-center sm:px-6 lg:px-8">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Walk into the job with a plan, a number, and zero guesswork.</h2>
           <p className="text-lg text-slate-300 mb-8 max-w-2xl mx-auto">
-            Naili gives you the clarity to plan the project, sanity-check the cost, and hire on your terms.
+            naili gives you the clarity to plan the project, sanity-check the cost, and hire on your terms.
           </p>
           <Link
             href="/vision/start"

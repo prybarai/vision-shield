@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { CheckCircle, ShieldCheck, Sparkles } from 'lucide-react';
+import Logo from '@/components/brand/Logo';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -51,10 +52,8 @@ export default function SignupPage() {
     <div className="min-h-screen bg-slate-50 px-4 py-8 sm:py-12">
       <div className="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div className="rounded-[2rem] bg-white border border-slate-200 p-6 sm:p-8 shadow-sm">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 mb-4">
-            <span className="text-xl font-bold">N</span>
-          </div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-3">Create your Naili account</h1>
+          <Logo className="mb-4" markClassName="h-12 w-[3.25rem]" />
+          <h1 className="text-3xl font-bold text-slate-900 mb-3">Create your naili account</h1>
           <p className="text-slate-600 leading-relaxed mb-6">
             Save projects, reopen estimates, and keep your planning and contractor trust tools in one place.
           </p>
@@ -100,7 +99,7 @@ export default function SignupPage() {
           </div>
 
           <p className="text-xs text-slate-400 text-center mt-4 leading-relaxed">
-            By signing up, you agree to our terms and understand Naili provides planning and informational tools, not legal or contractor guarantees.
+            By signing up, you agree to our terms and understand naili provides planning and informational tools, not legal or contractor guarantees.
           </p>
         </div>
       </div>

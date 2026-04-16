@@ -36,21 +36,22 @@ export async function GET(
           justifyContent: 'space-between',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              background: '#2563eb',
-              borderRadius: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span style={{ color: 'white', fontWeight: 'bold', fontSize: '20px' }}>N</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <svg width="58" height="52" viewBox="0 0 100 88" fill="none">
+            <defs>
+              <linearGradient id="logoGradient" x1="12" y1="78" x2="88" y2="10" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#1f7cf7" />
+                <stop offset="0.55" stopColor="#48c7f1" />
+                <stop offset="1" stopColor="#a8eb57" />
+              </linearGradient>
+            </defs>
+            <path d="M18 78V33.5L50 10L82 33.5V70" stroke="url(#logoGradient)" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M34 78V48L66 71" stroke="url(#logoGradient)" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <div style={{ display: 'flex', alignItems: 'baseline' }}>
+            <span style={{ color: 'white', fontWeight: 'bold', fontSize: '28px' }}>naili</span>
+            <span style={{ color: '#cbd5e1', fontWeight: 'bold', fontSize: '28px', marginLeft: '2px' }}>.ai</span>
           </div>
-          <span style={{ color: 'white', fontWeight: 'bold', fontSize: '28px' }}>Naili</span>
         </div>
 
         <div>
@@ -61,7 +62,7 @@ export async function GET(
             Nail the vision. Know the cost.
           </div>
           <div style={{ color: '#cbd5e1', fontSize: '24px', marginBottom: '28px' }}>
-            Here&apos;s your Naili plan
+            Here&apos;s your naili plan
           </div>
           <div
             style={{

@@ -188,7 +188,7 @@ export default function ConnectPage() {
         <Button type="submit" className="w-full" size="lg" loading={loading}>Save request</Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
-          If contractor routing is not configured yet, Naili still saves your request without sending your details anywhere.
+          If contractor routing is not configured yet, naili still saves your request without sending your details anywhere.
         </p>
       </form>
     </div>

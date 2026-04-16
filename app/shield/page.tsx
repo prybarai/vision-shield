@@ -3,14 +3,14 @@ import Link from 'next/link';
 import { ArrowRight, FileText, LifeBuoy, Search, ShieldCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Naili Shield',
+  title: 'naili shield',
   description:
     'Verify contractor licenses, scan quotes, review contracts, and protect yourself before money or signatures move.',
   alternates: {
     canonical: 'https://naili.ai/shield',
   },
   openGraph: {
-    title: 'Naili Shield',
+    title: 'naili shield',
     description: 'Hire with confidence. Never get burned.',
     url: 'https://naili.ai/shield',
     images: ['/og-naili.png'],
@@ -48,13 +48,13 @@ export default function ShieldPage() {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-slate-100 mb-5">
             <ShieldCheck className="h-4 w-4" />
-            Naili Shield
+            naili shield
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-balance">
             Hire with confidence. Never get burned.
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl leading-relaxed mb-7">
-            Before you hand over a deposit, run a Naili Shield check. Verify licenses, scan quotes for red flags, review contracts for risky clauses, and generate dispute letters if something goes wrong.
+            Before you hand over a deposit, run a naili shield check. Verify licenses, scan quotes for red flags, review contracts for risky clauses, and generate dispute letters if something goes wrong.
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link

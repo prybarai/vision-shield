@@ -21,14 +21,14 @@ const FEATURES = [
 ];
 
 export const metadata: Metadata = {
-  title: 'Naili Vision',
+  title: 'naili vision',
   description:
     'Upload a photo, see what your project could look like, and get a planning-grade estimate before talking to a contractor.',
   alternates: {
     canonical: 'https://naili.ai/vision',
   },
   openGraph: {
-    title: 'Naili Vision',
+    title: 'naili vision',
     description: 'See the project before it starts.',
     url: 'https://naili.ai/vision',
     images: ['/og-naili.png'],
@@ -42,13 +42,13 @@ export default function VisionPage() {
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700 mb-5">
             <Sparkles className="h-4 w-4" />
-            Naili Vision
+            naili vision
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 text-balance">
             See the project before it starts.
           </h1>
           <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mb-7 leading-relaxed">
-            Show Naili your space, answer a few smart scope questions, and get concept images, a real cost range, a materials plan, and a contractor-ready brief.
+            Show naili your space, answer a few smart scope questions, and get concept images, a real cost range, a materials plan, and a contractor-ready brief.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
             <Link
@@ -64,7 +64,7 @@ export default function VisionPage() {
               className="inline-flex items-center justify-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-6 py-3.5 rounded-xl text-base transition-colors"
             >
               <ShieldCheck className="h-5 w-5" />
-              See Naili Shield
+              See naili shield
             </Link>
           </div>
           <p className="text-sm text-slate-500">Free to start, private by default, no contractor outreach until you decide.</p>

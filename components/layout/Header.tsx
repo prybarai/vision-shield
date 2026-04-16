@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Camera, LayoutGrid, Menu, Shield, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Logo from '@/components/brand/Logo';
 
 export default function Header() {
   const pathname = usePathname();
@@ -44,13 +45,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-[72px] gap-4">
           <Link href="/" className="flex items-center gap-3" onClick={closeMenu}>
-            <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
-              <span className="text-white font-bold text-sm">N</span>
-            </div>
-            <div className="min-w-0">
-              <div className="text-lg font-bold text-slate-900 leading-none">Naili</div>
-              <div className="hidden sm:block text-xs text-slate-500 leading-none mt-1">Nail the vision. Know the cost.</div>
-            </div>
+            <Logo showTagline className="gap-2.5" markClassName="h-9 w-10" wordmarkClassName="text-[1.65rem]" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1">

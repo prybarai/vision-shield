@@ -228,7 +228,7 @@ export default function ConnectPage({ params }: PageProps) {
         </Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
-          Submitting saves your request and preferences. Naili only triggers contractor outreach when routing is actually available.
+          Submitting saves your request and preferences. naili only triggers contractor outreach when routing is actually available.
         </p>
       </form>
     </div>
