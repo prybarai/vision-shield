@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, ChevronUp, ExternalLink, Package2 } from 'lucide-react';
 import { formatCurrencyRange } from '@/lib/utils';
 import type { MaterialList, MaterialLineItem } from '@/types';
 
@@ -9,77 +9,86 @@ interface Props {
   materials: MaterialList;
 }
 
+function buildRetailerSearchUrl(item: string) {
+  return `https://www.homedepot.com/s/${encodeURIComponent(item)}`;
+}
+
 export default function MaterialsAccordion({ materials }: Props) {
-  const grouped = materials.line_items.reduce<Record<string, MaterialLineItem[]>>((acc, item) => {
+  const grouped = useMemo(() => materials.line_items.reduce<Record<string, MaterialLineItem[]>>((acc, item) => {
     if (!acc[item.category]) acc[item.category] = [];
     acc[item.category].push(item);
     return acc;
-  }, {});
+  }, {}), [materials.line_items]);
 
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     Object.keys(grouped).reduce((acc, key) => ({ ...acc, [key]: true }), {})
   );
 
   const toggle = (key: string) => {
-    setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-      {Object.entries(grouped).map(([cat, items], catIdx) => (
-        <div key={cat} className={catIdx > 0 ? 'border-t border-slate-100' : ''}>
-          <button
-            onClick={() => toggle(cat)}
-            className="w-full flex items-center justify-between p-5 hover:bg-slate-50 transition-colors text-left"
-          >
-            <div className="flex items-center gap-3">
-              <span className="font-semibold text-slate-900">{cat}</span>
-              <span className="text-xs text-slate-400">{items.length} item{items.length !== 1 ? 's' : ''}</span>
-            </div>
-            {openSections[cat] ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-          </button>
+    <div className="space-y-4">
+      {Object.entries(grouped).map(([category, items]) => {
+        const groupLow = items.reduce((sum, item) => sum + item.estimated_cost_low, 0);
+        const groupHigh = items.reduce((sum, item) => sum + item.estimated_cost_high, 0);
 
-          {openSections[cat] && (
-            <div className="border-t border-slate-50">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-slate-50 text-left">
-                      <th className="px-5 py-2 text-xs font-semibold text-slate-500">Item</th>
-                      <th className="px-3 py-2 text-xs font-semibold text-slate-500">Qty</th>
-                      <th className="px-3 py-2 text-xs font-semibold text-slate-500">Unit</th>
-                      <th className="px-3 py-2 text-xs font-semibold text-slate-500">Tier</th>
-                      <th className="px-3 py-2 text-xs font-semibold text-slate-500">Est. Cost</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((item, i) => (
-                      <tr key={i} className="border-t border-slate-50 hover:bg-slate-50">
-                        <td className="px-5 py-3">
-                          <div className="font-medium text-slate-800">{item.item}</div>
-                          {item.sourcing_notes && <div className="text-xs text-slate-400 mt-0.5">{item.sourcing_notes}</div>}
-                        </td>
-                        <td className="px-3 py-3 text-slate-600">{item.quantity}</td>
-                        <td className="px-3 py-3 text-slate-600">{item.unit}</td>
-                        <td className="px-3 py-3">
-                          <span className="text-xs bg-slate-100 text-slate-600 rounded-full px-2 py-0.5">{item.finish_tier}</span>
-                        </td>
-                        <td className="px-3 py-3 text-slate-700 font-medium whitespace-nowrap">
-                          {formatCurrencyRange(item.estimated_cost_low, item.estimated_cost_high)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+        return (
+          <div key={category} className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+            <button
+              onClick={() => toggle(category)}
+              className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-slate-50 sm:px-6"
+            >
+              <div>
+                <div className="text-lg font-semibold text-slate-900">{category}</div>
+                <div className="mt-1 text-sm text-slate-500">{items.length} item{items.length !== 1 ? 's' : ''} • {formatCurrencyRange(groupLow, groupHigh)}</div>
               </div>
-            </div>
-          )}
-        </div>
-      ))}
+              {openSections[category] ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />}
+            </button>
+
+            {openSections[category] && (
+              <div className="grid gap-4 border-t border-slate-100 bg-slate-50/70 p-5 sm:p-6 lg:grid-cols-2">
+                {items.map((item, index) => (
+                  <div key={`${item.item}-${index}`} className="rounded-[1.25rem] border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-base font-semibold text-slate-900">{item.item}</div>
+                        <div className="mt-1 text-sm text-slate-500">{item.quantity} {item.unit} • {item.finish_tier} tier</div>
+                      </div>
+                      <div className="rounded-full bg-[#fff4d9] px-3 py-1 text-xs font-semibold text-[#8b5b00]">
+                        {formatCurrencyRange(item.estimated_cost_low, item.estimated_cost_high)}
+                      </div>
+                    </div>
+
+                    {item.sourcing_notes && (
+                      <p className="mt-3 text-sm leading-relaxed text-slate-600">{item.sourcing_notes}</p>
+                    )}
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        <Package2 className="h-3.5 w-3.5" /> Allowance-ready
+                      </span>
+                      <a
+                        href={buildRetailerSearchUrl(item.item)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                      >
+                        Search supplier <ExternalLink className="h-3.5 w-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
 
       {materials.sourcing_notes && (
-        <div className="border-t border-slate-100 p-5 bg-slate-50">
-          <p className="text-sm text-slate-600"><span className="font-semibold">Sourcing note:</span> {materials.sourcing_notes}</p>
+        <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 text-sm text-slate-600 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+          <span className="font-semibold text-slate-900">Sourcing note:</span> {materials.sourcing_notes}
         </div>
       )}
     </div>

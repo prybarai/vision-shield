@@ -860,54 +860,69 @@ export default function VisionStartFlow() {
       )}
 
       {step === 'loading' && (
-        <div className="text-center py-12 sm:py-16">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-8">
-            <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">naili is building your vision…</h2>
-          <p className="text-slate-600 mb-3 max-w-2xl mx-auto">
-            We&apos;re reading your actual photo and request first, then turning that analysis into your estimate, materials list, contractor brief, and concepts.
-          </p>
-          <p className="text-sm text-slate-500 mb-10">Design concepts are optional and may keep rendering in the background after your results page opens.</p>
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1a1a2e_0%,#16213e_40%,#0f3460_70%,#533483_100%)] px-6 py-10 text-center text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-14">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(233,69,96,0.26),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(245,166,35,0.14),transparent_24%)]" />
+          <div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-56 w-56 rounded-full bg-[#e94560]/10 blur-3xl" />
 
-          <div className="max-w-lg mx-auto space-y-3 text-left">
-            {PROGRESS_STEPS.map((label, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'flex items-center gap-3 rounded-2xl p-4 transition-all',
-                  i < progressStep
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : i === progressStep
-                    ? 'bg-blue-50 text-blue-700 font-medium'
-                    : 'bg-slate-50 text-slate-400'
-                )}
-              >
-                {i < progressStep ? (
-                  <CheckCircle className="h-5 w-5 text-emerald-500 flex-shrink-0" />
-                ) : i === progressStep ? (
-                  <Loader2 className="h-5 w-5 text-blue-600 animate-spin flex-shrink-0" />
-                ) : (
-                  <div className="h-5 w-5 rounded-full border-2 border-slate-300 flex-shrink-0" />
-                )}
-                <span className="text-sm sm:text-base">{label}</span>
-              </div>
-            ))}
-          </div>
+          <div className="relative mx-auto max-w-5xl">
+            <div className="inline-flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur mb-8">
+              <Loader2 className="h-10 w-10 animate-spin text-white" />
+            </div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/60">naili vision</p>
+            <h2 className="mt-3 text-3xl font-bold sm:text-5xl">Nail the vision. Know the cost.</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
+              We&apos;re reading your actual photo and request first, then turning that analysis into your estimate, materials list, contractor brief, and concepts.
+            </p>
+            <p className="mt-3 text-sm text-white/60">Design concepts may keep rendering in the background after your results page opens.</p>
 
-          {analysisHighlights.length > 0 && (
-            <div className="max-w-lg mx-auto mt-6 rounded-3xl border border-blue-100 bg-white/80 p-5 text-left shadow-sm">
-              <p className="text-sm font-semibold text-slate-900 mb-3">What naili sees so far</p>
-              <div className="space-y-2">
-                {analysisHighlights.map((item, index) => (
-                  <div key={`${item}-${index}`} className="flex items-start gap-2 text-sm text-slate-700">
-                    <Sparkles className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <span>{item}</span>
+            <div className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+              <div className="space-y-3 text-left">
+                {PROGRESS_STEPS.map((label, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      'flex items-center gap-3 rounded-[1.5rem] border px-4 py-4 backdrop-blur transition-all',
+                      i < progressStep
+                        ? 'border-emerald-300/30 bg-emerald-400/10 text-emerald-100'
+                        : i === progressStep
+                        ? 'border-white/20 bg-white/12 text-white'
+                        : 'border-white/10 bg-white/6 text-white/45'
+                    )}
+                  >
+                    {i < progressStep ? (
+                      <CheckCircle className="h-5 w-5 flex-shrink-0 text-emerald-300" />
+                    ) : i === progressStep ? (
+                      <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin text-[#ffd27a]" />
+                    ) : (
+                      <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-white/30" />
+                    )}
+                    <span className="text-sm sm:text-base">{label}</span>
                   </div>
                 ))}
               </div>
+
+              <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-5 text-left backdrop-blur-xl">
+                <p className="text-sm font-semibold text-white mb-3">What naili sees so far</p>
+                {analysisHighlights.length > 0 ? (
+                  <div className="space-y-3">
+                    {analysisHighlights.map((item, index) => (
+                      <div key={`${item}-${index}`} className="flex items-start gap-2 text-sm text-white/80">
+                        <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#ffd27a]" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-sm text-white/65">
+                    <div className="rounded-2xl bg-white/5 px-4 py-3">Reading the photo and identifying the visible project scope.</div>
+                    <div className="rounded-2xl bg-white/5 px-4 py-3">Matching your request against the actual room condition and materials.</div>
+                    <div className="rounded-2xl bg-white/5 px-4 py-3">Calculating budget ranges and a contractor-ready plan for your ZIP code.</div>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>

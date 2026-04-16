@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -30,7 +30,7 @@ export default function ConceptsLoader({
   const [done, setDone] = useState(hasImages);
   const [error, setError] = useState<string | null>(null);
 
-  const runGeneration = async () => {
+  const runGeneration = useCallback(async () => {
     if (startedRef.current || done) return;
     startedRef.current = true;
     setLoading(true);
@@ -60,11 +60,11 @@ export default function ConceptsLoader({
     } finally {
       setLoading(false);
     }
-  };
+  }, [category, done, notes, projectId, qualityTier, referenceImageUrl, router, style]);
 
   useEffect(() => {
     if (!hasImages) runGeneration();
-  }, [hasImages]);
+  }, [hasImages, runGeneration]);
 
   if (hasImages) return null;
 
