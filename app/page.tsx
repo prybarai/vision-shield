@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -41,24 +42,32 @@ const HOW_IT_WORKS = [
     title: 'Upload a real photo',
     desc: 'Show naili the room, exterior, or project area you want to change. One good image is enough to start.',
     icon: Camera,
+    image: '/imagery/step-upload-photo.webp',
+    alt: 'Homeowner taking a project photo in a living room before starting a renovation plan.',
   },
   {
     step: '02',
     title: 'Describe what you want',
     desc: 'Tell naili what you want the space to feel like, what needs fixing, and what budget you want to respect.',
     icon: Sparkles,
+    image: '/imagery/step-describe-project.webp',
+    alt: 'Project notes, finish samples, and color swatches laid out on a kitchen table.',
   },
   {
     step: '03',
     title: 'Get the full brief',
     desc: 'See concepts, a smart estimate, materials guidance, and a contractor-ready brief built from your actual photo.',
     icon: FileText,
+    image: '/imagery/step-get-plan.webp',
+    alt: 'Renovation planning materials, a laptop, and estimate paperwork arranged on a table.',
   },
   {
     step: '04',
     title: 'Get matched to local pros',
     desc: 'When you are ready, naili uses that brief to match you with 2–3 local pros who can quote from the same scope.',
     icon: Users,
+    image: '/imagery/step-hire-confidence.webp',
+    alt: 'Homeowner meeting a contractor at the front door with a clipboard in hand.',
   },
 ];
 
@@ -224,14 +233,18 @@ export default function HomePage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-5 backdrop-blur-xl sm:col-span-2">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/75">
-                <Camera className="h-3.5 w-3.5" /> Brief first, matching second
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)] backdrop-blur-xl sm:col-span-2">
+              <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#0d2340]/55 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/90 backdrop-blur">
+                <Camera className="h-3.5 w-3.5 text-[#a8eb57]" /> Illustrative scene
               </div>
-              <h2 className="text-2xl font-bold">The goal is not just a PDF. The goal is a cleaner path to real quotes.</h2>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/74">
-                naili analyzes the actual photo, builds concept directions, calculates a local cost range, drafts materials guidance, and creates a contractor-ready brief. When you are ready, that same brief powers the local-pro match.
-              </p>
+              <Image
+                src="/imagery/home-hero.webp"
+                alt="Homeowner photographing a dated bathroom before starting a renovation plan."
+                width={1600}
+                height={1200}
+                className="h-full w-full object-cover"
+                priority
+              />
             </div>
             <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-5 backdrop-blur-xl">
               <div className="mb-3 inline-flex rounded-2xl bg-[#f4fde8]/15 p-3 text-[#a8eb57]">
@@ -272,6 +285,9 @@ export default function HomePage() {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {HOW_IT_WORKS.map((item) => (
               <div key={item.step} className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
+                <div className="relative mb-5 overflow-hidden rounded-[1.25rem] border border-slate-200 bg-slate-100 aspect-[4/3]">
+                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 25vw" />
+                </div>
                 <div className="mb-5 flex items-center justify-between">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef8ff] text-[#48c7f1]">
                     <item.icon className="h-6 w-6" />

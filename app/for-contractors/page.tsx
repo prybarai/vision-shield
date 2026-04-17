@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, MessageSquareText, Smartphone, Wrench } from 'lucide-react';
 import { absoluteUrl } from '@/lib/site';
@@ -79,31 +80,40 @@ export default function ForContractorsPage() {
       <section className="relative overflow-hidden bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-          <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">For contractors</p>
-            <h1 className="mt-3 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-              Free homeowner leads, with the brief already done.
-            </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 sm:text-xl">
-              Naili sends real homeowner leads, free, with the project already scoped. To receive those leads automatically and respond fast, sign up for Prybar.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                href="https://prybar.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100"
-              >
-                See Prybar signup <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="https://prybar.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
-              >
-                View founding member pricing
-              </Link>
+          <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+            <div className="max-w-4xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">For contractors</p>
+              <h1 className="mt-3 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+                Free homeowner leads, with the brief already done.
+              </h1>
+              <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 sm:text-xl">
+                Naili sends real homeowner leads, free, with the project already scoped. To receive those leads automatically and respond fast, sign up for Prybar.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link
+                  href="https://prybar.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100"
+                >
+                  See Prybar signup <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="https://prybar.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
+                >
+                  View founding member pricing
+                </Link>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)]">
+              <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#0d2340]/55 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/90 backdrop-blur">
+                <Wrench className="h-3.5 w-3.5 text-[#a8eb57]" /> Illustrative scene
+              </div>
+              <Image src="/imagery/contractors-hero.webp" alt="Residential contractor standing near a work van and checking a phone between jobs." width={1600} height={1200} className="h-full w-full object-cover" priority />
             </div>
           </div>
         </div>

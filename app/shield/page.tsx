@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, FileText, LifeBuoy, Search, ShieldCheck } from 'lucide-react';
 import { absoluteUrl } from '@/lib/site';
@@ -50,29 +51,38 @@ export default function ShieldPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-10 text-white shadow-[0_24px_90px_rgba(15,23,42,0.22)] sm:px-8 sm:py-12 lg:px-12 mb-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(31,124,247,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
-        <div className="relative max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/90 mb-5">
-            <ShieldCheck className="h-4 w-4 text-[#a8eb57]" />
-            naili shield
+        <div className="relative grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/90 mb-5">
+              <ShieldCheck className="h-4 w-4 text-[#a8eb57]" />
+              naili shield
+            </div>
+            <h1 className="text-4xl font-bold text-balance md:text-5xl">Hire with confidence. Never get burned.</h1>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/76">
+              Before you hand over a deposit, run a naili shield check. Verify licenses, scan quotes for red flags, review contracts for risky clauses, and generate practical next steps if something goes wrong.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/shield/check"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d0d1a] transition-colors hover:bg-slate-100"
+              >
+                Check a contractor
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/connect"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Request vetted options
+              </Link>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-balance md:text-5xl">Hire with confidence. Never get burned.</h1>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/76">
-            Before you hand over a deposit, run a naili shield check. Verify licenses, scan quotes for red flags, review contracts for risky clauses, and generate practical next steps if something goes wrong.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/shield/check"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d0d1a] transition-colors hover:bg-slate-100"
-            >
-              Check a contractor
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/connect"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
-            >
-              Request vetted options
-            </Link>
+
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)]">
+            <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#0d2340]/55 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/90 backdrop-blur">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#a8eb57]" /> Illustrative scene
+            </div>
+            <Image src="/imagery/shield-hero.webp" alt="Homeowner reviewing renovation paperwork and measurements at a kitchen table before hiring." width={1600} height={1200} className="h-full w-full object-cover" priority />
           </div>
         </div>
       </section>
