@@ -350,7 +350,7 @@ export default function ProPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-gradient-to-r from-[#1f7cf7] to-[#48c7f1] py-3.5 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-lg"
+                className="w-full rounded-xl bg-gradient-to-r from-[#38BDF8] to-emerald-500 py-3.5 font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-lg"
               >
                 Join the Directory
               </button>

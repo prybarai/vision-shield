@@ -217,11 +217,18 @@ export default function VisionDemoPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <VisionReveal
-                originalImageUrl={DEMO_IMAGE}
-                description={DEMO_DESCRIPTION}
-                onRevealComplete={handleRevealComplete}
-              />
+              <div className="text-center">
+                <p className="text-slate-600 mb-8">
+                  The VisionReveal component now uses the unified ProjectContext.
+                  Visit <code className="text-[#1E3A8A] font-mono">/vision/unified</code> for the complete integrated experience.
+                </p>
+                <button
+                  onClick={() => window.location.href = '/vision/unified'}
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#1E3A8A] to-[#FF6B35] px-6 py-3 font-semibold text-white hover:shadow-lg"
+                >
+                  Try Unified Flow
+                </button>
+              </div>
             </motion.div>
           )}
 

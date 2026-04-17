@@ -235,7 +235,7 @@ export default function ProjectFateCard({
             exit={{ opacity: 0, height: 0 }}
             className="mt-6 overflow-hidden"
           >
-            <MaterialsCart projectDescription={projectDescription} />
+            <MaterialsCart />
           </motion.div>
         )}
       </AnimatePresence>

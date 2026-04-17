@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --background: #f7fbff;
+  /* Homeowner Mode (Light) */
+  --background: #FFFDF9;
   --foreground: #0f172a;
-  --brand-blue: #1f7cf7;
+  --brand-blue: #1E3A8A; /* Deep trustworthy Navy */
+  --brand-accent: #FF6B35; /* Vibrant Orange */
   --brand-cyan: #48c7f1;
   --brand-lime: #a8eb57;
   --brand-ink: #0d2340;
@@ -13,13 +15,76 @@
   --brand-surface: #eef8ff;
   --brand-surface-strong: #d7f4ff;
   --brand-surface-lime: #f4fde8;
+  
+  /* Contractor Mode (Dark) */
+  --contractor-bg: #0F172A;
+  --contractor-card: #1E293B;
+  --contractor-accent: #38BDF8;
+  --contractor-text: #F1F5F9;
 }
 
+/* Base typography */
 body {
   min-height: 100vh;
   background-color: var(--background);
   background-image: radial-gradient(circle at top, rgba(72, 199, 241, 0.08), transparent 24%);
   color: var(--foreground);
+  font-feature-settings: "kern", "liga", "clig", "calt";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography consistency */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+
+/* Numbers should align perfectly */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Card design system */
+.card-base {
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 1.5rem; /* p-6 */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.card-base:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Button interactions */
+.btn-interactive {
+  transition: transform 0.2s ease-in-out;
+}
+
+.btn-interactive:hover {
+  transform: scale(1.02);
+}
+
+/* Loading state consistency */
+.loading-min-height {
+  min-height: 2.5rem; /* Prevents button jump */
+}
+
+/* Contractor mode styles */
+.contractor-mode {
+  background-color: var(--contractor-bg);
+  color: var(--contractor-text);
+}
+
+.contractor-card {
+  background-color: var(--contractor-card);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.contractor-accent {
+  color: var(--contractor-accent);
 }
 
 @media print {
@@ -59,5 +124,15 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
