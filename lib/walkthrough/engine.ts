@@ -44,7 +44,6 @@ export function createWalkthroughState(script: WalkthroughScript): WalkthroughSt
     scriptId: script.id,
     scriptVersion: script.version,
     trade: script.trade,
-    status: 'active',
     currentNodeId: script.startNodeId,
     completedNodeIds: [],
     answers: {},
@@ -113,24 +112,6 @@ function completeNode(state: WalkthroughState, nodeId: string, nextNodeId: strin
   };
 }
 
-export function pauseWalkthroughState(state: WalkthroughState): WalkthroughState {
-  return {
-    ...state,
-    status: 'paused',
-    pausedAt: nowIso(),
-    updatedAt: nowIso(),
-  };
-}
-
-export function resumeWalkthroughState(state: WalkthroughState): WalkthroughState {
-  return {
-    ...state,
-    status: state.status === 'completed' ? 'completed' : 'active',
-    pausedAt: null,
-    updatedAt: nowIso(),
-  };
-}
-
 function recordAsk(state: WalkthroughState, node: AskNode, input: WalkthroughAdvanceInput) {
   return {
     ...state,
@@ -190,10 +171,6 @@ export function advanceWalkthrough(script: WalkthroughScript, state: Walkthrough
       break;
     case 'confirm':
       nextState = completeNode(nextState, node.id, node.next || script.completionNodeId);
-      nextState = {
-        ...nextState,
-        status: node.next ? nextState.status : 'completed',
-      };
       break;
     case 'branch':
       nextState = completeNode(nextState, node.id, node.fallbackNext);
@@ -213,9 +190,9 @@ export function getWalkthroughProgress(script: WalkthroughScript, state: Walkthr
   }).length;
 
   return {
-    completed: state.status === 'completed' ? total : completed,
+    completed,
     total,
-    percent: total === 0 ? 0 : Math.round(((state.status === 'completed' ? total : completed) / total) * 100),
+    percent: total === 0 ? 0 : Math.round((completed / total) * 100),
   };
 }
 
