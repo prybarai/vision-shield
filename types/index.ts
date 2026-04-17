@@ -3,6 +3,7 @@ export type StylePreference = 'modern' | 'traditional' | 'minimal' | 'luxury' | 
 export type QualityTier = 'budget' | 'mid' | 'premium';
 export type LocationType = 'interior' | 'exterior';
 export type RiskLevel = 'low' | 'medium' | 'high';
+export type LeadStatus = 'new' | 'routed_to_prybar' | 'outbound' | 'converted' | 'closed';
 
 export interface Project {
   id: string;
@@ -90,9 +91,21 @@ export interface Lead {
   preferred_timing: 'asap' | 'within_month' | 'planning_ahead';
   budget_range: 'under_5k' | '5k_15k' | '15k_50k' | '50k_plus';
   priority: 'budget' | 'speed' | 'quality';
+  project_type?: string;
+  scope_summary?: string;
+  brief_summary?: string;
+  brief_url?: string;
+  photo_urls?: string[];
+  estimate_low?: number;
+  estimate_mid?: number;
+  estimate_high?: number;
+  assigned_contractor?: string;
+  admin_notes?: string;
+  source?: string;
   notes?: string;
-  status: 'new' | 'sent' | 'claimed' | 'converted' | 'closed';
+  status: LeadStatus;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface ContractorScan {

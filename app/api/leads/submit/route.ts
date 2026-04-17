@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
     const project = projectRes.data as Record<string, unknown> | null;
     const estimate = estimateRes.data as Record<string, unknown> | null;
     const brief = briefRes.data as Record<string, unknown> | null;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.naili.ai';
+    const trimmedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const briefPath = project?.share_token ? `/share/${String(project.share_token)}` : params.project_id ? `/vision/results/${params.project_id}` : null;
 
     const insertPayload: Record<string, unknown> = {
       project_id: params.project_id ?? null,
@@ -50,13 +53,36 @@ export async function POST(req: NextRequest) {
       notes: params.notes,
       status: 'new',
       source,
+      project_type: project?.project_category ? String(project.project_category) : null,
+      scope_summary: brief?.summary ? String(brief.summary) : project?.notes ? String(project.notes) : null,
+      brief_summary: brief?.summary ? String(brief.summary) : null,
+      brief_url: briefPath ? `${trimmedBaseUrl}${briefPath}` : null,
+      photo_urls: Array.isArray(project?.uploaded_image_urls) ? project.uploaded_image_urls : [],
+      estimate_low: typeof estimate?.low_estimate === 'number' ? Number(estimate.low_estimate) : null,
+      estimate_mid: typeof estimate?.mid_estimate === 'number' ? Number(estimate.mid_estimate) : null,
+      estimate_high: typeof estimate?.high_estimate === 'number' ? Number(estimate.high_estimate) : null,
+      assigned_contractor: null,
+      admin_notes: null,
+    };
+
+    const legacyPayload: Record<string, unknown> = {
+      project_id: params.project_id ?? null,
+      first_name: params.first_name,
+      last_name: params.last_name,
+      email: params.email,
+      phone: params.phone || '',
+      zip_code: params.zip_code,
+      preferred_timing: params.preferred_timing,
+      budget_range: params.budget_range,
+      priority: params.priority,
+      notes: params.notes,
+      status: 'new',
     };
 
     let insertResult = await supabaseAdmin.from('leads').insert(insertPayload).select().single();
 
-    if (insertResult.error && /source/i.test(insertResult.error.message || '')) {
-      const { source: _source, ...fallbackPayload } = insertPayload;
-      insertResult = await supabaseAdmin.from('leads').insert(fallbackPayload).select().single();
+    if (insertResult.error) {
+      insertResult = await supabaseAdmin.from('leads').insert(legacyPayload).select().single();
     }
 
     if (insertResult.error || !insertResult.data) throw insertResult.error || new Error('Lead insert returned no data');
