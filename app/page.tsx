@@ -92,23 +92,21 @@ const COST_GUIDE_LINKS = [
 const EXAMPLE_SLIDERS = [
   {
     eyebrow: 'Exterior',
-    title: 'From plain yard to a more usable outdoor plan',
+    title: 'Backyard refresh',
     beforeImage: '/imagery/example-backyard-before.webp',
     afterImage: '/imagery/example-backyard-after.webp',
-    beforeLabel: 'Before photo',
-    afterLabel: 'Illustrative after',
-    summary:
-      'A real backyard photo becomes a more concrete direction for planting, lighting, layout, and contractor conversations.',
+    beforeLabel: 'Before',
+    afterLabel: 'Concept',
+    detail: 'Landscape, lighting, and seating direction.',
   },
   {
     eyebrow: 'Interior',
-    title: 'From awkward spare room to a calmer finished direction',
+    title: 'Attic reset',
     beforeImage: '/imagery/example-attic-before.webp',
     afterImage: '/imagery/example-attic-after.webp',
-    beforeLabel: 'Before photo',
-    afterLabel: 'Illustrative after',
-    summary:
-      'The room stays the same size and shape, but the visual direction gets cleaner, more specific, and easier to price.',
+    beforeLabel: 'Before',
+    afterLabel: 'Concept',
+    detail: 'Paint, lighting, and storage direction.',
   },
 ];
 
@@ -304,37 +302,29 @@ export default function HomePage() {
 
       <section className="bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Real starting photos</p>
-              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">See how a rough space turns into a clearer direction.</h2>
-              <p className="mt-3 text-lg leading-relaxed text-slate-600">These examples start with real before photos. The “after” side shows illustrative concepts, not completed customer projects, so homeowners can see how Naili sharpens the brief before quotes begin.</p>
-            </div>
-            <Link href="/vision/start" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
-              Start a project now <ArrowRight className="h-4 w-4" />
-            </Link>
+          <div className="mb-8 max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Before + concept</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">See the direction faster.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">Real spaces in, cleaner project concepts out.</p>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
             {EXAMPLE_SLIDERS.map((example, index) => (
-              <div key={example.title} className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
-                <div className="bg-[linear-gradient(135deg,rgba(31,124,247,0.1),rgba(72,199,241,0.1))] p-6">
+              <div key={example.title} className="rounded-[2rem] border border-slate-200 bg-[#f8f9fc] p-4 shadow-[0_12px_32px_rgba(15,23,42,0.06)] sm:p-5">
+                <div className="mb-4 px-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">{example.eyebrow}</p>
-                  <h3 className="mt-2 text-xl font-bold text-[#0d0d1a]">{example.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{example.summary}</p>
+                  <div className="mt-2 flex items-end justify-between gap-4">
+                    <h3 className="text-xl font-bold text-[#0d0d1a]">{example.title}</h3>
+                    <p className="hidden text-sm text-slate-500 sm:block">{example.detail}</p>
+                  </div>
                 </div>
-                <div className="p-4 sm:p-5">
-                  <BeforeAfterSlider
-                    beforeImage={example.beforeImage}
-                    afterImage={example.afterImage}
-                    beforeLabel={example.beforeLabel}
-                    afterLabel={example.afterLabel}
-                    priority={index === 0}
-                  />
-                </div>
-                <div className="border-t border-slate-200 bg-[#f8f9fc] px-6 py-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Honest note</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">Real homeowner before photo. The after view is an illustrative planning concept, not a finished project photo.</p>
-                </div>
+                <BeforeAfterSlider
+                  beforeImage={example.beforeImage}
+                  afterImage={example.afterImage}
+                  beforeLabel={example.beforeLabel}
+                  afterLabel={example.afterLabel}
+                  priority={index === 0}
+                />
+                <p className="mt-3 px-1 text-sm text-slate-500 sm:hidden">{example.detail}</p>
               </div>
             ))}
           </div>
