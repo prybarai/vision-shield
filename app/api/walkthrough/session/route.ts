@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'sessionId is required' }, { status: 400 });
   }
 
-  const session = await getWalkthroughSession(sessionId);
+  const session = getWalkthroughSession(sessionId);
   if (!session) {
     return NextResponse.json({ error: 'Session not found' }, { status: 404 });
   }

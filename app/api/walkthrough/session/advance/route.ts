@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const params = schema.parse(body);
-    const session = await advanceWalkthroughSession(params.sessionId, params.input || {});
+    const session = advanceWalkthroughSession(params.sessionId, params.input || {});
 
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
