@@ -1,0 +1,116 @@
+{
+  "id": "interior-paint-proof-phase",
+  "trade": "interior_paint",
+  "version": "v1",
+  "label": "Interior painting walkthrough",
+  "intro": "A bounded, contractor-style walkthrough for interior painting. This is the proof-phase script foundation and should be refined with real painter input before public launch.",
+  "startNodeId": "room_scope",
+  "completionNodeId": "confirm_scope",
+  "nodes": [
+    {
+      "id": "room_scope",
+      "type": "ask",
+      "title": "Confirm the rooms in scope",
+      "prompt": "Tell me which room or rooms you want painted first. If it is easier, just name the main room and we can expand from there.",
+      "helpText": "Start with the smallest complete scope you want priced.",
+      "summaryLabel": "Rooms in scope",
+      "expectedInput": "voice",
+      "fieldKey": "rooms_in_scope",
+      "responseType": "string",
+      "next": "room_overview"
+    },
+    {
+      "id": "room_overview",
+      "type": "observe",
+      "title": "Capture the room overview",
+      "prompt": "Point the camera at the room and slowly pan from left to right so I can see the walls, trim, windows, and ceiling.",
+      "helpText": "A single steady video is better than several quick clips.",
+      "summaryLabel": "Room overview",
+      "expectedInput": "camera_video",
+      "observationKey": "room_overview",
+      "promptLabel": "Room overview capture",
+      "next": "surface_condition"
+    },
+    {
+      "id": "surface_condition",
+      "type": "ask",
+      "title": "Describe the wall condition",
+      "prompt": "Are the walls mostly clean, do they need minor patching, or are there obvious cracks, peeling, stains, or nail damage I should plan around?",
+      "summaryLabel": "Wall condition",
+      "expectedInput": "voice",
+      "fieldKey": "wall_condition",
+      "responseType": "choice",
+      "choices": [
+        { "value": "clean", "label": "Mostly clean" },
+        { "value": "minor_repairs", "label": "Minor patching" },
+        { "value": "heavy_repairs", "label": "Heavy repairs needed" }
+      ],
+      "next": "trim_complexity"
+    },
+    {
+      "id": "trim_complexity",
+      "type": "observe",
+      "title": "Check trim and detail complexity",
+      "prompt": "Hold the camera on the trim, doors, and windows for a few seconds so I can gauge the prep and cut-in complexity.",
+      "summaryLabel": "Trim complexity",
+      "expectedInput": "camera_photo",
+      "observationKey": "trim_complexity",
+      "promptLabel": "Trim and detail capture",
+      "next": "measure_perimeter"
+    },
+    {
+      "id": "measure_perimeter",
+      "type": "measure",
+      "title": "Measure the paintable perimeter",
+      "prompt": "Use AR to measure the room perimeter. If the room is open to another space, measure only the walls you want included in the bid.",
+      "helpText": "Linear wall footage is one of the most important pricing inputs for painting.",
+      "summaryLabel": "Measured perimeter",
+      "expectedInput": "ar_measure",
+      "measurementKey": "paintable_perimeter",
+      "unit": "linear_ft",
+      "next": "ceiling_scope"
+    },
+    {
+      "id": "ceiling_scope",
+      "type": "ask",
+      "title": "Clarify ceiling scope",
+      "prompt": "Do you want the ceiling included too, or just the walls and trim?",
+      "summaryLabel": "Ceiling included",
+      "expectedInput": "voice",
+      "fieldKey": "ceiling_included",
+      "responseType": "boolean",
+      "next": "repair_branch"
+    },
+    {
+      "id": "repair_branch",
+      "type": "branch",
+      "title": "Branch on repair detail",
+      "prompt": "Decide whether repair follow-up is needed.",
+      "branches": [
+        {
+          "when": { "key": "wall_condition", "operator": "eq", "value": "heavy_repairs" },
+          "next": "repair_detail"
+        }
+      ],
+      "fallbackNext": "confirm_scope"
+    },
+    {
+      "id": "repair_detail",
+      "type": "ask",
+      "title": "Capture repair detail",
+      "prompt": "What is driving the repair work most: settlement cracks, peeling paint, water staining, damaged drywall, or something else?",
+      "summaryLabel": "Repair driver",
+      "expectedInput": "voice",
+      "fieldKey": "repair_driver",
+      "responseType": "string",
+      "next": "confirm_scope"
+    },
+    {
+      "id": "confirm_scope",
+      "type": "confirm",
+      "title": "Confirm the inspection summary",
+      "prompt": "Here is the scope I captured. Confirm it before pricing so the estimate reflects the right prep level, wall footage, and ceiling scope.",
+      "summaryLabel": "Inspection summary"
+    }
+  ]
+}
