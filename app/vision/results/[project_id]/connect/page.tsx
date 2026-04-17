@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useMemo, useState, use } from 'react';
 import { CheckCircle, ArrowLeft, Clock3, ShieldCheck } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -41,6 +42,8 @@ interface SubmitResponse {
 
 export default function ConnectPage({ params }: PageProps) {
   const { project_id } = use(params);
+  const searchParams = useSearchParams();
+  const initialZip = useMemo(() => searchParams.get('zip') || '', [searchParams]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +55,7 @@ export default function ConnectPage({ params }: PageProps) {
     last_name: '',
     email: '',
     phone: '',
-    zip_code: '',
+    zip_code: initialZip,
     preferred_timing: 'within_month',
     budget_range: '15k_50k',
     priority: 'quality',
@@ -70,7 +73,7 @@ export default function ConnectPage({ params }: PageProps) {
       const res = await fetch('/api/leads/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, project_id, source: 'prybar_vision' }),
+        body: JSON.stringify({ ...form, project_id, source: 'prybar_vision', defer_routing: true }),
       });
 
       const data = await res.json().catch(() => ({} as SubmitResponse));
@@ -78,7 +81,7 @@ export default function ConnectPage({ params }: PageProps) {
 
       setConfirmationMessage(data.dispatch?.message || 'We saved your request and project details.');
       setConfirmationMode(data.dispatch?.mode || 'saved_only');
-      posthog.capture('naili_lead_submitted', {
+      posthog.capture('naili_match_requested', {
         source: 'vision',
         preferred_timing: form.preferred_timing,
         budget_range: form.budget_range,
@@ -97,15 +100,15 @@ export default function ConnectPage({ params }: PageProps) {
         <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
           <CheckCircle className="h-10 w-10 text-green-600" />
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-3">Request saved</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-3">You’re on the list</h1>
         <p className="text-slate-600 text-lg mb-8">{confirmationMessage}</p>
         <div className="bg-[#eef8ff] border border-[#d7f4ff] rounded-2xl p-6 mb-8 text-left space-y-4">
           <div>
             <h2 className="font-semibold text-slate-900 mb-2">What happens next</h2>
             <ul className="space-y-2 text-sm text-slate-700">
-              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">1.</span> Your project and contact details are saved.</li>
-              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">2.</span> You can still use your estimate, materials plan, and brief right away.</li>
-              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">3.</span> Use Shield before hiring anyone, even if someone comes recommended.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">1.</span> We review your brief, ZIP, timing, and priorities.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">2.</span> We reach back out within 24 hours with 2–3 pros who want to quote the project.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">3.</span> Your phone number stays private until you confirm you want to talk to a specific contractor.</li>
             </ul>
           </div>
           <div className="rounded-xl bg-white/70 p-4 text-sm text-slate-700 flex items-start gap-3">
@@ -116,8 +119,8 @@ export default function ConnectPage({ params }: PageProps) {
             )}
             <span>
               {confirmationMode === 'dispatched'
-                ? 'Contractor routing was triggered successfully.'
-                : 'No contractor outreach was triggered automatically unless routing was available.'}
+                ? 'Your project is already moving through the matching flow.'
+                : 'Your brief is queued for matching review, not blasted out for surprise calls.'}
             </span>
           </div>
         </div>
@@ -140,9 +143,9 @@ export default function ConnectPage({ params }: PageProps) {
       </Link>
 
       <div className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7 shadow-sm mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Request a contractor match</h1>
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Match me with local pros</h1>
         <p className="text-slate-600 leading-relaxed">
-          Save this project for vetted-contractor follow-up. If routing is not live yet, we still keep your request cleanly on file without surprise outreach.
+          We’ll send this brief to 2–3 vetted pros in your ZIP. No phone calls, no sales pitches until you’re ready. You pick who to talk to.
         </p>
       </div>
 
@@ -154,14 +157,14 @@ export default function ConnectPage({ params }: PageProps) {
             <Input label="Last name" value={form.last_name} onChange={e => update('last_name', e.target.value)} required />
           </div>
           <div className="mt-4 space-y-4">
-            <Input label="Email" type="email" value={form.email} onChange={e => update('email', e.target.value)} required hint="We will use this for project follow-up only." />
-            <Input label="Phone" type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="(555) 555-5555" required hint="Helpful if a vetted contractor is ready to reach out." />
-            <Input label="Project ZIP code" value={form.zip_code} onChange={e => update('zip_code', e.target.value)} required hint="Usually the same ZIP used for your estimate." />
+            <Input label="Email" type="email" value={form.email} onChange={e => update('email', e.target.value)} required hint="We’ll use this to send your match options and follow up on the brief." />
+            <Input label="Phone (optional)" type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="(555) 555-5555" hint="Encouraged, but we only share it after you confirm a specific contractor." />
+            <Input label="Project ZIP code" value={form.zip_code} onChange={e => update('zip_code', e.target.value)} required hint="Confirm the ZIP where you want us to find 2–3 local pros." />
           </div>
         </Card>
 
         <Card className="p-5 sm:p-6">
-          <h2 className="font-semibold text-slate-900 mb-4">Project timing</h2>
+          <h2 className="font-semibold text-slate-900 mb-4">When are you hoping to start?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {TIMING_OPTIONS.map(opt => (
               <button
@@ -178,7 +181,7 @@ export default function ConnectPage({ params }: PageProps) {
         </Card>
 
         <Card className="p-5 sm:p-6">
-          <h2 className="font-semibold text-slate-900 mb-4">Budget range</h2>
+          <h2 className="font-semibold text-slate-900 mb-4">What budget range feels realistic?</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {BUDGET_OPTIONS.map(opt => (
               <button
@@ -194,7 +197,7 @@ export default function ConnectPage({ params }: PageProps) {
         </Card>
 
         <Card className="p-5 sm:p-6">
-          <h2 className="font-semibold text-slate-900 mb-4">What matters most?</h2>
+          <h2 className="font-semibold text-slate-900 mb-4">What matters most in the match?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {PRIORITY_OPTIONS.map(opt => (
               <button
@@ -211,11 +214,11 @@ export default function ConnectPage({ params }: PageProps) {
         </Card>
 
         <Card className="p-5 sm:p-6">
-          <label className="block text-sm font-medium text-slate-700 mb-2">Anything a contractor should know? <span className="text-slate-400">(optional)</span></label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Anything the matching team should know? <span className="text-slate-400">(optional)</span></label>
           <textarea
             className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none"
             rows={4}
-            placeholder="Examples: narrow work hours, existing damage, preferred materials, or anything you want included in the first conversation."
+            placeholder="Examples: narrow work hours, HOA rules, preferred materials, or anything you want us to factor into the match."
             value={form.notes}
             onChange={e => update('notes', e.target.value)}
           />
@@ -224,11 +227,11 @@ export default function ConnectPage({ params }: PageProps) {
         {error && <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">{error}</div>}
 
         <Button type="submit" className="w-full" size="lg" loading={loading}>
-          Save request
+          Match me with local pros
         </Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
-          Submitting saves your request and preferences. naili only triggers contractor outreach when routing is actually available.
+          We review your brief first, then come back with matches. No surprise contractor calls and no phone sharing until you’re ready.
         </p>
       </form>
     </div>

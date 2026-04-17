@@ -155,6 +155,7 @@ export default function VisionResultsView({
   const materialsMid = estimate?.estimate_breakdown?.materials_mid ?? (estimate ? Math.round(estimate.mid_estimate * 0.3) : 0);
   const permitsMid = estimate ? derivePermitAllowance(estimate) : 0;
   const contingencyMid = estimate ? deriveContingency(estimate) : 0;
+  const matchHref = `/vision/results/${projectId}/connect?zip=${encodeURIComponent(project.zip_code)}`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -190,6 +191,24 @@ export default function VisionResultsView({
           </div>
 
           <div className="w-full max-w-md rounded-[1.75rem] border border-white/12 bg-white/10 p-5 backdrop-blur-xl">
+            <div className="rounded-2xl border border-white/12 bg-white/10 p-4">
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Next step</div>
+              <h2 className="mt-2 text-2xl font-bold text-white">Ready to make this real?</h2>
+              <p className="mt-2 text-sm leading-relaxed text-white/78">
+                We&apos;ll send this brief to 2–3 vetted pros in your ZIP. No phone calls, no sales pitches until you&apos;re ready. You pick who to talk to.
+              </p>
+              <div className="mt-4 flex flex-col gap-3">
+                <Link
+                  href={matchHref}
+                  onClick={() => posthog.capture('naili_match_cta_clicked', { project_id: projectId, placement: 'hero' })}
+                  className="inline-flex w-full items-center justify-center rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
+                >
+                  Match me with local pros <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+                <p className="text-xs text-white/65">We&apos;ll reach out within 24 hours with matches who already know the scope.</p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-2xl bg-white/10 p-4">
                 <div className="text-xs font-semibold uppercase tracking-wide text-white/60">Most likely cost</div>
@@ -202,15 +221,15 @@ export default function VisionResultsView({
             </div>
 
             <div className="mt-4 space-y-3">
-              <ShareButton shareUrl={shareUrl} variant="dark" />
               <div className="flex flex-col gap-3 sm:flex-row">
-                <Button className="w-full border-0 bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] shadow-[0_14px_40px_rgba(31,124,247,0.28)] hover:opacity-95" onClick={() => window.print()}>
+                <Button className="w-full border border-white/20 bg-white/10 text-white hover:bg-white/15" onClick={() => window.print()}>
                   <Download className="mr-2 h-4 w-4" /> Download / print brief
                 </Button>
                 <Link href="/shield/check" className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/15">
                   <ShieldCheck className="mr-2 h-4 w-4" /> Use shield
                 </Link>
               </div>
+              <ShareButton shareUrl={shareUrl} variant="dark" />
             </div>
           </div>
         </div>
@@ -495,13 +514,17 @@ export default function VisionResultsView({
       <section className="mt-10 overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">Ready to make this happen?</p>
-            <h2 className="mt-2 text-3xl font-bold">Turn this plan into cleaner contractor conversations.</h2>
-            <p className="mt-3 max-w-2xl text-white/75">Use your estimate, materials list, and brief to start with stronger scope, then run shield before you hire anyone.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">Ready to make this real?</p>
+            <h2 className="mt-2 text-3xl font-bold">Get matched with 2–3 local pros who can quote from the brief.</h2>
+            <p className="mt-3 max-w-2xl text-white/75">This is the fastest way to turn your estimate, materials list, and contractor-ready brief into real bids without starting from scratch on every call.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link href={`/vision/results/${projectId}/connect`} className="inline-flex items-center justify-center rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95">
-              Request contractor match <ArrowRight className="ml-2 h-4 w-4" />
+            <Link
+              href={matchHref}
+              onClick={() => posthog.capture('naili_match_cta_clicked', { project_id: projectId, placement: 'footer' })}
+              className="inline-flex items-center justify-center rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
+            >
+              Match me with local pros <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <Link href="/shield/check" className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/15">
               Verify a contractor first

@@ -8,13 +8,14 @@ const schema = z.object({
   first_name: z.string().min(1),
   last_name: z.string().min(1),
   email: z.string().email(),
-  phone: z.string().min(10),
+  phone: z.string().optional(),
   zip_code: z.string().min(5),
   preferred_timing: z.enum(['asap', 'within_month', 'planning_ahead']),
   budget_range: z.enum(['under_5k', '5k_15k', '15k_50k', '50k_plus']),
   priority: z.enum(['budget', 'speed', 'quality']),
   notes: z.string().optional(),
   source: z.enum(['prybar_vision', 'prybar_shield']).optional(),
+  defer_routing: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       first_name: params.first_name,
       last_name: params.last_name,
       email: params.email,
-      phone: params.phone,
+      phone: params.phone || '',
       zip_code: params.zip_code,
       preferred_timing: params.preferred_timing,
       budget_range: params.budget_range,
@@ -69,8 +70,9 @@ export async function POST(req: NextRequest) {
     const readyForDispatch = Boolean(project && estimate);
     let dispatchAttempted = false;
     let dispatchSucceeded = false;
+    const routingDeferred = Boolean(params.defer_routing);
 
-    if (webhookConfigured && readyForDispatch) {
+    if (!routingDeferred && webhookConfigured && readyForDispatch) {
       dispatchAttempted = true;
       dispatchSucceeded = await dispatchLeadToPrybarCore({
         source,
@@ -80,7 +82,7 @@ export async function POST(req: NextRequest) {
           first_name: params.first_name,
           last_name: params.last_name,
           email: params.email,
-          phone: params.phone,
+          phone: params.phone || '',
           zip_code: params.zip_code,
         },
         project: {
@@ -117,12 +119,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (!webhookConfigured) {
+    if (!routingDeferred && !webhookConfigured) {
       console.info('Lead saved without webhook dispatch because PRYBAR_CORE_WEBHOOK_URL is unset.', {
         lead_id: String(lead.id),
         source,
         email: params.email,
-        phone: params.phone,
+        phone: params.phone || '',
         zip_code: params.zip_code,
       });
     }
@@ -134,14 +136,18 @@ export async function POST(req: NextRequest) {
         attempted: dispatchAttempted,
         succeeded: dispatchSucceeded,
         pending_dispatch: !dispatchSucceeded,
-        mode: !webhookConfigured
+        mode: routingDeferred
+          ? 'saved_only'
+          : !webhookConfigured
           ? 'saved_only'
           : readyForDispatch && dispatchSucceeded
           ? 'dispatched'
           : readyForDispatch
           ? 'dispatch_pending'
           : 'saved_only',
-        message: !webhookConfigured
+        message: routingDeferred
+          ? 'Thanks, you’re in. We’ll review your brief and reach out within 24 hours with 2–3 pros who want to quote this project.'
+          : !webhookConfigured
           ? 'Lead saved. Contractor routing is not configured yet, so no outreach was triggered.'
           : readyForDispatch && dispatchSucceeded
           ? 'Lead saved and sent for contractor routing.'
