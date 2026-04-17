@@ -116,9 +116,68 @@ const PRO_FEATURES = [
   'Priority support',
 ];
 
+const HOME_FAQS = [
+  {
+    question: 'Will contractors contact me as soon as I upload a photo?',
+    answer:
+      'No. naili does not trigger contractor outreach just because you started a project. You stay private by default, and matching only begins when you explicitly ask for it.',
+  },
+  {
+    question: 'Is the estimate the same thing as a final quote?',
+    answer:
+      'No. naili gives you a planning-grade range to help you frame scope, budget, and trade conversations. Final pricing still comes from an actual contractor quote after site-specific verification.',
+  },
+  {
+    question: 'Do I need exact measurements before I start?',
+    answer:
+      'No. A solid photo, ZIP code, and a clear description of what you want are usually enough to start building a better brief and planning range.',
+  },
+  {
+    question: 'Can I use Shield without asking for contractor matching?',
+    answer:
+      'Yes. Shield is there whether you use matching or not. You can verify a contractor, scan a quote, or review risk language on your own timeline.',
+  },
+  {
+    question: 'What happens after I request matching?',
+    answer:
+      'naili saves your project brief and uses it to line up relevant local pros, so the first conversation starts with more context and less back-and-forth from scratch.',
+  },
+];
+
 export default function HomePage() {
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'naili',
+    url: absoluteUrl('/'),
+  };
+
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'naili',
+    url: absoluteUrl('/'),
+  };
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: HOME_FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <div className="flex flex-col">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
       <section className="relative overflow-hidden bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.16),transparent_26%)]" />
         <div className="absolute -left-10 top-12 h-44 w-44 rounded-full bg-white/6 blur-3xl" />
@@ -376,10 +435,39 @@ export default function HomePage() {
               As Naili briefs turn into real contractor conversations and real Prybar signups, this section will fill with actual homeowner and contractor results. Until then, we are being explicit about what is live today and what still needs to be earned.
             </p>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
-              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Homeowner testimonial slot, waiting for a real project outcome.</div>
-              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Contractor testimonial slot, waiting for a real Naili-sourced close.</div>
-              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Accuracy and conversion proof slot, waiting for real operating data.</div>
+              <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Photo-first planning</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">You can upload a real project photo today and get concepts, estimate context, materials direction, and a contractor-ready brief.</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Private matching flow</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">Contractor outreach does not start automatically. Homeowners stay in control and opt into matching only when they are ready.</p>
+              </div>
+              <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Shield protection tools</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">License checks, quote scanning, and dispute-help workflows are already live for homeowners who want another layer of caution.</p>
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">FAQ</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Questions homeowners usually ask before they start.</h2>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {HOME_FAQS.map((faq) => (
+              <div key={faq.question} className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                <h3 className="text-lg font-semibold text-[#0d0d1a]">{faq.question}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{faq.answer}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

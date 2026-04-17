@@ -35,9 +35,47 @@ const STEPS = [
   'You see the homeowner context before the first conversation, so you can respond faster and walk into the quote with the scope already framed.',
 ];
 
+const CONTRACTOR_FAQS = [
+  {
+    question: 'Do Naili leads cost money during launch?',
+    answer:
+      'The current contractor-facing promise is free homeowner leads. The goal is to prove the quality of the loop first, not to trap contractors in a junk-lead marketplace model.',
+  },
+  {
+    question: 'What comes with the lead?',
+    answer:
+      'The lead starts with homeowner context, project brief details, and estimate or scope framing that helps you respond without starting from zero.',
+  },
+  {
+    question: 'Do I need Prybar to receive them automatically?',
+    answer:
+      'Yes, that is the current operating path. Prybar is what lets Naili route the lead into a contractor workflow built for fast response instead of dropped follow-up.',
+  },
+  {
+    question: 'Is this a broad marketplace blast?',
+    answer:
+      'No. The intent is tighter routing based on trade and ZIP coverage, so the lead lands with contractors who actually fit the job instead of getting sprayed everywhere.',
+  },
+];
+
 export default function ForContractorsPage() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: CONTRACTOR_FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <div className="bg-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+
       <section className="relative overflow-hidden bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_30%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
@@ -118,13 +156,38 @@ export default function ForContractorsPage() {
               As real Naili leads turn into real Prybar jobs, this page will fill with contractor quotes, close stories, and honest numbers. Until then, we are keeping the promise simple: free leads, clearer context, and faster response loops.
             </p>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">
-                Contractor testimonial slot, waiting for a real closed lead.
+              <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Free lead promise</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Contractors are not being asked to buy anonymous junk leads. The pitch is free homeowner opportunities with better context.
+                </p>
               </div>
-              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">
-                Lead-to-close proof slot, waiting for real operating data.
+              <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Context before contact</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  The homeowner brief is meant to show up before the first conversation, so the contractor can respond faster and with a cleaner understanding of the job.
+                </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Contractor FAQ</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">The questions a skeptical contractor should ask.</h2>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            {CONTRACTOR_FAQS.map((faq) => (
+              <div key={faq.question} className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+                <h3 className="text-lg font-semibold text-[#0d0d1a]">{faq.question}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{faq.answer}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
