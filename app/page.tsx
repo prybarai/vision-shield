@@ -60,6 +60,14 @@ const PROJECT_TYPES = [
   { label: 'Landscaping', icon: Trees, desc: 'Planting, cleanup, hardscape, yard shape' },
 ];
 
+const COST_GUIDE_LINKS = [
+  { title: 'How much does a bathroom remodel cost?', href: '/cost-guides/bathroom-remodel-cost' },
+  { title: 'How much does interior painting cost?', href: '/cost-guides/interior-painting-cost' },
+  { title: 'How much does a deck cost to build?', href: '/cost-guides/deck-build-cost' },
+  { title: 'How much does a new roof cost?', href: '/cost-guides/roof-replacement-cost' },
+  { title: 'How much does a kitchen remodel cost?', href: '/cost-guides/kitchen-remodel-cost' },
+];
+
 const EXAMPLE_CARDS = [
   {
     eyebrow: 'Bathroom',
@@ -318,6 +326,48 @@ export default function HomePage() {
               <Link href="https://prybar.ai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">
                 Visit prybar.ai
               </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Cost guides</p>
+              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Real guides for the most common project questions.</h2>
+              <p className="mt-3 text-lg leading-relaxed text-slate-600">Start broad with real ranges, then upload your own project when you want a tighter estimate and a brief that matches your actual space.</p>
+            </div>
+            <Link href="/cost-guides" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
+              Browse all guides <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            {COST_GUIDE_LINKS.map((guide) => (
+              <Link key={guide.href} href={guide.href} className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-5 transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
+                <h3 className="text-base font-semibold leading-snug text-[#0d0d1a]">{guide.title}</h3>
+                <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#1f7cf7]">
+                  Read guide <ArrowRight className="h-4 w-4" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#f8f9fc] py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)] lg:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Proof will go here</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fake traction numbers. We will earn the proof.</h2>
+            <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
+              As Naili briefs turn into real contractor conversations and real Prybar signups, this section will fill with actual homeowner and contractor results. Until then, we are leaving the space honest and empty.
+            </p>
+            <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Homeowner testimonial slot, waiting for a real project outcome.</div>
+              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Contractor testimonial slot, waiting for a real Naili-sourced close.</div>
+              <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Accuracy and conversion proof slot, waiting for real operating data.</div>
             </div>
           </div>
         </div>

@@ -18,6 +18,7 @@ const GET_STARTED_LINKS = [
 const LEARN_LINKS = [
   { href: '/vision', label: 'How Vision works' },
   { href: '/shield', label: 'How Shield works' },
+  { href: '/cost-guides', label: 'Cost guides' },
   { href: '/for-contractors', label: 'How leads work for contractors' },
 ];
 
