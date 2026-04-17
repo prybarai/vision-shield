@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, type FileRejection } from 'react-dropzone';
 import {
   ArrowLeft,
   CheckCircle,
@@ -35,6 +35,50 @@ type ScopeQuestion = {
     description?: string;
   }>;
 };
+
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const SUPPORTED_IMAGE_LABEL = 'JPG, PNG, or WEBP up to 10MB';
+
+async function readApiError(response: Response, fallback: string) {
+  try {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (contentType.includes('application/json')) {
+      const data = await response.json() as { error?: string; message?: string };
+      const message = data.error || data.message;
+      if (message?.trim()) return message.trim();
+      return fallback;
+    }
+
+    const text = (await response.text()).trim();
+    return text.length > 0 ? text : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getFileRejectionMessage(rejections: FileRejection[]) {
+  const firstError = rejections[0]?.errors[0];
+
+  if (!firstError) {
+    return `Please upload a supported image, ${SUPPORTED_IMAGE_LABEL}.`;
+  }
+
+  if (firstError.code === 'file-too-large') {
+    return 'That photo is too large. Please use an image under 10MB.';
+  }
+
+  if (firstError.code === 'file-invalid-type') {
+    return `That photo format is not supported yet. Please use ${SUPPORTED_IMAGE_LABEL}.`;
+  }
+
+  if (firstError.code === 'too-many-files') {
+    return 'Please upload just one photo.';
+  }
+
+  return firstError.message || `Please upload a supported image, ${SUPPORTED_IMAGE_LABEL}.`;
+}
 
 const SCOPE_QUESTIONS: Partial<Record<ProjectCategory, ScopeQuestion[]>> = {
   interior_paint: [
@@ -258,6 +302,16 @@ export default function VisionStartFlow() {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
+      if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
+        setError(`That photo format is not supported yet. Please use ${SUPPORTED_IMAGE_LABEL}.`);
+        return;
+      }
+
+      if (file.size > MAX_UPLOAD_BYTES) {
+        setError('That photo is too large. Please use an image under 10MB.');
+        return;
+      }
+
       if (uploadPreview) {
         URL.revokeObjectURL(uploadPreview);
       }
@@ -272,6 +326,10 @@ export default function VisionStartFlow() {
     }
   }, [uploadPreview]);
 
+  const onDropRejected = useCallback((rejections: FileRejection[]) => {
+    setError(getFileRejectionMessage(rejections));
+  }, []);
+
   const removeUpload = () => {
     if (uploadPreview) {
       URL.revokeObjectURL(uploadPreview);
@@ -282,8 +340,11 @@ export default function VisionStartFlow() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] },
+    onDropRejected,
+    accept: { 'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'], 'image/webp': ['.webp'] },
     maxFiles: 1,
+    maxSize: MAX_UPLOAD_BYTES,
+    multiple: false,
   });
 
   const scopeQuestions = category ? SCOPE_QUESTIONS[category] ?? [] : [];
@@ -356,6 +417,7 @@ export default function VisionStartFlow() {
     setAnalysisHighlights([]);
     const sessionId = uuidv4();
     const notesWithScope = buildNotesWithScope(notes, scopeAnswers);
+    let recoveryStep: Step = 'quality';
 
     try {
       if (notesWithScope) {
@@ -390,7 +452,8 @@ export default function VisionStartFlow() {
         }),
       });
 
-      if (!projectRes.ok) throw new Error('Failed to create project');
+      if (!projectRes.ok) throw new Error(await readApiError(projectRes, 'We could not set up your project. Please try again.'));
+      recoveryStep = 'entry';
       const { project } = await projectRes.json() as { project: { id: string } };
       const projectId = project.id;
 
@@ -403,7 +466,7 @@ export default function VisionStartFlow() {
         body: formData,
       });
 
-      if (!uploadRes.ok) throw new Error('Failed to upload image');
+      if (!uploadRes.ok) throw new Error(await readApiError(uploadRes, `We could not upload that photo. Please use ${SUPPORTED_IMAGE_LABEL}.`));
       const { url: referenceImageUrl } = await uploadRes.json() as { url: string };
 
       let analysis: VisionAnalysis = FALLBACK_VISION_ANALYSIS;
@@ -449,7 +512,7 @@ export default function VisionStartFlow() {
         }),
       });
 
-      if (!estimateRes.ok) throw new Error('Failed to generate estimate');
+      if (!estimateRes.ok) throw new Error(await readApiError(estimateRes, 'We could not build your estimate yet. Please try again.'));
       const { estimate } = await estimateRes.json() as {
         estimate?: { low_estimate?: number; mid_estimate?: number; high_estimate?: number };
       };
@@ -518,9 +581,9 @@ export default function VisionStartFlow() {
 
       const [materialsRes, briefRes] = await Promise.all([materialsPromise, briefPromise]);
 
-      if (!materialsRes.ok) throw new Error('Failed to generate materials list');
+      if (!materialsRes.ok) throw new Error(await readApiError(materialsRes, 'We could not build your materials list yet. Please try again.'));
 
-      if (!briefRes.ok) throw new Error('Failed to generate project brief');
+      if (!briefRes.ok) throw new Error(await readApiError(briefRes, 'We could not build your contractor brief yet. Please try again.'));
 
       setProgressStep(4);
       await conceptPromise;
@@ -543,8 +606,10 @@ export default function VisionStartFlow() {
         style,
         quality_tier: qualityTier,
       });
-      setError('We hit a snag generating your project. Your photo and choices are still here, so please try again.');
-      setStep('quality');
+      setError(err instanceof Error && err.message
+        ? err.message
+        : 'We hit a snag generating your project. Your photo and choices are still here, so please try again.');
+      setStep(recoveryStep);
     }
   };
 
