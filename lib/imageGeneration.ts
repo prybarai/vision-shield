@@ -91,6 +91,54 @@ const TEXT_PROMPTS: Record<string, string> = {
   custom_project: 'Professional real estate style photograph of a realistic custom home improvement update, photorealistic, no watermarks.',
 };
 
+const PRESERVED_SITE_FEATURES: Array<{ label: string; pattern: RegExp }> = [
+  { label: 'driveway', pattern: /\bdriveway\b/i },
+  { label: 'walkway', pattern: /\bwalkway\b|\bwalk\b|\bpath\b|\bsidewalk\b/i },
+  { label: 'patio', pattern: /\bpatio\b|\bpavers?\b/i },
+  { label: 'steps', pattern: /\bsteps?\b|\bstairs?\b/i },
+  { label: 'retaining wall', pattern: /\bretaining\s+wall\b/i },
+  { label: 'fence line', pattern: /\bfence\b/i },
+  { label: 'garage door', pattern: /\bgarage\b/i },
+];
+
+function getPreservedSiteFeatures(analysis?: VisionAnalysis) {
+  if (!analysis) return [];
+
+  const haystack = [
+    ...(analysis.visible_constraints || []),
+    ...(analysis.visible_features || []),
+    ...(analysis.architectural_features || []),
+    analysis.photo_observations || '',
+  ].join(' | ');
+
+  return PRESERVED_SITE_FEATURES
+    .filter(({ pattern }) => pattern.test(haystack))
+    .map(({ label }) => label);
+}
+
+function hasExplicitHardscapeRequest(notes?: string) {
+  return /(add|replace|remove|extend|widen|redo|rework|install|update|new)\s+[^.\n]{0,40}(driveway|walkway|path|sidewalk|patio|pavers|steps|stairs|retaining wall|hardscape)/i.test(notes || '')
+    || /(driveway|walkway|path|sidewalk|patio|pavers|steps|stairs|retaining wall|hardscape)\s+[^.\n]{0,40}(add|replace|remove|extend|widen|redo|rework|install|update|new)/i.test(notes || '');
+}
+
+function buildExteriorPreservationGuidance(category: string, analysis?: VisionAnalysis, notes?: string) {
+  if (!analysis || INTERIOR_CATEGORIES.has(category)) return '';
+
+  const preservedFeatures = getPreservedSiteFeatures(analysis);
+  const hardscapeRequested = hasExplicitHardscapeRequest(notes);
+
+  if (category === 'landscaping' && !hardscapeRequested) {
+    const featureText = preservedFeatures.length > 0 ? preservedFeatures.join(', ') : 'driveways, walkways, patios, and other hardscape';
+    return `Preserve every existing fixed-site element exactly, especially ${featureText}. Do not plant over them, narrow them, hide them, or replace them. Landscaping work may happen only in existing lawn, soil, mulch, or bed areas unless the homeowner explicitly requested hardscape changes.`;
+  }
+
+  if (preservedFeatures.length > 0 && !hardscapeRequested) {
+    return `Preserve these visible fixed-site features exactly: ${preservedFeatures.join(', ')}.`;
+  }
+
+  return '';
+}
+
 function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis): string {
   if (!analysis) return '';
 
@@ -120,6 +168,11 @@ function buildAnalysisPromptContext(category: string, analysis?: VisionAnalysis)
   } else if (category === 'deck_patio') {
     if (analysis.scope_signals.yard_size) facts.push(`The yard appears ${analysis.scope_signals.yard_size}.`);
     if (analysis.scope_signals.access_difficulty) facts.push(`Access appears ${analysis.scope_signals.access_difficulty}. Keep the house structure and surrounding yard context unchanged.`);
+  } else if (category === 'landscaping') {
+    if (analysis.scope_signals.yard_size) facts.push(`The visible yard scope appears ${analysis.scope_signals.yard_size}.`);
+    if (analysis.visible_constraints?.length) facts.push(`Visible fixed-site constraints include ${analysis.visible_constraints.slice(0, 3).join(', ')}.`);
+    const preservedFeatures = getPreservedSiteFeatures(analysis);
+    if (preservedFeatures.length > 0) facts.push(`Preserve fixed features like ${preservedFeatures.join(', ')} exactly.`);
   }
 
   if (!facts.length) {
@@ -225,7 +278,7 @@ function buildStyleGuidance(category: string, styleDesc: string, constraints: De
       ? 'Use the homeowner notes as the dominant instruction. Apply only light stylistic interpretation where the notes leave room.'
       : `Use ${styleDesc} styling only where it does not conflict with the homeowner notes.`;
   }
-  if (exactConstraintHeavy && (category === 'exterior_paint' || category === 'roofing' || category === 'flooring' || category === 'interior_paint' || category === 'deck_patio')) {
+  if (exactConstraintHeavy && (category === 'exterior_paint' || category === 'roofing' || category === 'flooring' || category === 'interior_paint' || category === 'deck_patio' || category === 'landscaping')) {
     return 'Keep style influence light so exact requested colors and materials stay dominant.';
   }
   return `Style guidance: ${styleDesc}.`;
@@ -252,6 +305,8 @@ function buildInstruction(
     ? 'Category-specific direction: Repaint only the existing siding, body, trim, and requested accent details on this exact house. Follow body/trim/accent color placement literally.'
     : resolvedCategory === 'deck_patio'
     ? 'Category-specific direction: Add the requested deck or patio design without changing the house, neighbors, sky, or surrounding landscape.'
+    : resolvedCategory === 'landscaping'
+    ? 'Category-specific direction: Improve only the landscape planting areas. Keep the driveway, walks, patio, steps, and all existing hardscape footprints exactly where they are unless the homeowner explicitly asked for hardscape changes.'
     : resolvedCategory === 'flooring'
     ? 'Category-specific direction: Replace only the visible flooring surface and preserve furniture, layout, and windows exactly.'
     : resolvedCategory === 'kitchen' || resolvedCategory === 'bathroom'
@@ -261,6 +316,7 @@ function buildInstruction(
   return [
     baseInstruction,
     analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
+    buildExteriorPreservationGuidance(resolvedCategory, analysis, notes),
     constraintText ? `MANDATORY DESIGN REQUIREMENTS: ${constraintText}` : '',
     categoryInstruction,
     buildStyleGuidance(category, styleDesc, constraints, notes),
@@ -286,6 +342,7 @@ function buildTextPrompt(
   return [
     basePrompt,
     analysisContext ? `Structural preservation notes: ${analysisContext}` : '',
+    buildExteriorPreservationGuidance(resolvedCategory, analysis, notes),
     constraintText ? `Mandatory user constraints: ${constraintText}` : '',
     `Category direction: ${category === 'custom_project' ? 'custom project' : resolvedCategory.replace(/_/g, ' ')}.`,
     buildStyleGuidance(category, styleDesc, constraints, notes),

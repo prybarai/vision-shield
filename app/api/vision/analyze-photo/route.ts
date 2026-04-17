@@ -67,6 +67,8 @@ Rules:
 - Do not invent exact dimensions, exact square footage, or hidden conditions.
 - estimated_sqft should be a short planning string like "small powder room", "roughly 180-240 sq ft", or "front elevation only".
 - current_materials, architectural_features, key_challenges, visible_features, size_reasoning, estimation_notes, materials_signals, visible_constraints, and loading_observations must be concise and specific.
+- For exterior and landscaping photos, explicitly call out fixed-site elements that should usually be preserved, such as driveway, walkway, patio, pavers, retaining wall, steps, and fence lines, when they are visible.
+- If a driveway or walkway is visible, include it in visible_constraints or visible_features using those words directly.
 - loading_observations should be 3 to 5 short, user-facing lines that sound like live analysis updates.
 - renovation_scope should explain what would need to change to achieve the homeowner goal in this exact visible space.
 - customization_notes should connect the homeowner request to what is actually visible.

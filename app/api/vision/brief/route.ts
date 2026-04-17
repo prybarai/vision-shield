@@ -64,6 +64,7 @@ function inferLikelyTrades(category: string, analysis?: VisionAnalysis, notes?: 
   if (category === 'roofing') return ['roofing contractor', 'gutters/flashing'];
   if (category === 'flooring') return ['flooring installation', 'demo/disposal'];
   if (category === 'deck_patio') return ['carpentry', 'footings/foundation', 'railing'];
+  if (category === 'landscaping') return ['landscape contractor', 'irrigation/drainage', 'low-voltage lighting if requested'];
   if (category === 'bathroom') return ['bathroom remodeler', 'plumber', 'tile installer'];
   if (category === 'kitchen') return ['kitchen remodeler', 'cabinet installer', 'countertop fabricator'];
   return ['general contractor'];
@@ -104,6 +105,12 @@ function fallbackSiteData(category: string, analysis?: VisionAnalysis, notes?: s
         likely_trades: ['carpentry', 'footings/foundation', 'railing'],
         unknowns_to_verify: ['Final footprint', 'Code railing needs', 'Footing depth', 'Grade changes'],
         suggested_site_measurements: ['Deck footprint', 'Stair count', 'Railing length', 'Beam spans'],
+      };
+    case 'landscaping':
+      return {
+        likely_trades: ['landscape contractor', 'irrigation/drainage', 'low-voltage lighting if requested'],
+        unknowns_to_verify: ['Exact planting-bed area', 'Drainage and grading needs', 'Irrigation and lighting scope', 'Which hardscape stays versus changes'],
+        suggested_site_measurements: ['Planting-bed square footage', 'Lawn area', 'Edging linear footage', 'Driveway, walk, and patio boundaries to preserve'],
       };
     case 'custom_project':
       return {
@@ -209,6 +216,23 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
         'What subfloor prep, leveling, moisture mitigation, or crack isolation is needed?',
         'What product is being installed and what underlayment or waterproofing layer is required?',
         'Which transitions, stair noses, thresholds, and baseboard resets should be included?',
+      ],
+      ...siteData,
+    };
+  }
+
+  if (params.category === 'landscaping') {
+    return {
+      summary: `Homeowner is planning a ${params.quality_tier} landscaping project in a ${params.style} direction with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      homeowner_goals: params.notes || 'Improve curb appeal with cleaner planting areas, a more intentional yard plan, and a quote that separates planting, bed work, irrigation, lighting, and any hardscape changes.',
+      contractor_notes: `Treat visible hardscape like driveway, walks, patio, or steps as keep-in-place unless the homeowner explicitly wants them changed. Confirm bed area, lawn area, drainage, irrigation, lighting, plant count, and exact preserve-versus-change boundaries before quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      site_verification_questions: [
+        'Which visible areas are in scope for planting or lawn work, and which hardscape areas must stay exactly as they are?',
+        'What exact planting-bed square footage, lawn area, and edging lengths should replace the photo-based assumption?',
+        'Are grading, drainage correction, soil amendment, irrigation, or low-voltage lighting part of the actual scope?',
+        'What existing trees, roots, shade, or utility conflicts will affect planting layout or trenching?',
+        'Which driveway, walkway, patio, paver, or retaining-wall elements are to be preserved versus changed?',
+        'What plant palette, maintenance expectations, and replacement warranty assumptions should be built into the quote?',
       ],
       ...siteData,
     };

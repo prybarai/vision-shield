@@ -520,6 +520,113 @@ function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
   };
 }
 
+function getVisibleSiteConstraints(analysis?: VisionAnalysis) {
+  if (!analysis) return [] as string[];
+
+  const haystack = [
+    ...(analysis.visible_constraints || []),
+    ...(analysis.visible_features || []),
+    analysis.photo_observations || '',
+  ].join(' | ');
+
+  const labels = [
+    /\bdriveway\b/i.test(haystack) ? 'driveway' : null,
+    /\bwalkway\b|\bwalk\b|\bpath\b|\bsidewalk\b/i.test(haystack) ? 'walkway' : null,
+    /\bpatio\b|\bpavers?\b/i.test(haystack) ? 'patio' : null,
+    /\bsteps?\b|\bstairs?\b/i.test(haystack) ? 'steps' : null,
+    /\bretaining\s+wall\b/i.test(haystack) ? 'retaining wall' : null,
+  ].filter((value): value is string => Boolean(value));
+
+  return Array.from(new Set(labels));
+}
+
+function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
+  const yardSize = (scopeAnswers.yard_size as SizeKey | undefined)
+    || analysis?.scope_signals.yard_size
+    || (analysis?.estimated_size_bucket === 'small' || analysis?.estimated_size_bucket === 'large' ? analysis.estimated_size_bucket : undefined)
+    || 'medium';
+  const landscapeScope = scopeAnswers.landscape_scope || 'lawn_and_beds';
+  const hardscapeScope = scopeAnswers.hardscape_scope || 'preserve_existing';
+  const irrigationLighting = scopeAnswers.irrigation_lighting || 'none';
+
+  if (!analysis && Object.keys(scopeAnswers).length === 0) return null;
+
+  const baseMidByScope: Record<string, Record<SizeKey, number>> = {
+    refresh_beds: { small: 3200, medium: 6500, large: 11000 },
+    lawn_and_beds: { small: 6200, medium: 12000, large: 22000 },
+    full_yard: { small: 9800, medium: 19000, large: 36000 },
+  };
+  const hardscapeAdders: Record<string, Record<SizeKey, number>> = {
+    preserve_existing: { small: 0, medium: 0, large: 0 },
+    light_updates: { small: 1800, medium: 4200, large: 7600 },
+    new_hardscape: { small: 7000, medium: 14000, large: 26000 },
+  };
+  const systemsAdders: Record<string, Record<SizeKey, number>> = {
+    none: { small: 0, medium: 0, large: 0 },
+    irrigation: { small: 1800, medium: 3500, large: 6200 },
+    irrigation_and_lighting: { small: 3800, medium: 7200, large: 12400 },
+  };
+  const complexityMultiplier: Record<string, number> = {
+    simple: 0.96,
+    moderate: 1.08,
+    complex: 1.22,
+  };
+
+  const baseMid = baseMidByScope[landscapeScope]?.[yardSize] ?? baseMidByScope.lawn_and_beds.medium;
+  const hardscapeAdder = hardscapeAdders[hardscapeScope]?.[yardSize] ?? 0;
+  const systemsAdder = systemsAdders[irrigationLighting]?.[yardSize] ?? 0;
+  const zipMultiplier = getZipMultiplier(zip);
+  const qualityMultiplier = getQualityMultiplier(qualityTier);
+  const complexity = analysis?.complexity ?? 'moderate';
+  const accessMultiplier = analysis?.scope_signals.access_difficulty === 'difficult'
+    ? 1.08
+    : analysis?.scope_signals.access_difficulty === 'moderate'
+      ? 1.03
+      : 1;
+  const yardAreaMultiplier = areaBucketMultiplier(analysis?.area_signals.yard_area_bucket, 0.9, 1.18);
+  const mid = (baseMid + hardscapeAdder + systemsAdder) * qualityMultiplier * (complexityMultiplier[complexity] ?? 1.08) * accessMultiplier * yardAreaMultiplier * zipMultiplier;
+  const spread = analysis?.confidence === 'low' ? 0.24 : hardscapeScope === 'new_hardscape' || landscapeScope === 'full_yard' ? 0.2 : 0.17;
+  const range = buildRange(mid, spread);
+  const breakdown = buildEstimateBreakdown(range, hardscapeScope === 'new_hardscape' ? 0.6 : 0.64);
+  const visibleConstraints = getVisibleSiteConstraints(analysis);
+
+  const assumptions = [
+    `${yardSize} landscaping scope sized around a ${landscapeScope.replace(/_/g, ' ')}`,
+    hardscapeScope === 'preserve_existing'
+      ? 'Existing driveway, walkways, patio areas, and other visible hardscape were preserved, not rebuilt'
+      : hardscapeScope === 'light_updates'
+        ? 'Included only light hardscape touches like borders, edging, or small path adjustments'
+        : 'Included meaningful hardscape work such as new or reworked paths, patio, pavers, or similar site features',
+    irrigationLighting === 'none'
+      ? 'No irrigation or lighting package included'
+      : irrigationLighting === 'irrigation'
+        ? 'Included an irrigation allowance'
+        : 'Included irrigation and low-voltage lighting allowances',
+    analysis?.area_signals.yard_area_bucket
+      ? `Yard area signal of ${analysis.area_signals.yard_area_bucket} refined the visible landscape footprint`
+      : 'Visible yard footprint kept at a standard planning assumption',
+    visibleConstraints.length > 0
+      ? `Visible fixed-site constraints like ${visibleConstraints.join(', ')} were treated as keep-in-place elements unless explicitly changed`
+      : 'Visible hardscape and circulation areas were treated as keep-in-place unless explicitly changed',
+    analysis?.scope_signals.access_difficulty === 'difficult'
+      ? 'Difficult site access increased installation labor modestly'
+      : 'Normal landscaping access assumed',
+  ];
+  addPhotoDrivenAssumptions(assumptions, analysis, 'landscaping');
+
+  return {
+    ...range,
+    assumptions,
+    risk_notes: [
+      'Drainage correction, grading, irrigation trenching, tree/root conflicts, haul-off, and utility conflicts can materially change landscaping bids',
+      'Exact bed area, plant count, sun exposure, soil condition, and any hardscape changes should be field-verified before quoting',
+    ],
+    estimate_basis: withAnalysisBasis('Planning estimate based on visible yard scope, landscape program, preserved hardscape assumptions, systems allowances, and ZIP-based pricing.', analysis, 4),
+    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    estimate_breakdown: breakdown,
+  };
+}
+
 function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: string, analysis?: VisionAnalysis): EstimateResult | null {
   const deckSize = scopeAnswers.deck_size;
   const materialType = scopeAnswers.material_type;
@@ -886,6 +993,10 @@ function estimateDeterministically(category: string, scopeAnswers: ScopeAnswers 
 
   if (category === 'exterior_paint' && analysis) {
     return estimateExteriorPaint(scopeAnswers || {}, qualityTier, zip, analysis);
+  }
+
+  if (category === 'landscaping') {
+    return estimateLandscaping(scopeAnswers || {}, qualityTier, zip, analysis);
   }
 
   if ((!scopeAnswers || Object.keys(scopeAnswers).length === 0) && !analysis) return null;

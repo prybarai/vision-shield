@@ -215,6 +215,46 @@ const SCOPE_QUESTIONS: Partial<Record<ProjectCategory, ScopeQuestion[]>> = {
       ],
     },
   ],
+  landscaping: [
+    {
+      key: 'yard_size',
+      label: 'Area size',
+      helper: 'Choose the part of the yard you actually want priced, not the whole lot unless that is the plan.',
+      options: [
+        { value: 'small', label: 'Small', description: 'Single bed refresh or a compact front area' },
+        { value: 'medium', label: 'Medium', description: 'Most front-yard landscaping projects' },
+        { value: 'large', label: 'Large', description: 'Large frontage or multi-zone yard work' },
+      ],
+    },
+    {
+      key: 'landscape_scope',
+      label: 'What kind of landscape work?',
+      options: [
+        { value: 'refresh_beds', label: 'Planting bed refresh', description: 'Mostly beds, shrubs, cleanup, mulch, edging' },
+        { value: 'lawn_and_beds', label: 'Lawn + beds', description: 'Grass plus beds and broader curb appeal work' },
+        { value: 'full_yard', label: 'Full landscape makeover', description: 'Bigger redesign across most visible yard areas' },
+      ],
+    },
+    {
+      key: 'hardscape_scope',
+      label: 'What about hardscape?',
+      helper: 'This helps naili avoid planting over driveways or assuming new paving when that is not part of the job.',
+      options: [
+        { value: 'preserve_existing', label: 'Preserve existing hardscape', description: 'Keep driveway, walks, and existing paved areas as-is' },
+        { value: 'light_updates', label: 'Light hardscape updates', description: 'Minor edging, borders, or small path touches only' },
+        { value: 'new_hardscape', label: 'New hardscape included', description: 'Adding or reworking paths, patio, pavers, or similar' },
+      ],
+    },
+    {
+      key: 'irrigation_lighting',
+      label: 'Include irrigation or lighting?',
+      options: [
+        { value: 'none', label: 'No, plants only' },
+        { value: 'irrigation', label: 'Irrigation only' },
+        { value: 'irrigation_and_lighting', label: 'Irrigation + lighting' },
+      ],
+    },
+  ],
   roofing: [
     {
       key: 'roof_size',

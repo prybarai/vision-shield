@@ -152,6 +152,26 @@ function fallbackMaterials(category: string, style: string, qualityTier: string,
     };
   }
 
+  if (category === 'landscaping') {
+    const yardMultiplier = quantityMultiplier(analysis, 'yard');
+    const visibleConstraintText = analysis?.visible_constraints?.length
+      ? ` Preserve existing fixed-site features like ${analysis.visible_constraints.slice(0, 3).join(', ')} unless explicitly requested otherwise.`
+      : '';
+    const baseBedArea = analysis?.scope_signals.yard_size === 'small' ? 140 : analysis?.scope_signals.yard_size === 'large' ? 650 : 320;
+    const plantingArea = Math.round(baseBedArea * yardMultiplier);
+    const values = distributeBudget(estimateMid, [16, 26, 18, 24, 16]);
+    return {
+      line_items: [
+        lineItem('Prep & Demo', 'Site cleanup and bed-definition package', `Basic cleanup, weed removal, bed shaping, edge refresh, and prep work tied to the visible landscape scope.${visibleConstraintText}`, 1, 'lot', qualityTier, values[0] * 0.82, values[0], 'Assumes existing driveway and major hardscape stay in place unless the homeowner requested otherwise.'),
+        lineItem('Core Materials', 'Plant material allowance', `${qualityTier} allowance for shrubs, ornamental plantings, and accent material sized to about ${plantingArea} sq ft of visible planting area.`, plantingArea, 'sq ft', qualityTier, values[1] * 0.82, values[1], 'Final plant count depends on mature spacing, sun exposure, and species selection.'),
+        lineItem('Finish Materials', 'Soil, mulch, edging, and amendment package', 'Mulch, soil amendments, compost, edging touch-ups, and finishing materials that make the planting work look complete.', plantingArea, 'sq ft', qualityTier, values[2] * 0.82, values[2], 'Stone, steel edging, decorative rock, or premium specialty finishes may increase this bucket.'),
+        lineItem('Labor', 'Landscape installation labor', 'Crew labor for layout, planting, bed work, shaping, cleanup, and final detail work across the visible yard scope.', 1, 'lot', qualityTier, values[3] * 0.82, values[3], 'Drainage work, major grading, tree work, or hardscape rebuilds are typically separate.'),
+        lineItem('Permits / Misc', 'Irrigation, lighting, and closeout allowance', 'Planning allowance for minor irrigation adjustments, low-voltage lighting prep, haul-off, and closeout.', 1, 'lot', qualityTier, values[4] * 0.82, values[4], 'If full irrigation or new hardscape is part of the project, confirm that scope separately during the site visit.'),
+      ],
+      sourcing_notes: `Planning-grade landscaping scope sheet organized around visible planting areas rather than a loose shopping list.${visibleConstraintText} Verify exact planting bed square footage, irrigation needs, sun exposure, drainage, edging, and any requested hardscape changes onsite.`,
+    };
+  }
+
   if (category === 'custom_project') {
     const values = distributeBudget(estimateMid, [16, 24, 14, 30, 16]);
     return {
