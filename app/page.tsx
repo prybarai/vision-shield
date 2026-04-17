@@ -127,11 +127,11 @@ export default function HomePage() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
-                href="/vision/start"
+                href="/estimate"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
               >
                 <Camera className="h-5 w-5" />
-                Upload a photo
+                Start an estimate
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
