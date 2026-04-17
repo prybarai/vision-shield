@@ -488,6 +488,13 @@ export default function HomePage() {
                   <li key={feature} className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#7ccf43]" />{feature}</li>
                 ))}
               </ul>
+              <Link
+                href="/vision/start"
+                className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95"
+              >
+                Start free
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
             <div className="rounded-[2rem] border border-[#d7f4ff] bg-[linear-gradient(135deg,rgba(31,124,247,0.08),rgba(72,199,241,0.08))] p-8 shadow-[0_16px_44px_rgba(72,199,241,0.14)]">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#0f5fc6]">naili pro</p>
@@ -498,6 +505,43 @@ export default function HomePage() {
                   <li key={feature} className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#1f7cf7]" />{feature}</li>
                 ))}
               </ul>
+              <Link
+                href="/auth/signup"
+                className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl border border-[#9adfff] bg-white px-5 py-3 text-sm font-semibold text-[#0f5fc6] transition-colors hover:bg-[#eef8ff]"
+              >
+                Create account
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white pb-16 sm:pb-20">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,#0d2340_0%,#123964_45%,#165ca8_75%,#48c7f1_100%)] p-8 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-10">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">Start with a real project</p>
+              <h2 className="mt-3 text-3xl font-bold sm:text-4xl">If you have a photo and a project in mind, you have enough to start.</h2>
+              <p className="mt-4 text-lg leading-relaxed text-white/74">
+                Start with Vision for planning and scope clarity, then use Shield when it is time to verify the contractor and the paperwork.
+              </p>
+            </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/vision/start"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100"
+              >
+                <Camera className="h-5 w-5" />
+                Start my project
+              </Link>
+              <Link
+                href="/shield"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                <ShieldCheck className="h-5 w-5" />
+                Explore Shield
+              </Link>
             </div>
           </div>
         </div>
