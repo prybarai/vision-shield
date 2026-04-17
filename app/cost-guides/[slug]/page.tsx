@@ -56,6 +56,8 @@ export default async function CostGuideDetailPage({ params }: { params: Promise<
     notFound();
   }
 
+  const visibleSources = guide.sources.filter((source) => !/homeadvisor|angi/i.test(source.url));
+
   const articleSchema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -241,18 +243,20 @@ export default async function CostGuideDetailPage({ params }: { params: Promise<
               </div>
             </section>
 
-            <section className="mt-12">
-              <h2 className="text-3xl font-bold text-[#0d0d1a]">Sources</h2>
-              <ul className="mt-4 space-y-3 text-base text-slate-700">
-                {guide.sources.map((source) => (
-                  <li key={source.url}>
-                    <a href={source.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-medium text-[#1f7cf7] hover:text-[#0f5fc6]">
-                      {source.label} <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
+            {visibleSources.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-3xl font-bold text-[#0d0d1a]">Sources</h2>
+                <ul className="mt-4 space-y-3 text-base text-slate-700">
+                  {visibleSources.map((source) => (
+                    <li key={source.url}>
+                      <a href={source.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-medium text-[#1f7cf7] hover:text-[#0f5fc6]">
+                        {source.label} <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </div>
 
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">

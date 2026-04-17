@@ -5,7 +5,6 @@ import Logo from '@/components/brand/Logo';
 const PRODUCT_LINKS = [
   { href: '/vision', label: 'naili vision' },
   { href: '/shield', label: 'naili shield' },
-  { href: '/for-contractors', label: 'For contractors' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
 
@@ -19,7 +18,7 @@ const LEARN_LINKS = [
   { href: '/vision', label: 'How Vision works' },
   { href: '/shield', label: 'How Shield works' },
   { href: '/cost-guides', label: 'Cost guides' },
-  { href: '/for-contractors', label: 'How leads work for contractors' },
+  { href: '/for-contractors', label: 'For pros' },
 ];
 
 export default function Footer() {
@@ -70,12 +69,10 @@ export default function Footer() {
           <div className="flex flex-col gap-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 naili. All rights reserved.</p>
             <Link
-              href="https://prybar.ai"
-              className="font-medium text-[#a8eb57] transition-colors hover:text-white"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/for-contractors"
+              className="font-medium text-slate-400 transition-colors hover:text-white"
             >
-              Are you a contractor? Try prybar.ai →
+              For pros →
             </Link>
           </div>
         </div>

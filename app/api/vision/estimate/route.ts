@@ -45,6 +45,13 @@ type AreaBucket = 'low' | 'medium' | 'high' | null | undefined;
 type WidthBucket = 'narrow' | 'standard' | 'wide' | null | undefined;
 type DepthBucket = 'shallow' | 'standard' | 'deep' | null | undefined;
 
+const GUIDE_ESTIMATE_GUARDRAILS: Partial<Record<string, { low: number; mid: number; high: number }>> = {
+  bathroom: { low: 8000, mid: 11000, high: 15000 },
+  kitchen: { low: 15000, mid: 20000, high: 25000 },
+  deck_patio: { low: 4000, mid: 6000, high: 8000 },
+  roofing: { low: 6000, mid: 9000, high: 12000 },
+};
+
 function roundToHundred(value: number) {
   return Math.round(value / 100) * 100;
 }
@@ -58,6 +65,22 @@ function buildRange(mid: number, spread = 0.15) {
     low_estimate: Math.max(low, 100),
     mid_estimate: Math.max(roundedMid, 100),
     high_estimate: Math.max(high, 100),
+  };
+}
+
+function applyEstimateGuardrails(category: string, result: EstimateResult): EstimateResult {
+  const floor = GUIDE_ESTIMATE_GUARDRAILS[category];
+  if (!floor || result.low_estimate >= floor.low) return result;
+
+  return {
+    ...result,
+    low_estimate: Math.max(result.low_estimate, floor.low),
+    mid_estimate: Math.max(result.mid_estimate, floor.mid),
+    high_estimate: Math.max(result.high_estimate, floor.high),
+    assumptions: [
+      ...result.assumptions,
+      'Guide-aligned planning floor applied to avoid unrealistically low outputs for this project type.',
+    ],
   };
 }
 
@@ -1045,6 +1068,8 @@ export async function POST(req: NextRequest) {
       result.estimate_basis = withAnalysisBasis(result.estimate_basis, analysis, 4);
       addConfidenceAssumption(result.assumptions, analysis);
     }
+
+    result = applyEstimateGuardrails(params.category, result);
 
     const { data, error } = await supabaseAdmin
       .from('estimates')
