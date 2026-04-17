@@ -73,7 +73,7 @@ export default function VisionPage() {
           </div>
 
           <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)]">
-            <Image src="/imagery/vision-hero.webp" alt="Homeowner reviewing a kitchen renovation idea while standing in the space." width={1600} height={1200} className="h-full w-full object-cover" priority />
+            <Image src="/imagery/home-hero.webp" alt="Homeowner photographing a dated bathroom before starting a renovation plan." width={1600} height={1200} className="h-full w-full object-cover" priority />
           </div>
         </div>
       </section>
