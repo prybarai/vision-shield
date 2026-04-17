@@ -77,6 +77,8 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
 
   const { data, error } = await query;
 
+  const { data: statusRows } = await supabaseAdmin.from('leads').select('status');
+
   if (error) {
     throw new Error(error.message || 'Failed to load leads');
   }
@@ -89,6 +91,12 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
       uploaded_image_urls?: string[] | null;
     } | null;
   }>;
+
+  const summaryCounts = (statusRows || []).reduce<Record<string, number>>((acc, row) => {
+    const key = typeof row.status === 'string' ? row.status : 'unknown';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
@@ -141,6 +149,21 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
           </Button>
         </form>
       </Card>
+
+      <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        {[
+          { label: 'New', value: summaryCounts.new || 0 },
+          { label: 'Routed to Prybar', value: summaryCounts.routed_to_prybar || 0 },
+          { label: 'Outbound', value: summaryCounts.outbound || 0 },
+          { label: 'Converted', value: summaryCounts.converted || 0 },
+          { label: 'Closed', value: summaryCounts.closed || 0 },
+        ].map((item) => (
+          <Card key={item.label} className="p-5">
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.label}</div>
+            <div className="mt-2 text-3xl font-bold text-slate-900">{item.value}</div>
+          </Card>
+        ))}
+      </section>
 
       <div className="mt-8 space-y-5">
         {leads.length === 0 ? (

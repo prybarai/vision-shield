@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { trackServerEvent } from '@/lib/analytics';
 
 function isAuthorized(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -52,9 +53,16 @@ export async function GET(req: NextRequest) {
 
     if (!error) {
       escalatedIds.push(lead.id);
+      await trackServerEvent({
+        eventName: 'naili_lead_escalated_to_outbound',
+        distinctId: lead.id,
+        eventData: {
+          lead_id: lead.id,
+          assigned_contractor: lead.assigned_contractor || null,
+        },
+      });
     }
   }
 
   return NextResponse.json({ escalated: escalatedIds.length, lead_ids: escalatedIds });
 }
-

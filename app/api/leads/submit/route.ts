@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { dispatchLeadToPrybarCore } from '@/lib/prybar-core';
 import { findPrybarRoutingMatch } from '@/lib/leadRouting';
+import { trackServerEvent } from '@/lib/analytics';
 
 const schema = z.object({
   project_id: z.string().uuid().optional(),
@@ -88,6 +89,21 @@ export async function POST(req: NextRequest) {
 
     if (insertResult.error || !insertResult.data) throw insertResult.error || new Error('Lead insert returned no data');
     const lead = insertResult.data as Record<string, unknown>;
+    const homeownerId = typeof project?.homeowner_id === 'string' ? String(project.homeowner_id) : null;
+    const sessionId = typeof project?.session_id === 'string' ? String(project.session_id) : null;
+
+    await trackServerEvent({
+      eventName: 'naili_lead_queued',
+      homeownerId,
+      sessionId,
+      distinctId: String(lead.id),
+      eventData: {
+        lead_id: String(lead.id),
+        source,
+        zip_code: params.zip_code,
+        project_category: project?.project_category ? String(project.project_category) : null,
+      },
+    });
 
     if (params.project_id) {
       await supabaseAdmin.from('projects').update({ status: 'lead_submitted' }).eq('id', params.project_id);
@@ -231,6 +247,30 @@ export async function POST(req: NextRequest) {
         email: params.email,
         phone: params.phone || '',
         zip_code: params.zip_code,
+      });
+    }
+
+    if (!routingDeferred) {
+      const routingEventName = leadStatus === 'routed_to_prybar'
+        ? 'naili_lead_routed_to_prybar'
+        : leadStatus === 'outbound'
+        ? 'naili_lead_marked_outbound'
+        : 'naili_lead_routing_blocked';
+
+      await trackServerEvent({
+        eventName: routingEventName,
+        homeownerId,
+        sessionId,
+        distinctId: String(lead.id),
+        eventData: {
+          lead_id: String(lead.id),
+          source,
+          zip_code: params.zip_code,
+          project_category: project?.project_category ? String(project.project_category) : null,
+          routing_status: leadStatus,
+          matched_contractor: routeMatch?.contractorName || null,
+          routing_error: lastRoutingError,
+        },
       });
     }
 
