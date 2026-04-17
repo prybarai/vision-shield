@@ -236,8 +236,8 @@ export default function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)] backdrop-blur-xl sm:col-span-2">
               <Image
-                src="/imagery/home-hero.webp"
-                alt="Homeowner photographing a dated bathroom before starting a renovation plan."
+                src="/imagery/vision-hero.webp"
+                alt="Homeowner reviewing a kitchen renovation idea while standing in the space."
                 width={1600}
                 height={1200}
                 className="h-full w-full object-cover"
