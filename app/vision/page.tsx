@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Camera, DollarSign, FileText, ShieldCheck, Sparkles } from 'lucide-react';
+import { absoluteUrl } from '@/lib/site';
 
 const FEATURES = [
   {
@@ -25,12 +26,12 @@ export const metadata: Metadata = {
   description:
     'Upload a photo, see what your project could look like, and get a planning-grade estimate before talking to a contractor.',
   alternates: {
-    canonical: 'https://naili.ai/vision',
+    canonical: absoluteUrl('/vision'),
   },
   openGraph: {
     title: 'naili vision',
     description: 'See the project before it starts.',
-    url: 'https://naili.ai/vision',
+    url: absoluteUrl('/vision'),
     images: ['/og-naili.png'],
   },
 };

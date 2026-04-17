@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, MessageSquareText, Smartphone, Wrench } from 'lucide-react';
+import { absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'For contractors',
   description: 'Get free homeowner leads from naili and route them into your Prybar inbox so you can respond fast while you are still on the job.',
   alternates: {
-    canonical: 'https://www.naili.ai/for-contractors',
+    canonical: absoluteUrl('/for-contractors'),
   },
 };
 
@@ -111,10 +112,10 @@ export default function ForContractorsPage() {
       <section className="bg-[#f8f9fc] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)] lg:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Proof will go here</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fake testimonials. We will earn these.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built for real operators</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fake testimonials, no paid-looking fluff.</h2>
             <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-              As real Naili leads turn into real Prybar jobs, this page will fill with contractor quotes, close stories, and honest numbers. Until then, we are leaving the space empty on purpose.
+              As real Naili leads turn into real Prybar jobs, this page will fill with contractor quotes, close stories, and honest numbers. Until then, we are keeping the promise simple: free leads, clearer context, and faster response loops.
             </p>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">

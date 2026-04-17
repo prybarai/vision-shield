@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -16,6 +17,16 @@ import {
   Users,
   Wrench,
 } from 'lucide-react';
+import { absoluteUrl } from '@/lib/site';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: absoluteUrl('/'),
+  },
+  openGraph: {
+    url: absoluteUrl('/'),
+  },
+};
 
 const TRUST_POINTS = [
   'Photo-aware project briefs',
@@ -359,10 +370,10 @@ export default function HomePage() {
       <section className="bg-[#f8f9fc] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)] lg:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Proof will go here</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fake traction numbers. We will earn the proof.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built honestly</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">We would rather launch clean than fake traction.</h2>
             <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-              As Naili briefs turn into real contractor conversations and real Prybar signups, this section will fill with actual homeowner and contractor results. Until then, we are leaving the space honest and empty.
+              As Naili briefs turn into real contractor conversations and real Prybar signups, this section will fill with actual homeowner and contractor results. Until then, we are being explicit about what is live today and what still needs to be earned.
             </p>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-[#f8f9fc] p-6 text-sm text-slate-500">Homeowner testimonial slot, waiting for a real project outcome.</div>

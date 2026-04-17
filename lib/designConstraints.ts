@@ -72,7 +72,6 @@ export function extractDesignConstraints(notes?: string): DesignConstraints {
 
   if (!text) return constraints;
 
-  const normalized = text.toLowerCase();
   let foundConstraint = false;
 
   if (/\bcream\s+white\s+house\b/i.test(text)) {

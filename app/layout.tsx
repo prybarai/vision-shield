@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import QueryProvider from '@/components/providers/QueryProvider';
 import PostHogProvider from '@/components/providers/PostHogProvider';
+import { SITE_URL } from '@/lib/site';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,15 +25,12 @@ export const metadata: Metadata = {
     'find trusted contractor',
     'naili',
   ],
-  metadataBase: new URL('https://naili.ai'),
-  alternates: {
-    canonical: 'https://naili.ai',
-  },
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     siteName: 'naili',
     title: 'naili — Nail the vision. Know the cost.',
     description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
-    url: 'https://naili.ai',
+    url: SITE_URL,
     images: ['/og-naili.png'],
   },
   twitter: {

@@ -8,10 +8,19 @@ import Disclaimer from '@/components/ui/Disclaimer';
 import Badge from '@/components/ui/Badge';
 import { DISCLAIMERS } from '@/lib/disclaimers';
 import type { Project, Estimate } from '@/types';
+import type { Metadata } from 'next';
 
 interface PageProps {
   params: Promise<{ token: string }>;
 }
+
+export const metadata: Metadata = {
+  title: 'Shared project',
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function SharePage({ params }: PageProps) {
   const { token } = await params;

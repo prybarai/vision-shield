@@ -1,18 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, FileText, LifeBuoy, Search, ShieldCheck } from 'lucide-react';
+import { absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'naili shield',
   description:
     'Verify contractor licenses, scan quotes, review contracts, and protect yourself before money or signatures move.',
   alternates: {
-    canonical: 'https://naili.ai/shield',
+    canonical: absoluteUrl('/shield'),
   },
   openGraph: {
     title: 'naili shield',
     description: 'Hire with confidence. Never get burned.',
-    url: 'https://naili.ai/shield',
+    url: absoluteUrl('/shield'),
     images: ['/og-naili.png'],
   },
 };

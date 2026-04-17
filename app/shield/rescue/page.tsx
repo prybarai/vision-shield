@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { AlertTriangle, CheckCircle, Copy, FileText, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Copy, ShieldCheck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';

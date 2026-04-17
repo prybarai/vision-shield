@@ -26,6 +26,10 @@ export async function generateMetadata({ params }: PageProps) {
   const { project_id } = await params;
   return {
     title: 'Here’s your naili plan',
+    robots: {
+      index: false,
+      follow: false,
+    },
     openGraph: {
       images: [`/api/og/vision/${project_id}`],
     },

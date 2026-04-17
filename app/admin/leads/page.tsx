@@ -12,6 +12,10 @@ import { updateLeadQueueEntry } from './actions';
 export const metadata: Metadata = {
   title: 'Lead Queue',
   description: 'Internal Naili lead queue for Prybar routing and outbound follow-up.',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const STATUS_OPTIONS: Array<{ value: LeadStatus | 'all'; label: string }> = [

@@ -71,10 +71,6 @@ function inferLikelyTrades(category: string, analysis?: VisionAnalysis, notes?: 
 }
 
 function fallbackSiteData(category: string, analysis?: VisionAnalysis, notes?: string) {
-  const customTrade = analysis?.suggested_trade && analysis.suggested_trade !== 'unknown'
-    ? analysis.suggested_trade.replace(/_/g, ' ')
-    : undefined;
-
   switch (category) {
     case 'roofing':
       return {

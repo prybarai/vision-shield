@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, FileText } from 'lucide-react';
 import { COST_GUIDES } from '@/lib/costGuides';
+import { absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Cost guides',
   description: 'Real cost guides for common home projects, plus a faster path to a custom brief and estimate when you want numbers for your exact space.',
   alternates: {
-    canonical: 'https://www.naili.ai/cost-guides',
+    canonical: absoluteUrl('/cost-guides'),
   },
 };
 

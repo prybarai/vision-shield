@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRight, CheckCircle2, ExternalLink } from 'lucide-react';
 import { COST_GUIDES, COST_GUIDE_MAP } from '@/lib/costGuides';
+import { absoluteUrl } from '@/lib/site';
 
 export function generateStaticParams() {
   return COST_GUIDES.map((guide) => ({ slug: guide.slug }));
@@ -20,13 +21,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: guide.title,
     description: guide.description,
     alternates: {
-      canonical: `https://www.naili.ai/cost-guides/${guide.slug}`,
+      canonical: absoluteUrl(`/cost-guides/${guide.slug}`),
     },
     openGraph: {
       title: guide.title,
       description: guide.description,
       type: 'article',
-      url: `https://www.naili.ai/cost-guides/${guide.slug}`,
+      url: absoluteUrl(`/cost-guides/${guide.slug}`),
     },
   };
 }
@@ -44,7 +45,7 @@ export default async function CostGuideDetailPage({ params }: { params: Promise<
     '@type': 'Article',
     headline: guide.title,
     description: guide.description,
-    mainEntityOfPage: `https://www.naili.ai/cost-guides/${guide.slug}`,
+    mainEntityOfPage: absoluteUrl(`/cost-guides/${guide.slug}`),
     author: {
       '@type': 'Organization',
       name: 'naili',

@@ -10,8 +10,9 @@ import type { Project } from '@/types';
 export const metadata: Metadata = {
   title: 'Dashboard',
   description: 'Review your naili plans, estimates, and Shield checks in one place.',
-  alternates: {
-    canonical: 'https://naili.ai/dashboard',
+  robots: {
+    index: false,
+    follow: false,
   },
 };
 

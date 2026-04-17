@@ -1,4 +1,17 @@
+import type { Metadata } from 'next';
 import ContractorCheckFlow from '@/components/shield/ContractorCheckFlow';
+import { absoluteUrl } from '@/lib/site';
+
+export const metadata: Metadata = {
+  title: 'Check a contractor',
+  description: 'Verify license status and get a plain-English risk read before you hire, pay a deposit, or sign a contract.',
+  alternates: {
+    canonical: absoluteUrl('/shield/check'),
+  },
+  openGraph: {
+    url: absoluteUrl('/shield/check'),
+  },
+};
 
 export default function ShieldCheckPage() {
   return (
