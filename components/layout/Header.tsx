@@ -35,6 +35,7 @@ export default function Header() {
   const navLinks = [
     { href: '/vision', label: 'Vision', icon: Camera },
     { href: '/shield', label: 'Shield', icon: Shield },
+    { href: '/my-projects', label: 'My Projects', icon: LayoutGrid },
     { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
   ];
 
