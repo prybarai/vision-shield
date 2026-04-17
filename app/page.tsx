@@ -5,7 +5,6 @@ import {
   Camera,
   CheckCircle2,
   ClipboardCheck,
-  DollarSign,
   FileText,
   Home,
   LayoutGrid,
@@ -14,14 +13,15 @@ import {
   Sofa,
   Sparkles,
   Trees,
+  Users,
   Wrench,
 } from 'lucide-react';
 
 const TRUST_POINTS = [
-  '10,000+ projects planned',
-  'Trusted by homeowners in all 50 states',
+  'Photo-aware project briefs',
   'Private by default',
-  'No contractor calls until you ask',
+  'No contractor calls until you opt in',
+  'Matched pros start with your brief',
 ];
 
 const HOW_IT_WORKS = [
@@ -39,15 +39,15 @@ const HOW_IT_WORKS = [
   },
   {
     step: '03',
-    title: 'Get your plan',
+    title: 'Get the full brief',
     desc: 'See concepts, a smart estimate, materials guidance, and a contractor-ready brief built from your actual photo.',
-    icon: DollarSign,
+    icon: FileText,
   },
   {
     step: '04',
-    title: 'Hire with confidence',
-    desc: 'Use shield to verify licenses, scan quotes, and slow risky contractor decisions down before money moves.',
-    icon: ShieldCheck,
+    title: 'Get matched to local pros',
+    desc: 'When you are ready, naili uses that brief to match you with 2–3 local pros who can quote from the same scope.',
+    icon: Users,
   },
 ];
 
@@ -63,36 +63,29 @@ const PROJECT_TYPES = [
 const EXAMPLE_CARDS = [
   {
     eyebrow: 'Bathroom',
-    title: 'Spa-like refresh under a real budget',
-    before: 'Dated ceramic tile, single vanity, low lighting',
-    after: 'Warm modern palette, calmer lighting, smarter materials mix',
+    title: 'Start with a better brief, not a vague wish list',
+    before: 'Homeowner wants a cleaner, calmer bathroom but does not know what scope to ask contractors to price.',
+    after: 'naili organizes the scope, range, materials direction, and walk-through questions before the first quote.',
   },
   {
     eyebrow: 'Kitchen',
-    title: 'Same footprint, cleaner finish direction',
-    before: 'Oak cabinets, laminate counters, crowded visual feel',
-    after: 'White shaker cabinetry, quartz look, better visual flow',
+    title: 'Same footprint, fewer wasted conversations',
+    before: 'The homeowner has inspiration but no shared scope, so every contractor imagines a different job.',
+    after: 'naili gives every bidder the same starting brief, which makes quote comparisons much cleaner.',
   },
   {
     eyebrow: 'Exterior',
-    title: 'Curb appeal without guesswork',
-    before: 'Flat paint, unclear color direction, quote anxiety',
-    after: 'Body/trim palette, cost range, and shield-ready hiring plan',
+    title: 'Match pros who already understand the project',
+    before: 'The homeowner has to explain the job from scratch on every call and still wonders what is missing.',
+    after: 'naili gets the project scoped first, then matches them to pros who can step in with context.',
   },
-];
-
-const SEO_TOPICS = [
-  'How much does a bathroom remodel cost?',
-  'How much does a new roof cost?',
-  'How much does interior painting cost?',
-  'Questions to ask a contractor before hiring',
 ];
 
 const FREE_FEATURES = [
   '2 Vision projects per month',
   'Basic estimate range',
   '1 Shield check per month',
-  'Shareable project results',
+  'Project matching request when ready',
 ];
 
 const PRO_FEATURES = [
@@ -101,7 +94,7 @@ const PRO_FEATURES = [
   'Detailed materials list',
   'PDF brief download',
   'Unlimited Shield tools',
-  'Priority lead matching',
+  'Priority support',
 ];
 
 export default function HomePage() {
@@ -119,10 +112,10 @@ export default function HomePage() {
               naili vision + shield
             </div>
             <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-              Nail the vision. Know the cost.
+              Skip the sales visits. Get your project priced and matched to pros who want it.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/78 sm:text-xl">
-              The homeowner AI platform for the moment before anything starts. Upload a photo, describe what you want, get a real plan, then hire with confidence.
+              Upload a photo, describe what you want, and naili builds your estimate, materials plan, and contractor-ready brief. Then we match you with 2–3 local pros who&apos;ve seen the brief before they even call.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -131,19 +124,19 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
               >
                 <Camera className="h-5 w-5" />
-                Upload a photo
+                Start my project
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/shield"
+                href="#how-it-works"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
               >
-                Explore shield
+                How it works
               </Link>
             </div>
 
             <div className="mt-6 flex flex-wrap gap-x-5 gap-y-3 text-sm text-white/72">
-              {['Free to start', 'Planning-grade estimate', 'No contractor outreach yet'].map((item) => (
+              {['Free to start', 'Private by default', 'No contractor outreach until you opt in'].map((item) => (
                 <div key={item} className="inline-flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-[#a8eb57]" />
                   {item}
@@ -155,26 +148,26 @@ export default function HomePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-5 backdrop-blur-xl sm:col-span-2">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/75">
-                <Camera className="h-3.5 w-3.5" /> Vision flow
+                <Camera className="h-3.5 w-3.5" /> Brief first, matching second
               </div>
-              <h2 className="text-2xl font-bold">Upload a room. Describe the goal. Get the plan.</h2>
+              <h2 className="text-2xl font-bold">The goal is not just a PDF. The goal is a cleaner path to real quotes.</h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/74">
-                naili analyzes the actual photo, builds concept directions, calculates a local cost range, drafts materials guidance, and creates a contractor-ready brief you can share.
+                naili analyzes the actual photo, builds concept directions, calculates a local cost range, drafts materials guidance, and creates a contractor-ready brief. When you are ready, that same brief powers the local-pro match.
               </p>
             </div>
             <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-5 backdrop-blur-xl">
               <div className="mb-3 inline-flex rounded-2xl bg-[#f4fde8]/15 p-3 text-[#a8eb57]">
-                <DollarSign className="h-6 w-6" />
+                <FileText className="h-6 w-6" />
               </div>
-              <h3 className="text-lg font-semibold">Smart estimate</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/70">Low, mid, and high ranges with photo-aware assumptions and local market context.</p>
+              <h3 className="text-lg font-semibold">Photo-aware brief</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">Estimate, materials, and scope notes grounded in the space you actually uploaded.</p>
             </div>
             <div className="rounded-[1.75rem] border border-white/12 bg-white/10 p-5 backdrop-blur-xl">
               <div className="mb-3 inline-flex rounded-2xl bg-white/10 p-3 text-white">
-                <FileText className="h-6 w-6" />
+                <Users className="h-6 w-6" />
               </div>
-              <h3 className="text-lg font-semibold">Brief to share</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/70">Show contractors what you want before they quote, so scope stays cleaner from the start.</p>
+              <h3 className="text-lg font-semibold">Matched pros</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/70">When you opt in, we use the brief to line up 2–3 local pros who can quote from the same scope.</p>
             </div>
           </div>
         </div>
@@ -191,12 +184,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#f8f9fc] py-16 sm:py-20">
+      <section id="how-it-works" className="bg-[#f8f9fc] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">How it works</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Built for the moment before the contractor call.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">naili helps homeowners show up informed, specific, and a lot harder to overcharge.</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Built for the jump from planning to matched pros.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">naili helps homeowners show up informed, specific, and much harder to jerk around, then uses that work to create a warmer lead for the right contractor.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {HOW_IT_WORKS.map((item) => (
@@ -219,9 +212,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Example outcomes</p>
-              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">From unclear project to clear direction.</h2>
-              <p className="mt-3 text-lg leading-relaxed text-slate-600">Every result should feel like naili looked at your actual space, not a generic category template.</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Why the brief matters</p>
+              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">From unclear project to quote-ready scope.</h2>
+              <p className="mt-3 text-lg leading-relaxed text-slate-600">The faster you get from fuzzy idea to shared scope, the better every contractor conversation gets.</p>
             </div>
             <Link href="/vision/start" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
               Start a project now <ArrowRight className="h-4 w-4" />
@@ -255,7 +248,7 @@ export default function HomePage() {
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Project types</p>
             <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start with the project you actually have.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">From kitchen refreshes to outdoor work, naili is designed to turn homeowner uncertainty into a clearer plan.</p>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">From kitchen refreshes to outdoor work, naili is designed to turn homeowner uncertainty into a clearer plan and a better contractor handoff.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {PROJECT_TYPES.map((type) => (
@@ -275,8 +268,8 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1fr_0.95fr] lg:items-center lg:px-8">
           <div className="max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">naili shield</p>
-            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">Hire with confidence, not anxiety.</h2>
-            <p className="mt-4 text-lg leading-relaxed text-white/74">Verify contractor licenses, scan quotes, review risky contract language, and slow bad decisions down before deposits or signatures happen.</p>
+            <h2 className="mt-3 text-3xl font-bold sm:text-4xl">Still verify before you hire.</h2>
+            <p className="mt-4 text-lg leading-relaxed text-white/74">Matching helps you start cleaner. Shield helps you stay careful. Verify contractor licenses, scan quotes, review risky contract language, and slow bad decisions down before deposits or signatures happen.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/shield" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d0d1a] transition-colors hover:bg-slate-100">
                 Explore shield <ArrowRight className="h-4 w-4" />
@@ -307,20 +300,24 @@ export default function HomePage() {
       </section>
 
       <section className="bg-white py-16 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Most searched questions</p>
-              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">The cost-guide engine that grows with the product.</h2>
-              <p className="mt-3 text-lg leading-relaxed text-slate-600">naili is building a library of cost guides, planning advice, and homeowner answers that bring people in before they even upload a photo.</p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {SEO_TOPICS.map((topic) => (
-                <div key={topic} className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-5">
-                  <div className="text-sm font-semibold text-[#0d0d1a]">{topic}</div>
-                  <p className="mt-2 text-sm text-slate-600">Coming into the naili cost guide library.</p>
-                </div>
-              ))}
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:px-8">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">For contractors</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Free homeowner leads, already scoped.</h2>
+            <p className="mt-3 max-w-2xl text-lg leading-relaxed text-slate-600">
+              If you are a contractor, naili can send warm homeowner leads with the brief already written. To receive those leads automatically and respond fast, sign up for Prybar.
+            </p>
+          </div>
+          <div className="rounded-[2rem] border border-slate-200 bg-[#f8f9fc] p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+            <h3 className="text-xl font-bold text-[#0d0d1a]">See how Naili + Prybar works</h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">One page, no fluff. If you just got offered a lead and want to know what Prybar has to do with it, this is the place to start.</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/for-contractors" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95">
+                For contractors <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link href="https://prybar.ai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">
+                Visit prybar.ai
+              </Link>
             </div>
           </div>
         </div>
@@ -330,13 +327,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl text-center mx-auto">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Pricing</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start free, upgrade when you want the full playbook.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start free, upgrade only if you want more planning depth.</h2>
           </div>
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">naili free</p>
               <h3 className="mt-3 text-3xl font-bold text-[#0d0d1a]">$0</h3>
-              <p className="mt-2 text-slate-600">Enough to test the planning flow and see the product in action.</p>
+              <p className="mt-2 text-slate-600">Enough to test the planning flow, build a brief, and request matching when you are ready.</p>
               <ul className="mt-6 space-y-3 text-sm text-slate-700">
                 {FREE_FEATURES.map((feature) => (
                   <li key={feature} className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#7ccf43]" />{feature}</li>
@@ -346,7 +343,7 @@ export default function HomePage() {
             <div className="rounded-[2rem] border border-[#d7f4ff] bg-[linear-gradient(135deg,rgba(31,124,247,0.08),rgba(72,199,241,0.08))] p-8 shadow-[0_16px_44px_rgba(72,199,241,0.14)]">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#0f5fc6]">naili pro</p>
               <h3 className="mt-3 text-3xl font-bold text-[#0d0d1a]">$19<span className="text-lg text-slate-500">/month</span></h3>
-              <p className="mt-2 text-slate-700">For homeowners who want the full estimate, materials, shield, and project history stack.</p>
+              <p className="mt-2 text-slate-700">For homeowners who want more project history, deeper estimate detail, and full Shield access.</p>
               <ul className="mt-6 space-y-3 text-sm text-slate-700">
                 {PRO_FEATURES.map((feature) => (
                   <li key={feature} className="flex items-start gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#1f7cf7]" />{feature}</li>

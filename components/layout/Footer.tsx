@@ -5,6 +5,7 @@ import Logo from '@/components/brand/Logo';
 const PRODUCT_LINKS = [
   { href: '/vision', label: 'naili vision' },
   { href: '/shield', label: 'naili shield' },
+  { href: '/for-contractors', label: 'For contractors' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
 
@@ -17,7 +18,7 @@ const GET_STARTED_LINKS = [
 const LEARN_LINKS = [
   { href: '/vision', label: 'How Vision works' },
   { href: '/shield', label: 'How Shield works' },
-  { href: '/', label: 'Pricing' },
+  { href: '/for-contractors', label: 'How leads work for contractors' },
 ];
 
 export default function Footer() {
@@ -28,7 +29,7 @@ export default function Footer() {
           <div>
             <Logo theme="dark" showTagline className="mb-4 gap-2.5" markClassName="h-9 w-10" wordmarkClassName="text-[1.65rem]" taglineClassName="text-slate-400" />
             <p className="max-w-md text-sm leading-relaxed text-slate-400">
-              naili helps homeowners plan, estimate, vet, and hire with more confidence before any contractor shows up.
+              naili helps homeowners price a project, build a cleaner brief, and get matched to local pros before the contractor chase starts.
             </p>
             <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300">
               Nail the vision. Know the cost.

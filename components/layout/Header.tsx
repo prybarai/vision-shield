@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Camera, LayoutGrid, Menu, Shield, X } from 'lucide-react';
+import { BriefcaseBusiness, Camera, LayoutGrid, Menu, Shield, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Logo from '@/components/brand/Logo';
@@ -35,6 +35,7 @@ export default function Header() {
   const navLinks = [
     { href: '/vision', label: 'Vision', icon: Camera },
     { href: '/shield', label: 'Shield', icon: Shield },
+    { href: '/for-contractors', label: 'For contractors', icon: BriefcaseBusiness },
     { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
   ];
 
