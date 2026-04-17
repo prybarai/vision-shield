@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { parseClaudeJSON } from '@/lib/anthropic';
-import { buildEstimationPrompt } from '@/lib/prompts';
 import { getEstimatorFloor, getScopeMids } from '@/lib/pricing';
+import { getRegionalPricingContext } from '@/lib/regionalPricing';
 import { buildAnalysisSummary, describeAnalysisFacts, FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
@@ -35,6 +34,7 @@ interface EstimateResult {
   risk_notes: string[];
   estimate_basis: string;
   regional_notes?: string;
+  region_multiplier?: number;
   estimate_breakdown?: EstimateBreakdown;
 }
 
@@ -86,35 +86,66 @@ function applyEstimateGuardrails(category: string, result: EstimateResult): Esti
   };
 }
 
+function normalizeEstimateResult(result: EstimateResult): EstimateResult {
+  const mid = Math.max(roundToHundred(result.mid_estimate), 100);
+  const low = Math.max(Math.min(roundToHundred(result.low_estimate), roundToHundred(mid * 0.93)), 100);
+  const high = Math.max(roundToHundred(result.high_estimate), roundToHundred(mid * 1.08));
+
+  return {
+    ...result,
+    low_estimate: Math.max(100, Math.min(low, mid - 100)),
+    mid_estimate: mid,
+    high_estimate: Math.max(high, mid + 100),
+    assumptions: Array.from(new Set(result.assumptions)).slice(0, 8),
+    risk_notes: Array.from(new Set(result.risk_notes)).slice(0, 5),
+  };
+}
+
 function getZipMultiplier(zip: string): number {
-  const firstDigit = zip.trim()[0];
-
-  if (firstDigit === '9' || firstDigit === '0') return 1.2;
-  if (firstDigit === '1') return 1.08;
-  if (firstDigit === '6' || firstDigit === '7') return 0.95;
-  return 1.0;
+  return getRegionalPricingContext(zip).multiplier;
 }
 
-function getRegionalNotes(zip: string, multiplier: number) {
-  if (multiplier > 1) {
-    return `ZIP ${zip} uses an above-average labor and material multiplier of ${multiplier.toFixed(2)}.`;
-  }
-
-  if (multiplier < 1) {
-    return `ZIP ${zip} uses a slightly below-average labor and material multiplier of ${multiplier.toFixed(2)}.`;
-  }
-
-  return `ZIP ${zip} uses a baseline regional multiplier of ${multiplier.toFixed(2)}.`;
+function getRegionalNotes(zip: string, _multiplier: number) {
+  void _multiplier;
+  return getRegionalPricingContext(zip).notes;
 }
 
-function getQualityMultiplier(qualityTier: string) {
-  const multipliers: Record<string, number> = {
-    budget: 0.85,
-    mid: 1.0,
-    premium: 1.35,
+function getQualityMultiplier(qualityTier: string, category?: string) {
+  const categoryGroup = category === 'bathroom' || category === 'kitchen'
+    ? 'remodel'
+    : category === 'roofing' || category === 'deck_patio' || category === 'landscaping'
+      ? 'exterior'
+      : category === 'interior_paint' || category === 'flooring' || category === 'exterior_paint'
+        ? 'finish'
+        : 'default';
+
+  const multipliers: Record<string, Record<string, number>> = {
+    remodel: { budget: 0.9, mid: 1.0, premium: 1.22 },
+    exterior: { budget: 0.92, mid: 1.0, premium: 1.18 },
+    finish: { budget: 0.94, mid: 1.0, premium: 1.14 },
+    default: { budget: 0.9, mid: 1.0, premium: 1.18 },
   };
 
-  return multipliers[qualityTier] ?? 1.0;
+  return multipliers[categoryGroup][qualityTier] ?? 1.0;
+}
+
+function inferScopeMultiplierFromNotes(category: string, notes?: string) {
+  const text = (notes || '').toLowerCase();
+  if (!text) return 1;
+
+  if (/(gut|full remodel|full renovation|layout change|move plumbing|structural|addition|custom)/.test(text)) {
+    return category === 'kitchen' || category === 'bathroom' ? 1.35 : 1.2;
+  }
+
+  if (/(repair|patch|touch up|small area|partial|single room|cosmetic|refresh|paint only)/.test(text)) {
+    return category === 'kitchen' || category === 'bathroom' ? 0.8 : 0.85;
+  }
+
+  if (/(premium|high end|luxury|custom cabinets|designer|stone|tile shower|metal roof|composite)/.test(text)) {
+    return 1.12;
+  }
+
+  return 1;
 }
 
 function areaBucketMultiplier(bucket: AreaBucket, low = 0.85, high = 1.15) {
@@ -492,7 +523,7 @@ function estimateBathroom(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
   const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.16 : analysis?.current_condition === 'poor' ? 1.1 : analysis?.current_condition === 'dated' ? 1.05 : 1.0;
   const zipMultiplier = getZipMultiplier(zip);
   const scopeMid = baseMidByScope[scopeLevel] ?? baseMidByScope.mid_refresh ?? 22000;
-  const mid = scopeMid * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
+  const mid = scopeMid * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier, 'bathroom') * conditionMultiplier * zipMultiplier;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.24 : 0.2);
   const breakdown = buildEstimateBreakdown(range, 0.62);
   const assumptions = [
@@ -524,7 +555,7 @@ function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
   const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.18 : analysis?.current_condition === 'poor' ? 1.12 : analysis?.current_condition === 'dated' ? 1.06 : 1.0;
   const zipMultiplier = getZipMultiplier(zip);
   const scopeMid = baseMidByScope[scopeLevel] ?? baseMidByScope.mid_refresh ?? 42500;
-  const mid = scopeMid * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
+  const mid = scopeMid * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier, 'kitchen') * conditionMultiplier * zipMultiplier;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.22 : 0.18);
   const breakdown = buildEstimateBreakdown(range, 0.58);
   const assumptions = [
@@ -603,7 +634,7 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
   const hardscapeAdder = hardscapeAdders[hardscapeScope]?.[yardSize] ?? 0;
   const systemsAdder = systemsAdders[irrigationLighting]?.[yardSize] ?? 0;
   const zipMultiplier = getZipMultiplier(zip);
-  const qualityMultiplier = getQualityMultiplier(qualityTier);
+  const qualityMultiplier = getQualityMultiplier(qualityTier, 'landscaping');
   const complexity = analysis?.complexity ?? 'moderate';
   const accessMultiplier = analysis?.scope_signals.access_difficulty === 'difficult'
     ? 1.08
@@ -933,8 +964,7 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
 
   const baseMidBySize: Record<string, number> = { small: 3500, medium: 9000, large: 18000 };
   const complexityMultiplier: Record<string, number> = { simple: 1.0, moderate: 1.25, complex: 1.6 };
-  const qualityMultiplier = getQualityMultiplier(qualityTier);
-  const mid = (baseMidBySize[sizeBucket] ?? 9000) * (complexityMultiplier[complexity] ?? 1.25) * qualityMultiplier * zipMultiplier;
+  const mid = (baseMidBySize[sizeBucket] ?? 9000) * (complexityMultiplier[complexity] ?? 1.25) * getQualityMultiplier(qualityTier, 'custom_project') * zipMultiplier;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.26 : 0.22);
   const breakdown = buildEstimateBreakdown(range, 0.68);
   const assumptions = [
@@ -963,22 +993,23 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
 
 function fallbackEstimate(category: string, qualityTier: string, zip: string, notes?: string): EstimateResult {
   const baseMid: Record<string, number> = {
-    roofing: 16000,
-    exterior_paint: 7000,
-    deck_patio: 18000,
+    roofing: 14000,
+    exterior_paint: 6500,
+    deck_patio: 13000,
     landscaping: 10000,
-    kitchen: 35000,
-    bathroom: 18000,
-    flooring: 8000,
-    interior_paint: 4500,
+    kitchen: getScopeMids('kitchen').mid_refresh ?? 42500,
+    bathroom: getScopeMids('bathroom').mid_refresh ?? 22000,
+    flooring: 7000,
+    interior_paint: 3500,
     custom_project: 9000,
   };
 
   let mid = baseMid[category] ?? 15000;
   const zipMultiplier = getZipMultiplier(zip);
+  const scopeMultiplier = inferScopeMultiplierFromNotes(category, notes);
 
-  if (qualityTier === 'budget') mid *= 0.75;
-  if (qualityTier === 'premium') mid *= 1.45;
+  mid *= getQualityMultiplier(qualityTier, category);
+  mid *= scopeMultiplier;
   mid *= zipMultiplier;
 
   const range = buildRange(mid, 0.22);
@@ -1007,8 +1038,9 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
       'Hidden damage, code upgrades, or site conditions can increase costs',
       'Final contractor pricing may vary based on measurements and material selections',
     ],
-    estimate_basis: 'Fallback planning estimate based on project category benchmarks, quality tier, and ZIP-based regional adjustment.',
+    estimate_basis: 'Deterministic planning estimate based on category benchmarks, homeowner notes, calibrated finish tier, and region-aware ZIP pricing.',
     regional_notes: getRegionalNotes(zip, zipMultiplier),
+    region_multiplier: zipMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -1050,22 +1082,7 @@ export async function POST(req: NextRequest) {
     let result = estimateDeterministically(params.category, params.scope_answers, params.quality_tier, params.zip_code, analysis, params.notes);
 
     if (!result) {
-      try {
-        const { system, user } = buildEstimationPrompt({
-          category: params.category,
-          locationType: params.location_type,
-          style: params.style,
-          qualityTier: params.quality_tier,
-          zipCode: params.zip_code,
-          notes: params.notes,
-          scopeAnswers: params.scope_answers,
-          analysis,
-        });
-        result = await parseClaudeJSON<EstimateResult>(system, user);
-      } catch (aiError) {
-        console.error('estimate ai fallback:', aiError);
-        result = fallbackEstimate(params.category, params.quality_tier, params.zip_code, params.notes);
-      }
+      result = fallbackEstimate(params.category, params.quality_tier, params.zip_code, params.notes);
     }
 
     if (analysis) {
@@ -1074,6 +1091,7 @@ export async function POST(req: NextRequest) {
     }
 
     result = applyEstimateGuardrails(params.category, result);
+    result = normalizeEstimateResult(result);
 
     const { data, error } = await supabaseAdmin
       .from('estimates')
@@ -1085,6 +1103,7 @@ export async function POST(req: NextRequest) {
         assumptions: result.assumptions,
         risk_notes: result.risk_notes,
         estimate_basis: result.estimate_basis,
+        region_multiplier: result.region_multiplier ?? getRegionalPricingContext(params.zip_code).multiplier,
       })
       .select()
       .single();
