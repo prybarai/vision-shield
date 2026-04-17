@@ -73,7 +73,7 @@ export default function ConnectPage({ params }: PageProps) {
       const res = await fetch('/api/leads/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, project_id, source: 'prybar_vision', defer_routing: true }),
+        body: JSON.stringify({ ...form, project_id, source: 'prybar_vision' }),
       });
 
       const data = await res.json().catch(() => ({} as SubmitResponse));

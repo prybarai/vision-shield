@@ -102,6 +102,9 @@ export interface Lead {
   assigned_contractor?: string;
   admin_notes?: string;
   source?: string;
+  prybar_routed_at?: string;
+  outbound_ready_at?: string;
+  last_routing_error?: string;
   notes?: string;
   status: LeadStatus;
   created_at: string;

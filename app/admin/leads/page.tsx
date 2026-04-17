@@ -217,6 +217,9 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
                         <div>{hasEstimate ? formatCurrencyRange(lead.estimate_low!, lead.estimate_high!) : 'Estimate not stored yet'}</div>
                         <div>{photoUrls.length} photo{photoUrls.length === 1 ? '' : 's'} attached</div>
                         <div>Source: {lead.source || 'naili'}</div>
+                        {lead.assigned_contractor && <div>Prybar match: {lead.assigned_contractor}</div>}
+                        {lead.outbound_ready_at && <div>Outbound if no response by: {new Date(lead.outbound_ready_at).toLocaleString()}</div>}
+                        {lead.last_routing_error && <div className="text-amber-700">Routing note: {lead.last_routing_error}</div>}
                       </div>
                     </div>
                   </div>
@@ -269,4 +272,3 @@ export default async function AdminLeadsPage({ searchParams }: { searchParams?: 
     </div>
   );
 }
-

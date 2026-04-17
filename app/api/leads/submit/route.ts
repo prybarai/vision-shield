@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { dispatchLeadToPrybarCore } from '@/lib/prybar-core';
+import { findPrybarRoutingMatch } from '@/lib/leadRouting';
 
 const schema = z.object({
   project_id: z.string().uuid().optional(),
@@ -92,18 +93,29 @@ export async function POST(req: NextRequest) {
       await supabaseAdmin.from('projects').update({ status: 'lead_submitted' }).eq('id', params.project_id);
     }
 
-    const webhookConfigured = Boolean(process.env.PRYBAR_CORE_WEBHOOK_URL);
-    const readyForDispatch = Boolean(project && estimate);
-    let dispatchAttempted = false;
-    let dispatchSucceeded = false;
     const routingDeferred = Boolean(params.defer_routing);
 
-    if (!routingDeferred && webhookConfigured && readyForDispatch) {
+    const webhookConfigured = Boolean(process.env.PRYBAR_CORE_WEBHOOK_URL);
+    const readyForDispatch = Boolean(project && estimate);
+    const routeMatch = project?.project_category
+      ? findPrybarRoutingMatch(params.zip_code, String(project.project_category))
+      : null;
+    const routedAt = new Date();
+    const outboundReadyAt = new Date(routedAt.getTime() + 24 * 60 * 60 * 1000);
+
+    let dispatchAttempted = false;
+    let dispatchSucceeded = false;
+    let leadStatus = 'new';
+    const assignedContractor = !routingDeferred && routeMatch?.contractorName ? routeMatch.contractorName : null;
+    let lastRoutingError: string | null = null;
+    let adminNotes = typeof lead.admin_notes === 'string' ? String(lead.admin_notes) : '';
+
+    if (!routingDeferred && routeMatch && webhookConfigured && readyForDispatch) {
       dispatchAttempted = true;
       dispatchSucceeded = await dispatchLeadToPrybarCore({
         source,
         lead_id: String(lead.id),
-        created_at: new Date().toISOString(),
+        created_at: routedAt.toISOString(),
         homeowner: {
           first_name: params.first_name,
           last_name: params.last_name,
@@ -143,9 +155,76 @@ export async function POST(req: NextRequest) {
           service_categories: [String(project?.project_category || 'general_home_improvement')],
         },
       });
+
+      if (dispatchSucceeded) {
+        leadStatus = 'routed_to_prybar';
+        adminNotes = [adminNotes, `Auto-routed to Prybar for ${routeMatch.contractorName} on ${routedAt.toISOString()}. Escalate to outbound if no response is recorded within 24 hours.`]
+          .filter(Boolean)
+          .join('\n\n');
+      } else {
+        leadStatus = 'outbound';
+        lastRoutingError = 'Matched Prybar coverage, but webhook dispatch did not succeed.';
+        adminNotes = [adminNotes, `Matched Prybar coverage for ${routeMatch.contractorName}, but dispatch failed on ${routedAt.toISOString()}. Moved to outbound queue.`]
+          .filter(Boolean)
+          .join('\n\n');
+      }
+    } else if (!routingDeferred && routeMatch && !webhookConfigured) {
+      lastRoutingError = 'Matched Prybar coverage, but PRYBAR_CORE_WEBHOOK_URL is not configured.';
+      adminNotes = [adminNotes, `Matched Prybar coverage for ${routeMatch.contractorName}, but Prybar webhook routing is not configured yet.`]
+        .filter(Boolean)
+        .join('\n\n');
+    } else if (!routingDeferred && routeMatch && !readyForDispatch) {
+      lastRoutingError = 'Matched Prybar coverage, but the project context was incomplete for dispatch.';
+      adminNotes = [adminNotes, `Matched Prybar coverage for ${routeMatch.contractorName}, but project data was incomplete, so the lead stayed in the queue.`]
+        .filter(Boolean)
+        .join('\n\n');
+    } else if (!routingDeferred && !routeMatch) {
+      leadStatus = 'outbound';
+      adminNotes = [adminNotes, `No Prybar coverage rule matched ZIP ${params.zip_code} and trade ${project?.project_category ? String(project.project_category) : 'unknown'}, so the lead moved to outbound.`]
+        .filter(Boolean)
+        .join('\n\n');
     }
 
-    if (!routingDeferred && !webhookConfigured) {
+    const leadUpdates: Record<string, unknown> = {
+      status: leadStatus,
+      assigned_contractor: assignedContractor,
+      admin_notes: adminNotes || null,
+      last_routing_error: lastRoutingError,
+      updated_at: routedAt.toISOString(),
+    };
+
+    if (leadStatus === 'routed_to_prybar') {
+      leadUpdates.prybar_routed_at = routedAt.toISOString();
+      leadUpdates.outbound_ready_at = outboundReadyAt.toISOString();
+    } else if (leadStatus === 'outbound') {
+      leadUpdates.outbound_ready_at = null;
+    }
+
+    let { error: leadUpdateError } = await supabaseAdmin
+      .from('leads')
+      .update(leadUpdates)
+      .eq('id', String(lead.id));
+
+    if (leadUpdateError) {
+      const legacyStatus = leadStatus === 'routed_to_prybar'
+        ? 'sent'
+        : leadStatus === 'outbound'
+        ? 'new'
+        : leadStatus;
+
+      const legacyUpdate = await supabaseAdmin
+        .from('leads')
+        .update({ status: legacyStatus, updated_at: routedAt.toISOString() })
+        .eq('id', String(lead.id));
+
+      leadUpdateError = legacyUpdate.error || null;
+
+      if (leadUpdateError) {
+        console.warn('lead update after routing failed', leadUpdateError);
+      }
+    }
+
+    if (!routingDeferred && routeMatch && !webhookConfigured) {
       console.info('Lead saved without webhook dispatch because PRYBAR_CORE_WEBHOOK_URL is unset.', {
         lead_id: String(lead.id),
         source,
@@ -157,6 +236,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       lead,
+      routing: {
+        status: leadStatus,
+        matched_contractor: routeMatch?.contractorName || null,
+        last_error: lastRoutingError,
+        outbound_ready_at: leadStatus === 'routed_to_prybar' ? outboundReadyAt.toISOString() : null,
+      },
       dispatch: {
         webhook_configured: webhookConfigured,
         attempted: dispatchAttempted,
@@ -164,21 +249,25 @@ export async function POST(req: NextRequest) {
         pending_dispatch: !dispatchSucceeded,
         mode: routingDeferred
           ? 'saved_only'
+          : leadStatus === 'routed_to_prybar'
+          ? 'dispatched'
+          : routeMatch && !dispatchSucceeded
+          ? 'dispatch_pending'
           : !webhookConfigured
           ? 'saved_only'
-          : readyForDispatch && dispatchSucceeded
-          ? 'dispatched'
-          : readyForDispatch
-          ? 'dispatch_pending'
           : 'saved_only',
         message: routingDeferred
           ? 'Thanks, you’re in. We’ll review your brief and reach out within 24 hours with 2–3 pros who want to quote this project.'
-          : !webhookConfigured
-          ? 'Lead saved. Contractor routing is not configured yet, so no outreach was triggered.'
-          : readyForDispatch && dispatchSucceeded
-          ? 'Lead saved and sent for contractor routing.'
-          : readyForDispatch
-          ? 'Lead saved, but contractor routing did not complete yet.'
+          : leadStatus === 'routed_to_prybar'
+          ? `Lead saved and routed to Prybar for ${routeMatch?.contractorName || 'a matched contractor'}.`
+          : leadStatus === 'outbound' && routeMatch
+          ? `Lead saved. ${routeMatch.contractorName} matched in Prybar, but routing did not complete, so the lead moved to outbound.`
+          : leadStatus === 'outbound'
+          ? 'Lead saved and moved to the outbound queue because no Prybar route is available right now.'
+          : routeMatch && !webhookConfigured
+          ? 'Lead saved. Prybar coverage matched, but webhook routing is not configured yet.'
+          : routeMatch && !readyForDispatch
+          ? 'Lead saved. Prybar coverage matched, but project data was not ready for dispatch yet.'
           : 'Lead saved. Contractor routing will happen once the rest of the project data is ready.',
       },
     });
