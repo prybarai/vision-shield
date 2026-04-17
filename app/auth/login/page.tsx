@@ -49,7 +49,7 @@ export default function LoginPage() {
             <h2 className="text-2xl font-bold text-[#0d0d1a] mb-2">Check your email</h2>
             <p className="text-slate-500 leading-relaxed">We sent a magic link to <strong>{email}</strong>. Open it on this device to jump into your dashboard.</p>
             <Link href="/vision/start" className="mt-6 inline-flex text-sm font-medium text-[#48c7f1] hover:text-[#1f7cf7]">
-              Start a new project while you wait
+              Upload a project photo while you wait
             </Link>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
             <Logo theme="dark" className="mb-4" markClassName="h-12 w-[3.25rem]" taglineClassName="text-slate-300" />
             <h1 className="text-3xl font-bold mb-3">Welcome back to naili</h1>
             <p className="text-white/74 leading-relaxed mb-6">
-              Reopen saved projects, review estimates, and move into contractor vetting only when you&apos;re ready.
+              Reopen saved projects, review estimates, and step back into contractor decisions without losing your place.
             </p>
             <div className="space-y-3 text-sm text-white/78">
               <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#a8eb57]" /><span>Vision results stay organized in one place.</span></div>
@@ -119,7 +119,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center text-sm text-slate-500">
             Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="font-medium text-[#48c7f1] hover:text-[#1f7cf7]">Sign up free</Link>
+            <Link href="/auth/signup" className="font-medium text-[#48c7f1] hover:text-[#1f7cf7]">Create an account</Link>
           </div>
         </div>
       </div>

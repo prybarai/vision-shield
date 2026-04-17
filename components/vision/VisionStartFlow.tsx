@@ -769,7 +769,7 @@ export default function VisionStartFlow() {
             {error && <div className="mt-4 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm">{error}</div>}
 
             <Button className="w-full mt-6" size="lg" onClick={handleEntryNext} disabled={!uploadedFile || !zipCode.trim()}>
-              Continue
+              Use this photo
             </Button>
           </Card>
 

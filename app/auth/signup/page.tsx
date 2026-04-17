@@ -42,7 +42,7 @@ export default function SignupPage() {
             <h2 className="text-2xl font-bold text-[#0d0d1a] mb-2">Check your email</h2>
             <p className="text-slate-500 leading-relaxed">We sent a confirmation link to <strong>{email}</strong>. Once you confirm, your dashboard will be ready.</p>
             <Link href="/vision/start" className="mt-6 inline-block text-sm font-medium text-[#48c7f1] hover:text-[#1f7cf7]">
-              Start a project while you wait
+              Upload a project photo while you wait
             </Link>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function SignupPage() {
           <Logo className="mb-4" markClassName="h-12 w-[3.25rem]" />
           <h1 className="text-3xl font-bold text-[#0d0d1a] mb-3">Create your naili account</h1>
           <p className="text-slate-600 leading-relaxed mb-6">
-            Save projects, reopen estimates, and keep your planning and contractor trust tools in one place.
+            Save projects, reopen estimates, and keep your planning and contractor checks in one place.
           </p>
           <div className="space-y-3 text-sm text-slate-600">
             <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#48c7f1]" /><span>Free to start, no credit card required.</span></div>

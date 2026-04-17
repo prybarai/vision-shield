@@ -115,7 +115,7 @@ export default async function SharePage({ params }: PageProps) {
           href="/vision/start"
           className="inline-flex items-center gap-2 bg-white text-[#1f7cf7] hover:bg-[#eef8ff] font-semibold px-8 py-3 rounded-xl transition-colors"
         >
-          Start my project
+          Upload my project photo
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

@@ -24,22 +24,25 @@ export default function ShieldPage() {
       href: '/shield/check',
       icon: Search,
       title: 'Check a contractor',
-      desc: 'Verify license status, combine it with trust signals, and get a calmer risk read before sending money.',
+      desc: 'Catch things like an expired license, the wrong business name, or missing state records before you send a deposit.',
       eyebrow: 'Before you hire',
+      cta: 'Check licenses',
     },
     {
       href: '/shield/scan',
       icon: FileText,
       title: 'Scan a quote or contract',
-      desc: 'Catch vague scope, aggressive payment terms, and missing protections before you sign.',
+      desc: 'Flag vague scope, front-loaded payment schedules, and thin warranty language before you sign.',
       eyebrow: 'Before you sign',
+      cta: 'Scan a quote',
     },
     {
       href: '/shield/rescue',
       icon: LifeBuoy,
       title: 'Get dispute help',
-      desc: 'Generate practical drafts and organize your next steps if a project has already gone sideways.',
+      desc: 'Draft the next email, demand letter, or complaint summary when a job stalls out or the contractor disappears.',
       eyebrow: 'If things go wrong',
+      cta: 'Get next steps',
     },
   ];
 
@@ -68,7 +71,7 @@ export default function ShieldPage() {
               href="/connect"
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
             >
-              Find vetted contractors
+              Request vetted options
             </Link>
           </div>
         </div>
@@ -89,7 +92,7 @@ export default function ShieldPage() {
               <h2 className="text-xl font-bold text-[#0d0d1a] transition-colors group-hover:text-[#48c7f1]">{tool.title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-600 mb-5">{tool.desc}</p>
               <div className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1]">
-                Open tool
+                {tool.cta}
                 <ArrowRight className="h-4 w-4" />
               </div>
             </Link>

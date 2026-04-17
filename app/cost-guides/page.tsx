@@ -27,7 +27,7 @@ export default function CostGuidesIndexPage() {
           </p>
           <div className="mt-8">
             <Link href="/vision/start" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100">
-              Start my project <ArrowRight className="h-4 w-4" />
+              Upload my project photo <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>

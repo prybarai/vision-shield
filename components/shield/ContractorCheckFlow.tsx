@@ -450,7 +450,7 @@ export default function ContractorCheckFlow() {
               Scan their quote next
             </Link>
             <Link href="/connect" className="inline-flex items-center justify-center rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
-              Find vetted contractors
+              Request vetted options
             </Link>
           </div>
         </Card>

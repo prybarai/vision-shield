@@ -7,17 +7,17 @@ const FEATURES = [
   {
     icon: Sparkles,
     title: 'Photo-aware concept direction',
-    desc: 'naili reads the actual photo and your request before it generates inspiration, instead of relying on category defaults alone.',
+    desc: 'See concept directions shaped by the room you actually uploaded, not a generic category prompt.',
   },
   {
     icon: DollarSign,
     title: 'Smart cost range',
-    desc: 'Get low, mid, and high planning ranges shaped by visible condition, likely scope, ZIP code, and finish tier.',
+    desc: 'Get a planning range shaped by visible condition, ZIP code, scope, and finish level.',
   },
   {
     icon: FileText,
     title: 'Contractor-ready brief',
-    desc: 'Walk into quote conversations with scope notes, material direction, and better questions already in hand.',
+    desc: 'Leave with scope notes, materials direction, and contractor questions you can actually use.',
   },
 ];
 
@@ -56,7 +56,7 @@ export default function VisionPage() {
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
             >
               <Camera className="h-5 w-5" />
-              Nail my project
+              Upload my project photo
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link

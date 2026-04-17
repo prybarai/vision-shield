@@ -185,7 +185,7 @@ export default function ConnectPage() {
 
         {error && <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">{error}</div>}
 
-        <Button type="submit" className="w-full" size="lg" loading={loading}>Save request</Button>
+        <Button type="submit" className="w-full" size="lg" loading={loading}>Request vetted options</Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
           If contractor routing is not configured yet, naili still saves your request without sending your details anywhere.

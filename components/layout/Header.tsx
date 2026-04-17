@@ -81,7 +81,7 @@ export default function Header() {
               href="/vision/start"
               className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95"
             >
-              {signedIn ? 'New project' : 'Start free'}
+              {signedIn ? 'Start new project' : 'Upload a photo'}
             </Link>
           </div>
 
@@ -120,7 +120,7 @@ export default function Header() {
               {signedIn ? 'Go to dashboard' : 'Sign in'}
             </Link>
             <Link href="/vision/start" onClick={closeMenu} className="rounded-2xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-4 py-3 text-center text-sm font-semibold text-white shadow-[0_12px_30px_rgba(31,124,247,0.24)]">
-              {signedIn ? 'Start new project' : 'Start free'}
+              {signedIn ? 'Start new project' : 'Upload a photo'}
             </Link>
           </div>
         </div>

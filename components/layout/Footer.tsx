@@ -10,7 +10,7 @@ const PRODUCT_LINKS = [
 ];
 
 const GET_STARTED_LINKS = [
-  { href: '/vision/start', label: 'Nail my project' },
+  { href: '/vision/start', label: 'Upload a project photo' },
   { href: '/auth/signup', label: 'Create account' },
   { href: '/auth/login', label: 'Sign in' },
 ];
@@ -66,7 +66,7 @@ export default function Footer() {
         </div>
 
         <div className="space-y-4 border-t border-white/10 pt-6">
-          <p className="text-xs leading-relaxed text-slate-500">{DISCLAIMERS.global_footer}</p>
+          <p className="max-w-4xl text-[11px] leading-relaxed text-slate-500">{DISCLAIMERS.global_footer}</p>
           <div className="flex flex-col gap-3 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
             <p>© 2026 naili. All rights reserved.</p>
             <Link

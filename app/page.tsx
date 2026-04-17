@@ -108,12 +108,12 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  'Unlimited Vision projects',
-  'Full estimate breakdown',
-  'Detailed materials list',
-  'PDF brief download',
-  'Unlimited Shield tools',
-  'Priority support',
+  'Keep every project, brief, and estimate in one place',
+  'See the full estimate breakdown, not just the topline range',
+  'Get the complete materials list and planning detail',
+  'Download a shareable PDF brief for contractor conversations',
+  'Run Shield checks and quote scans as often as you need',
+  'Get help faster when a project needs a closer look',
 ];
 
 const HOME_FAQS = [
@@ -202,7 +202,7 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
               >
                 <Camera className="h-5 w-5" />
-                Start my project
+                Upload my project photo
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
@@ -325,8 +325,8 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Project types</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start with the project you actually have.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">From kitchen refreshes to outdoor work, naili is designed to turn homeowner uncertainty into a clearer plan and a better contractor handoff.</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Pick the closest job type and keep moving.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">Kitchen, bath, paint, outdoor, or something custom. naili uses that choice to frame the first pass faster.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {PROJECT_TYPES.map((type) => (
@@ -476,7 +476,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl text-center mx-auto">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Pricing</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start free, upgrade only if you want more planning depth.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start with a photo, upgrade only if you want more planning depth.</h2>
           </div>
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
@@ -492,7 +492,7 @@ export default function HomePage() {
                 href="/vision/start"
                 className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95"
               >
-                Start free
+                Upload my project photo
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -533,7 +533,7 @@ export default function HomePage() {
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100"
               >
                 <Camera className="h-5 w-5" />
-                Start my project
+                Upload my project photo
               </Link>
               <Link
                 href="/shield"

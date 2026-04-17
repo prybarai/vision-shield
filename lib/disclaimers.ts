@@ -12,5 +12,5 @@ export const DISCLAIMERS = {
   not_for_employment:
     'naili is not a Consumer Reporting Agency. This tool is intended for personal home improvement decisions only and is not intended for use in employment decisions, tenant screening, or credit determinations.',
   global_footer:
-    'naili provides general consumer information tools. We are not a law firm, licensed contractor, or government agency. Information provided may be inaccurate, incomplete, or out of date. Your use of this app does not create any professional relationship.',
+    'General information only. naili is not a law firm, licensed contractor, or government agency, and important details should be verified independently before you hire, sign, or pay.',
 } as const;

@@ -125,7 +125,7 @@ export default async function CostGuideDetailPage({ params }: { params: Promise<
               </p>
               <div className="mt-6">
                 <Link href="/vision/start" className="inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95">
-                  Start my project <ArrowRight className="h-4 w-4" />
+                  Upload my project photo <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </section>
@@ -171,7 +171,7 @@ export default async function CostGuideDetailPage({ params }: { params: Promise<
               <p className="mt-3 text-sm leading-relaxed text-slate-600">Upload a photo, get a planning-grade estimate, and turn this broad guide into a real brief.</p>
               <div className="mt-5">
                 <Link href="/vision/start" className="inline-flex items-center gap-2 text-sm font-semibold text-[#1f7cf7] hover:text-[#0f5fc6]">
-                  Start my project <ArrowRight className="h-4 w-4" />
+                  Upload my project photo <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>

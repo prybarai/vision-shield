@@ -171,7 +171,7 @@ export default function ShieldRescuePage() {
           </div>
           <p className="text-sm text-slate-300 mb-4 leading-relaxed">Keep your timeline, receipts, screenshots, and contract together. If you move forward with someone new, start fresh with a cleaner vetting path.</p>
           <Link href="/connect" className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors">
-            Find vetted contractors
+            Request vetted options
           </Link>
         </Card>
 
