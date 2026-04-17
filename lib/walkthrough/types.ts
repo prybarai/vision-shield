@@ -112,6 +112,7 @@ export interface WalkthroughState {
   scriptId: string;
   scriptVersion: string;
   trade: WalkthroughTrade;
+  status: 'active' | 'paused' | 'completed';
   currentNodeId: string;
   completedNodeIds: string[];
   answers: Record<string, WalkthroughAnswer>;
