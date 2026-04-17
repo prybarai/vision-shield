@@ -1,3 +1,5 @@
+import { getPricingPlanningRanges, getPricingPublicSources } from '@/lib/pricing';
+
 export interface CostGuideRange {
   label: string;
   range: string;
@@ -61,11 +63,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
       'As a planning rule of thumb, a light bathroom refresh often starts around $8,000 to $15,000, a solid mid-range remodel often lands around $15,000 to $30,000, and a full layout-changing or high-end primary bath can move well beyond $30,000. In higher-cost metros, complicated tile work, glass, stone, or plumbing changes can push the number higher fast.',
       'The useful question is not just “what does a bathroom remodel cost?” It is “what exact scope am I asking contractors to price?” The tighter your scope, the easier it is to compare quotes and the less likely you are to get surprised by change orders later.'
     ],
-    ranges: [
-      { label: 'Cosmetic refresh', range: '$8,000 to $15,000', note: 'Paint, vanity, fixture swaps, limited tile, minimal plumbing changes.' },
-      { label: 'Mid-range remodel', range: '$15,000 to $30,000', note: 'New finishes throughout, better shower/tub work, some electrical and plumbing updates.' },
-      { label: 'Full custom or layout change', range: '$30,000+', note: 'Moving plumbing, premium materials, extensive tile, larger primary baths, or structural work.' },
-    ],
+    ranges: getPricingPlanningRanges('bathroom'),
     sections: [
       {
         heading: 'What moves the bathroom budget the most',
@@ -126,10 +124,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
         answer: 'Sometimes, but only if the contractor is comfortable with it and responsibilities for delays, damage, and missing parts are clearly spelled out.'
       }
     ],
-    sources: [
-      { label: 'HomeAdvisor, Bathroom Remodel Cost [2025 Data]', url: 'https://www.homeadvisor.com/cost/bathrooms/remodel-a-bathroom/' },
-      { label: 'Remodeling, Cost vs. Value Report', url: 'https://www.remodeling.hw.net/cost-vs-value/' },
-    ],
+    sources: getPricingPublicSources('bathroom'),
   },
   {
     slug: 'interior-painting-cost',
@@ -140,11 +135,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
       'A single-room repaint can be a few hundred dollars on the low end, but a whole-home repaint with ceilings, trim, doors, patching, and better-quality coatings can rise into the many thousands. For planning, many homeowners will see roughly $2 to $6 per square foot for typical wall painting, with higher all-in pricing when trim, ceilings, extensive prep, and difficult access get layered in.',
       'The cleanest way to budget interior paint is to think in terms of surfaces, prep severity, and finish expectations. Once you do that, painter quotes start making a lot more sense.'
     ],
-    ranges: [
-      { label: 'Single room refresh', range: '$400 to $1,200', note: 'Basic walls, limited prep, normal ceiling height, homeowner-provided clearing.' },
-      { label: 'Multi-room repaint', range: '$2,000 to $6,000', note: 'Several rooms, standard prep, trim and ceilings depending on scope.' },
-      { label: 'Whole-home interior', range: '$5,000 to $15,000+', note: 'Large square footage, heavy prep, doors, trim, ceilings, stairwells, or premium coatings.' },
-    ],
+    ranges: getPricingPlanningRanges('interior_paint'),
     sections: [
       {
         heading: 'Prep work is often the real job',
@@ -205,9 +196,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
         answer: 'Prep severity, trim and ceiling scope, access difficulty, and the level of finish expected usually matter more than the paint itself.'
       }
     ],
-    sources: [
-      { label: 'HomeAdvisor, Cost to Paint Interior of House in 2025', url: 'https://www.homeadvisor.com/cost/painting/paint-a-home-interior/' },
-    ],
+    sources: getPricingPublicSources('interior_paint'),
   },
   {
     slug: 'deck-build-cost',
@@ -218,11 +207,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
       'For planning, a modest basic deck often starts around $4,000 to $8,000, a larger mid-range build often lands around $8,000 to $18,000, and a premium composite or specialty-material deck with stairs, rails, and upgrades can run well beyond that. Size matters, but material and elevation matter almost as much.',
       'If you want a quote that does not drift later, define the structure first. What size? What height off grade? What railing condition? What stair count? What board material? Once those answers are clear, deck pricing becomes much less mysterious.'
     ],
-    ranges: [
-      { label: 'Basic pressure-treated deck', range: '$4,000 to $8,000', note: 'Smaller footprint, simple shape, low height, straightforward access.' },
-      { label: 'Mid-range family deck', range: '$8,000 to $18,000', note: 'Larger footprint, rails, stairs, upgraded framing or finishes.' },
-      { label: 'Premium composite or custom build', range: '$18,000+', note: 'Composite or hardwood, complex layout, multiple elevations, lighting, skirting, or heavy site work.' },
-    ],
+    ranges: getPricingPlanningRanges('deck_patio'),
     sections: [
       {
         heading: 'Size matters, but not all square feet cost the same',
@@ -283,9 +268,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
         answer: 'Sometimes, but structure and permit logic usually work best when the main deck is planned as one coordinated build rather than pieced together casually.'
       }
     ],
-    sources: [
-      { label: 'HomeAdvisor, How Much Does It Cost to Build a Deck in 2025?', url: 'https://www.homeadvisor.com/cost/outdoor-living/build-a-deck/' },
-    ],
+    sources: getPricingPublicSources('deck_patio'),
   },
   {
     slug: 'roof-replacement-cost',
@@ -296,11 +279,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
       'As a broad planning range, many asphalt roof replacements land around $6,000 to $15,000, while larger homes, steeper roofs, premium shingles, metal, tile, or more complicated flashing packages can push the total much higher. In roofing, labor access and material choice both matter, but hidden repair conditions matter too.',
       'A good roof quote should tell you what system is being installed, not just what the top layer costs. That is the difference between buying a roof and buying a shingle delivery.'
     ],
-    ranges: [
-      { label: 'Basic asphalt replacement', range: '$6,000 to $12,000', note: 'Straightforward roof geometry, standard tear-off, common shingle systems.' },
-      { label: 'Larger or steeper roof', range: '$12,000 to $20,000', note: 'More squares, harder access, upgraded shingles, more flashing detail.' },
-      { label: 'Premium material or complex roof', range: '$20,000+', note: 'Metal, tile, specialty systems, heavy repair scope, or high-complexity rooflines.' },
-    ],
+    ranges: getPricingPlanningRanges('roofing'),
     sections: [
       {
         heading: 'Roof size is only the starting point',
@@ -361,9 +340,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
         answer: 'Sometimes. It depends on gutter condition, fascia details, and whether the gutter system would benefit from being coordinated with the new roof work.'
       }
     ],
-    sources: [
-      { label: 'HomeAdvisor, How Much Does Roof Replacement Cost? [2025 Data]', url: 'https://www.homeadvisor.com/cost/roofing/install-a-roof/' },
-    ],
+    sources: getPricingPublicSources('roofing'),
   },
   {
     slug: 'kitchen-remodel-cost',
@@ -374,11 +351,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
       'For planning, a lighter update may start around $15,000 to $25,000, a solid mid-range remodel often lives around $25,000 to $60,000, and a major layout change or premium custom kitchen can climb well beyond that. Cabinet scope is often the center of gravity, but appliances, electrical, and layout decisions can move the total just as hard.',
       'If you are budgeting a kitchen, the smartest thing you can do early is define whether you are refreshing what exists or rebuilding the room around a new layout and higher-performance finish level.'
     ],
-    ranges: [
-      { label: 'Refresh or partial update', range: '$15,000 to $25,000', note: 'Painted or refaced cabinets, counters, backsplash, fixtures, selected appliance updates.' },
-      { label: 'Mid-range remodel', range: '$25,000 to $60,000', note: 'New cabinets and counters, flooring, lighting, appliances, moderate trade coordination.' },
-      { label: 'Major redesign or premium kitchen', range: '$60,000+', note: 'Layout changes, custom cabinets, premium appliances, structural work, or extensive finish upgrades.' },
-    ],
+    ranges: getPricingPlanningRanges('kitchen'),
     sections: [
       {
         heading: 'Cabinets usually set the tone for the whole budget',
@@ -439,10 +412,7 @@ const BASE_COST_GUIDES: BaseCostGuide[] = [
         answer: 'Cabinet scope, layout changes, appliance assumptions, allowances, and trade coordination are the biggest reasons.'
       }
     ],
-    sources: [
-      { label: 'HomeAdvisor, How Much Does It Cost to Remodel a Kitchen? [2025 Data]', url: 'https://www.homeadvisor.com/cost/kitchens/remodel-a-kitchen/' },
-      { label: 'Remodeling, Cost vs. Value Report', url: 'https://www.remodeling.hw.net/cost-vs-value/' },
-    ],
+    sources: getPricingPublicSources('kitchen'),
   },
 ];
 

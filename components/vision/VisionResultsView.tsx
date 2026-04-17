@@ -27,6 +27,7 @@ import ShareButton from '@/components/vision/ShareButton';
 import MaterialsAccordion from '@/components/vision/MaterialsAccordion';
 import ConceptsLoader from '@/components/vision/ConceptsLoader';
 import BeforeAfterSlider from '@/components/vision/BeforeAfterSlider';
+import ProjectBriefDocument from '@/components/vision/ProjectBriefDocument';
 import type { Estimate, MaterialList, Project, ProjectBrief } from '@/types';
 
 interface Props {
@@ -159,7 +160,7 @@ export default function VisionResultsView({
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
-      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-8 text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-10">
+      <section className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-8 text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] print:hidden sm:px-8 sm:py-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.14),transparent_24%)]" />
         <div className="relative flex flex-col gap-8 xl:flex-row xl:items-start xl:justify-between">
           <div className="max-w-3xl">
@@ -229,7 +230,7 @@ export default function VisionResultsView({
         </div>
       </section>
 
-      <section className="mt-8 grid gap-4 md:grid-cols-3">
+      <section className="mt-8 grid gap-4 print:hidden md:grid-cols-3">
         <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-500"><Wallet className="h-4 w-4 text-[#1f7cf7]" /> Smart estimate</div>
           <div className="mt-3 text-lg font-semibold text-slate-900">{estimate ? formatCurrencyRange(estimate.low_estimate, estimate.high_estimate) : 'Still preparing'}</div>
@@ -247,7 +248,7 @@ export default function VisionResultsView({
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-10 print:hidden">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Concept images</h2>
@@ -316,7 +317,7 @@ export default function VisionResultsView({
         )}
       </section>
 
-      <section className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] sm:p-8">
+      <section className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] print:hidden sm:p-8">
         <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Smart cost estimate</h2>
@@ -402,7 +403,7 @@ export default function VisionResultsView({
         )}
       </section>
 
-      <section className="mt-10">
+      <section className="mt-10 print:hidden">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Materials list</h2>
@@ -417,66 +418,33 @@ export default function VisionResultsView({
         )}
       </section>
 
-      <section className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] sm:p-8">
+      <section className="mt-10 sm:p-8">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Contractor-ready brief</h2>
-            <p className="mt-1 text-sm text-slate-500">Share this with any contractor before they quote you.</p>
+            <h2 className="text-2xl font-bold text-slate-900 print:hidden sm:text-3xl">Project handoff brief</h2>
+            <p className="mt-1 text-sm text-slate-500 print:hidden">Share or print this version when you want a cleaner contractor walk-through.</p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 print:hidden sm:flex-row">
             <Button className="border-0 bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] shadow-[0_14px_40px_rgba(31,124,247,0.28)] hover:opacity-95" onClick={() => window.print()}>
-              <Download className="mr-2 h-4 w-4" /> Download as PDF
+              <Download className="mr-2 h-4 w-4" /> Print handoff brief
             </Button>
             <ShareButton shareUrl={shareUrl} variant="light" />
           </div>
         </div>
 
-        {brief ? (
-          <div className="grid gap-5 lg:grid-cols-[1.25fr_0.75fr]">
-            <div className="space-y-5">
-              <div className="rounded-[1.5rem] bg-slate-50 p-5">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Summary</div>
-                <p className="mt-3 text-base leading-relaxed text-slate-800">{brief.summary}</p>
-              </div>
-              <div className="rounded-[1.5rem] bg-slate-50 p-5">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Homeowner goals</div>
-                <p className="mt-3 text-base leading-relaxed text-slate-800">{brief.homeowner_goals}</p>
-              </div>
-              <div className="rounded-[1.5rem] bg-slate-50 p-5">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Walk-through notes</div>
-                <p className="mt-3 whitespace-pre-wrap text-base leading-relaxed text-slate-800">{brief.contractor_notes}</p>
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              <div className="rounded-[1.5rem] border border-slate-200 p-5">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Likely trades</div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {likelyTrades.length > 0 ? likelyTrades.map((trade, index) => (
-                    <span key={index} className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">{trade}</span>
-                  )) : <span className="text-sm text-slate-500">Still inferring likely trades.</span>}
-                </div>
-              </div>
-
-              <div className="rounded-[1.5rem] border border-slate-200 p-5">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Questions for the walk-through</div>
-                <ul className="mt-3 space-y-3">
-                  {siteQuestions.map((question, index) => (
-                    <li key={index} className="flex items-start gap-3 text-sm text-slate-700">
-                      <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#eef8ff] font-semibold text-[#48c7f1]">{index + 1}</span>
-                      <span>{question}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">Your brief is still being assembled. Once it lands, this section becomes the easiest thing to hand to a contractor before they quote.</div>
-        )}
+        <ProjectBriefDocument
+          project={project}
+          categoryLabel={categoryLabel}
+          estimate={estimate}
+          materials={materials}
+          brief={brief}
+          likelyTrades={likelyTrades}
+          siteQuestions={siteQuestions}
+          subtitle="Use this version for cleaner bid comparisons, walk-through notes, and handoff conversations."
+        />
       </section>
 
-      <section className="mt-10">
+      <section className="mt-10 print:hidden">
         <div className="mb-4">
           <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">What to do next</h2>
           <p className="mt-1 text-sm text-slate-500">Keep the project controlled before any deposit is paid.</p>
@@ -505,7 +473,7 @@ export default function VisionResultsView({
         </div>
       </section>
 
-      <section className="mt-10 overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] sm:p-8">
+      <section className="mt-10 overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] print:hidden sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">When you&apos;re ready</p>
@@ -527,7 +495,7 @@ export default function VisionResultsView({
         </div>
       </section>
 
-      <Disclaimer text="Design concepts are optional inspiration only and may not reflect final buildable dimensions, code requirements, or contractor scope." className="mt-8" />
+      <Disclaimer text="Design concepts are optional inspiration only and may not reflect final buildable dimensions, code requirements, or contractor scope." className="mt-8 print:hidden" />
     </div>
   );
 }

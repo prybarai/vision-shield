@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, MessageSquareText, Smartphone, Wrench } from 'lucide-react';
+import { ArrowRight, CheckCircle2, MapPinned, MessageSquareText, ShieldCheck } from 'lucide-react';
 import { absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
-  title: 'For contractors',
-  description: 'Get free homeowner leads from naili and route them into your Prybar inbox so you can respond fast while you are still on the job.',
+  title: 'For pros',
+  description: 'Join the Naili contractor directory and receive better-scoped homeowner requests as the network grows.',
   alternates: {
     canonical: absoluteUrl('/for-contractors'),
   },
@@ -14,48 +14,48 @@ export const metadata: Metadata = {
 
 const BENEFITS = [
   {
-    title: 'Real homeowner leads, already scoped',
-    desc: 'Leads arrive with the project brief, estimate context, photos, and scope summary.',
-    icon: Wrench,
+    title: 'Directory-first positioning',
+    desc: 'Naili is building a quieter local network, not a spray-and-pray lead marketplace.',
+    icon: MapPinned,
   },
   {
-    title: 'Route them straight into Prybar',
-    desc: 'Use Prybar to catch and answer them in one place.',
-    icon: Smartphone,
-  },
-  {
-    title: 'Reply faster, miss fewer jobs',
-    desc: 'Miss fewer leads while you are in the truck or on the job.',
+    title: 'Better project context',
+    desc: 'Requests arrive with the homeowner brief, estimate context, photo history, and walk-through questions.',
     icon: MessageSquareText,
+  },
+  {
+    title: 'Trust before contact',
+    desc: 'Homeowners can verify and compare from the same written scope instead of starting every call from zero.',
+    icon: ShieldCheck,
   },
 ];
 
 const STEPS = [
-  'A homeowner finishes a Naili brief and asks for local pros.',
-  'If you cover that ZIP and trade, Naili routes the lead through Prybar.',
-  'You see the project context before the first call.',
+  'A homeowner finishes a Naili brief and asks for local contractor options.',
+  'Naili uses ZIP and trade fit to narrow the shortlist instead of blasting the request widely.',
+  'Matched pros receive the same project packet the homeowner is using to compare bids.',
 ];
 
 const CONTRACTOR_FAQS = [
   {
-    question: 'Do Naili leads cost money during launch?',
+    question: 'Is there a pay-to-play lead fee during launch?',
     answer:
-      'The current contractor-facing promise is free homeowner leads. The goal is to prove the quality of the loop first, not to trap contractors in a junk-lead marketplace model.',
+      'No. The current model is a free directory and network while Naili proves the homeowner experience and routing quality.',
   },
   {
-    question: 'What comes with the lead?',
+    question: 'What does a matched request include?',
     answer:
-      'The lead starts with homeowner context, project brief details, and estimate or scope framing that helps you respond without starting from zero.',
+      'The goal is a cleaner handoff: project summary, homeowner goals, estimate context, source photo, and walk-through questions when available.',
   },
   {
-    question: 'Do I need Prybar to receive them automatically?',
+    question: 'Do homeowners get sprayed to lots of contractors?',
     answer:
-      'Yes, that is the current operating path. Prybar is what lets Naili route the lead into a contractor workflow built for fast response instead of dropped follow-up.',
+      'That is not the intent. The operating direction is smaller, better-fit routing based on trade and location coverage.',
   },
   {
-    question: 'Is this a broad marketplace blast?',
+    question: 'Why does Prybar still show up here?',
     answer:
-      'No. The intent is tighter routing based on trade and ZIP coverage, so the lead lands with contractors who actually fit the job instead of getting sprayed everywhere.',
+      'Prybar is the current ops layer for receiving and responding quickly. Naili stays homeowner-facing, while Prybar helps the contractor side stay organized.',
   },
 ];
 
@@ -82,12 +82,12 @@ export default function ForContractorsPage() {
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
           <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
             <div className="max-w-4xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">For contractors</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">For pros</p>
               <h1 className="mt-3 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-                Free homeowner leads, with the brief already done.
+                Join the Naili contractor directory.
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 sm:text-xl">
-                Naili sends free homeowner leads with the project already scoped. Use Prybar to receive them and reply fast.
+                The goal is simple, better-scoped homeowner requests, routed more selectively, with free early access while the network is still taking shape.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
@@ -96,16 +96,9 @@ export default function ForContractorsPage() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100"
                 >
-                  See Prybar signup <ArrowRight className="h-4 w-4" />
+                  Join via Prybar <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link
-                  href="https://prybar.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
-                >
-                  View founding member pricing
-                </Link>
+                <p className="text-sm text-white/70">No lead fee during launch.</p>
               </div>
             </div>
 
@@ -135,10 +128,10 @@ export default function ForContractorsPage() {
       <section className="bg-white py-16 sm:py-20">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:px-8">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">How the loop works</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Naili brings the lead in. Prybar helps you move fast.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">How the network works</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Homeowner first, contractor-ready when it matters.</h2>
             <p className="mt-3 text-lg leading-relaxed text-slate-600">
-              Not another junk lead marketplace. The homeowner already did the scope work.
+              Naili is designed to help homeowners get clear first. The directory exists so the right pro can step in later without losing the scope work.
             </p>
           </div>
           <div className="rounded-[2rem] border border-slate-200 bg-[#f8f9fc] p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
@@ -157,24 +150,24 @@ export default function ForContractorsPage() {
       <section className="bg-[#f8f9fc] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)] lg:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built for real operators</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fluff. Just the promise.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Live now</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">The current promise is deliberately modest.</h2>
             <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-              Free leads, clearer context, and faster response.
+              Free early access, better homeowner context, and a quieter matching model while the directory is still small.
             </p>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
-                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Free lead promise</h3>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">What Naili is trying to avoid</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Marketplace spam</h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  Contractors are not being asked to buy anonymous junk leads. The pitch is free homeowner opportunities with better context.
+                  The goal is not anonymous junk leads or broad quote blasts. The network should feel tighter and more useful than that.
                 </p>
               </div>
               <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
-                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Context before contact</h3>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">What the homeowner should feel</p>
+                <h3 className="mt-3 text-lg font-semibold text-[#0d0d1a]">Clear before contact</h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  The homeowner brief is meant to show up before the first conversation, so the contractor can respond faster and with a cleaner understanding of the job.
+                  Homeowners should arrive with a cleaner brief, which usually means better first conversations for everyone involved.
                 </p>
               </div>
             </div>
@@ -186,7 +179,7 @@ export default function ForContractorsPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Contractor FAQ</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Questions contractors should ask.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Questions worth asking early.</h2>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             {CONTRACTOR_FAQS.map((faq) => (

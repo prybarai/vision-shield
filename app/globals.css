@@ -22,6 +22,40 @@ body {
   color: var(--foreground);
 }
 
+@media print {
+  :root {
+    --background: #ffffff;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    background-image: none !important;
+  }
+
+  header,
+  footer {
+    display: none !important;
+  }
+
+  .project-brief-document {
+    box-shadow: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+  }
+
+  .brief-page-break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

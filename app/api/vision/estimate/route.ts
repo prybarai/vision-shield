@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { parseClaudeJSON } from '@/lib/anthropic';
 import { buildEstimationPrompt } from '@/lib/prompts';
+import { getEstimatorFloor, getScopeMids } from '@/lib/pricing';
 import { buildAnalysisSummary, describeAnalysisFacts, FALLBACK_VISION_ANALYSIS, type VisionAnalysis } from '@/lib/visionAnalysis';
 
 const schema = z.object({
@@ -46,10 +47,11 @@ type WidthBucket = 'narrow' | 'standard' | 'wide' | null | undefined;
 type DepthBucket = 'shallow' | 'standard' | 'deep' | null | undefined;
 
 const GUIDE_ESTIMATE_GUARDRAILS: Partial<Record<string, { low: number; mid: number; high: number }>> = {
-  bathroom: { low: 8000, mid: 11000, high: 15000 },
-  kitchen: { low: 15000, mid: 20000, high: 25000 },
-  deck_patio: { low: 4000, mid: 6000, high: 8000 },
-  roofing: { low: 6000, mid: 9000, high: 12000 },
+  bathroom: getEstimatorFloor('bathroom'),
+  kitchen: getEstimatorFloor('kitchen'),
+  deck_patio: getEstimatorFloor('deck_patio'),
+  roofing: getEstimatorFloor('roofing'),
+  interior_paint: getEstimatorFloor('interior_paint'),
 };
 
 function roundToHundred(value: number) {
@@ -485,11 +487,12 @@ function estimateBathroom(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
   const scopeLevel = scopeAnswers.scope_level || inferScopeLevelFromAnalysis(notes, analysis);
   const bathroomSize = (scopeAnswers.bathroom_size as SizeKey | undefined) || inferRemodelSizeFromAnalysis(analysis);
 
-  const baseMidByScope: Record<string, number> = { cosmetic: 9000, mid_refresh: 18000, full_remodel: 30000 };
+  const baseMidByScope = getScopeMids('bathroom');
   const sizeMultiplierBySize: Record<string, number> = { small: 0.85, medium: 1.0, large: 1.25 };
   const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.16 : analysis?.current_condition === 'poor' ? 1.1 : analysis?.current_condition === 'dated' ? 1.05 : 1.0;
   const zipMultiplier = getZipMultiplier(zip);
-  const mid = baseMidByScope[scopeLevel] * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
+  const scopeMid = baseMidByScope[scopeLevel] ?? baseMidByScope.mid_refresh ?? 22000;
+  const mid = scopeMid * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.24 : 0.2);
   const breakdown = buildEstimateBreakdown(range, 0.62);
   const assumptions = [
@@ -516,11 +519,12 @@ function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
   const scopeLevel = scopeAnswers.scope_level || inferScopeLevelFromAnalysis(notes, analysis);
   const kitchenSize = (scopeAnswers.kitchen_size as SizeKey | undefined) || inferRemodelSizeFromAnalysis(analysis);
 
-  const baseMidByScope: Record<string, number> = { cosmetic: 18000, mid_refresh: 35000, full_remodel: 65000 };
+  const baseMidByScope = getScopeMids('kitchen');
   const sizeMultiplierBySize: Record<string, number> = { small: 0.85, medium: 1.0, large: 1.3 };
   const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.18 : analysis?.current_condition === 'poor' ? 1.12 : analysis?.current_condition === 'dated' ? 1.06 : 1.0;
   const zipMultiplier = getZipMultiplier(zip);
-  const mid = baseMidByScope[scopeLevel] * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
+  const scopeMid = baseMidByScope[scopeLevel] ?? baseMidByScope.mid_refresh ?? 42500;
+  const mid = scopeMid * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier) * conditionMultiplier * zipMultiplier;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.22 : 0.18);
   const breakdown = buildEstimateBreakdown(range, 0.58);
   const assumptions = [
