@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, FileText } from 'lucide-react';
+import { ArrowRight, CalendarDays, FileText } from 'lucide-react';
 import { COST_GUIDES } from '@/lib/costGuides';
 import { absoluteUrl } from '@/lib/site';
 
@@ -11,6 +12,15 @@ export const metadata: Metadata = {
     canonical: absoluteUrl('/cost-guides'),
   },
 };
+
+function formatGuideDate(dateString: string) {
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${dateString}T00:00:00Z`));
+}
 
 export default function CostGuidesIndexPage() {
   return (
@@ -35,14 +45,30 @@ export default function CostGuidesIndexPage() {
 
       <section className="py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 max-w-3xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built for real planning</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Five launch guides, each with clearer ranges, review context, and a path into Naili.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">These are broad planning guides, not final quotes. Each guide is reviewed, sourced, and paired with a direct path to upload your own space when you want a tighter range.</p>
+          </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {COST_GUIDES.map((guide) => (
               <Link key={guide.slug} href={`/cost-guides/${guide.slug}`} className="rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_12px_32px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:shadow-[0_20px_48px_rgba(72,199,241,0.14)]">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef8ff] text-[#48c7f1]">
-                  <FileText className="h-6 w-6" />
+                <div className="relative -mx-6 -mt-6 mb-6 overflow-hidden rounded-t-[1.75rem] bg-[#eef8ff]">
+                  <Image src={guide.heroImage} alt={guide.heroAlt} width={1536} height={1024} className="aspect-[16/9] w-full object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" />
+                  <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 backdrop-blur">
+                    <FileText className="h-3.5 w-3.5 text-[#1f7cf7]" /> Cost guide
+                  </div>
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-[#0d0d1a]">{guide.title}</h2>
+                <div className="mt-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-slate-500">
+                  <CalendarDays className="h-3.5 w-3.5" /> Updated {formatGuideDate(guide.updatedAt)}
+                </div>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">{guide.description}</p>
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-[#f8f9fc] p-4">
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Planning range</div>
+                  <div className="mt-2 text-lg font-bold text-[#0d0d1a]">{guide.ranges[0]?.range}</div>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{guide.ranges[0]?.label}</p>
+                </div>
                 <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#1f7cf7]">
                   Read guide <ArrowRight className="h-4 w-4" />
                 </div>

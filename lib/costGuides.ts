@@ -19,18 +19,39 @@ export interface CostGuideSource {
   url: string;
 }
 
+export interface CostGuideByline {
+  name: string;
+  role: string;
+}
+
+export interface CostGuideBudgetFactor {
+  item: string;
+  impact: 'High' | 'Medium';
+  note: string;
+}
+
 export interface CostGuide {
   slug: string;
   title: string;
   description: string;
+  heroImage: string;
+  heroAlt: string;
+  publishedAt: string;
+  updatedAt: string;
+  author: CostGuideByline;
+  reviewer: CostGuideByline;
   intro: string[];
   ranges: CostGuideRange[];
+  budgetFactors: CostGuideBudgetFactor[];
+  quoteChecklist: string[];
   sections: CostGuideSection[];
   faqs: CostGuideFaq[];
   sources: CostGuideSource[];
 }
 
-export const COST_GUIDES: CostGuide[] = [
+type BaseCostGuide = Omit<CostGuide, 'heroImage' | 'heroAlt' | 'publishedAt' | 'updatedAt' | 'author' | 'reviewer' | 'budgetFactors' | 'quoteChecklist'>;
+
+const BASE_COST_GUIDES: BaseCostGuide[] = [
   {
     slug: 'bathroom-remodel-cost',
     title: 'How much does a bathroom remodel cost?',
@@ -424,5 +445,113 @@ export const COST_GUIDES: CostGuide[] = [
     ],
   },
 ];
+
+const DEFAULT_AUTHOR: CostGuideByline = {
+  name: 'Naili editorial team',
+  role: 'Research, writing, and homeowner guidance',
+};
+
+const DEFAULT_REVIEWER: CostGuideByline = {
+  name: 'Prybar contractor review',
+  role: 'Scope and pricing sanity review',
+};
+
+const GUIDE_ENHANCEMENTS: Record<string, Pick<CostGuide, 'heroImage' | 'heroAlt' | 'publishedAt' | 'updatedAt' | 'author' | 'reviewer' | 'budgetFactors' | 'quoteChecklist'>> = {
+  'bathroom-remodel-cost': {
+    heroImage: '/imagery/cost-guide-bathroom.webp',
+    heroAlt: 'Bright bathroom with vanity, mirror, shower tile, and glass shower enclosure.',
+    publishedAt: '2026-04-17',
+    updatedAt: '2026-04-17',
+    author: DEFAULT_AUTHOR,
+    reviewer: DEFAULT_REVIEWER,
+    budgetFactors: [
+      { item: 'Layout changes', impact: 'High', note: 'Moving shower, toilet, or vanity locations pushes plumbing, electrical, and labor up quickly.' },
+      { item: 'Tile scope', impact: 'High', note: 'Large-format tile, ceiling-height runs, niches, and specialty layouts add both material and installation cost.' },
+      { item: 'Fixture and glass level', impact: 'Medium', note: 'Premium plumbing trim, frameless glass, and custom vanities stack up fast in smaller rooms.' },
+    ],
+    quoteChecklist: [
+      'Confirm demolition, disposal, waterproofing, and permit handling are clearly included.',
+      'Check whether tile height, shower glass, and fixture allowances match across every bid.',
+      'Ask how hidden moisture, subfloor damage, or plumbing surprises are handled after demo.',
+    ],
+  },
+  'interior-painting-cost': {
+    heroImage: '/imagery/cost-guide-interior-paint.webp',
+    heroAlt: 'Neutral freshly painted room with trim detail, sofa, and natural light.',
+    publishedAt: '2026-04-17',
+    updatedAt: '2026-04-17',
+    author: DEFAULT_AUTHOR,
+    reviewer: DEFAULT_REVIEWER,
+    budgetFactors: [
+      { item: 'Prep severity', impact: 'High', note: 'Patching, sanding, stain blocking, and problem walls usually matter more than paint gallons.' },
+      { item: 'Surface count', impact: 'High', note: 'Walls only prices differently than walls, ceilings, trim, doors, and closets.' },
+      { item: 'Access and occupancy', impact: 'Medium', note: 'High ceilings, furnished rooms, stairwells, and occupied spaces increase labor time.' },
+    ],
+    quoteChecklist: [
+      'Ask which surfaces are included: walls, ceilings, trim, doors, closets, and accent walls.',
+      'Confirm prep steps, number of coats, and paint line in writing.',
+      'Clarify who moves furniture and how repair discoveries during prep are billed.',
+    ],
+  },
+  'deck-build-cost': {
+    heroImage: '/imagery/cost-guide-deck.webp',
+    heroAlt: 'Backyard deck with wood-toned boards, seating area, and railing.',
+    publishedAt: '2026-04-17',
+    updatedAt: '2026-04-17',
+    author: DEFAULT_AUTHOR,
+    reviewer: DEFAULT_REVIEWER,
+    budgetFactors: [
+      { item: 'Material choice', impact: 'High', note: 'Pressure-treated, cedar, composite, and specialty products change both upfront and lifetime cost.' },
+      { item: 'Height, rails, and stairs', impact: 'High', note: 'Guardrails, tall posts, stair runs, and site transitions add major labor and safety complexity.' },
+      { item: 'Site access', impact: 'Medium', note: 'Tight yards, slopes, and difficult footing conditions can move the budget even when the deck size stays the same.' },
+    ],
+    quoteChecklist: [
+      'Compare framing assumptions, board material, rail scope, stair count, and permit handling line by line.',
+      'Check whether demolition, disposal, and site restoration are included or separate.',
+      'Ask how hidden footing, grading, or drainage issues will be priced if they show up during layout.',
+    ],
+  },
+  'roof-replacement-cost': {
+    heroImage: '/imagery/cost-guide-roof.webp',
+    heroAlt: 'Single-story home with a clean dark roof in daylight.',
+    publishedAt: '2026-04-17',
+    updatedAt: '2026-04-17',
+    author: DEFAULT_AUTHOR,
+    reviewer: DEFAULT_REVIEWER,
+    budgetFactors: [
+      { item: 'Roof geometry and access', impact: 'High', note: 'Steep pitches, complex rooflines, and harder property access change labor and safety setup fast.' },
+      { item: 'System details', impact: 'High', note: 'Underlayment, flashing, ventilation, and tear-off scope matter almost as much as shingle choice.' },
+      { item: 'Repair contingencies', impact: 'Medium', note: 'Decking damage and flashing repairs often appear only after tear-off begins.' },
+    ],
+    quoteChecklist: [
+      'Verify measured roof size, tear-off layers, underlayment, ventilation, and flashing assumptions.',
+      'Ask how damaged decking is billed if it appears after tear-off.',
+      'Check permit handling, cleanup, and who is actually performing the work.',
+    ],
+  },
+  'kitchen-remodel-cost': {
+    heroImage: '/imagery/cost-guide-kitchen.webp',
+    heroAlt: 'Bright kitchen with white cabinets, counters, backsplash, and natural light.',
+    publishedAt: '2026-04-17',
+    updatedAt: '2026-04-17',
+    author: DEFAULT_AUTHOR,
+    reviewer: DEFAULT_REVIEWER,
+    budgetFactors: [
+      { item: 'Cabinet scope', impact: 'High', note: 'Keeping, refacing, repainting, or replacing cabinets changes the whole project direction.' },
+      { item: 'Layout moves', impact: 'High', note: 'Relocating plumbing, gas, islands, or major electrical lines adds real coordination cost.' },
+      { item: 'Finish stacking', impact: 'Medium', note: 'Counters, appliances, lighting, and hardware often blow up the budget through many smaller upgrades.' },
+    ],
+    quoteChecklist: [
+      'Match cabinet type, counter allowance, appliance assumptions, and flooring scope across bids.',
+      'Review allowances closely so the headline price is based on products you would actually choose.',
+      'Confirm demo, disposal, permit handling, paint, trim, and project-management assumptions before comparing totals.',
+    ],
+  },
+};
+
+export const COST_GUIDES: CostGuide[] = BASE_COST_GUIDES.map((guide) => ({
+  ...guide,
+  ...GUIDE_ENHANCEMENTS[guide.slug],
+}));
 
 export const COST_GUIDE_MAP = Object.fromEntries(COST_GUIDES.map((guide) => [guide.slug, guide]));
