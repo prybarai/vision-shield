@@ -8,17 +8,17 @@ const FEATURES = [
   {
     icon: Sparkles,
     title: 'Photo-aware concept direction',
-    desc: 'See concept directions shaped by the room you actually uploaded, not a generic category prompt.',
+    desc: 'Concepts shaped by your room, not a generic prompt.',
   },
   {
     icon: DollarSign,
     title: 'Smart cost range',
-    desc: 'Get a planning range shaped by visible condition, ZIP code, scope, and finish level.',
+    desc: 'A planning range shaped by condition, ZIP, and finish level.',
   },
   {
     icon: FileText,
     title: 'Contractor-ready brief',
-    desc: 'Leave with scope notes, materials direction, and contractor questions you can actually use.',
+    desc: 'Scope, materials, and questions you can actually use.',
   },
 ];
 
@@ -50,12 +50,12 @@ export default function VisionPage() {
             </div>
             <h1 className="text-4xl font-bold text-balance md:text-5xl">See the project before it starts.</h1>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/76">
-              Upload a photo of your space, describe what you want to change, and get concepts, a real cost range, a materials plan, and a contractor-ready brief before you talk to anyone.
+              Upload a photo and get concepts, a cost range, and a clear brief before you talk to a contractor.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/vision/start"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95 sm:w-auto"
               >
                 <Camera className="h-5 w-5" />
                 Upload my project photo
@@ -69,7 +69,7 @@ export default function VisionPage() {
                 See naili shield
               </Link>
             </div>
-            <p className="mt-4 text-sm text-white/60">Free to start, private by default, no contractor outreach until you choose.</p>
+            <p className="mt-4 text-sm text-white/60">Free to start. Private by default. No outreach until you choose.</p>
           </div>
 
           <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)]">

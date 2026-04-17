@@ -25,7 +25,7 @@ export default function ShieldPage() {
       href: '/shield/check',
       icon: Search,
       title: 'Check a contractor',
-      desc: 'Catch things like an expired license, the wrong business name, or missing state records before you send a deposit.',
+      desc: 'Spot expired licenses, wrong business names, or missing records before a deposit.',
       eyebrow: 'Before you hire',
       cta: 'Check licenses',
     },
@@ -33,7 +33,7 @@ export default function ShieldPage() {
       href: '/shield/scan',
       icon: FileText,
       title: 'Scan a quote or contract',
-      desc: 'Flag vague scope, front-loaded payment schedules, and thin warranty language before you sign.',
+      desc: 'Flag vague scope, risky payment terms, and thin warranty language.',
       eyebrow: 'Before you sign',
       cta: 'Scan a quote',
     },
@@ -41,7 +41,7 @@ export default function ShieldPage() {
       href: '/shield/rescue',
       icon: LifeBuoy,
       title: 'Get dispute help',
-      desc: 'Draft the next email, demand letter, or complaint summary when a job stalls out or the contractor disappears.',
+      desc: 'Draft the next email or complaint summary when a job goes sideways.',
       eyebrow: 'If things go wrong',
       cta: 'Get next steps',
     },
@@ -59,12 +59,12 @@ export default function ShieldPage() {
             </div>
             <h1 className="text-4xl font-bold text-balance md:text-5xl">Hire with confidence. Never get burned.</h1>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/76">
-              Before you hand over a deposit, run a naili shield check. Verify licenses, scan quotes for red flags, review contracts for risky clauses, and generate practical next steps if something goes wrong.
+              Check licenses, scan quotes, and review risky contract language before you pay or sign.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/shield/check"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d0d1a] transition-colors hover:bg-slate-100"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d0d1a] transition-colors hover:bg-slate-100 sm:w-auto"
               >
                 Check a contractor
                 <ArrowRight className="h-4 w-4" />

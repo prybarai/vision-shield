@@ -15,25 +15,25 @@ export const metadata: Metadata = {
 const BENEFITS = [
   {
     title: 'Real homeowner leads, already scoped',
-    desc: 'naili sends homeowner requests that already include the project brief, estimate context, photos, and scope summary.',
+    desc: 'Leads arrive with the project brief, estimate context, photos, and scope summary.',
     icon: Wrench,
   },
   {
     title: 'Route them straight into Prybar',
-    desc: 'Sign up for Prybar and those leads can land in the same place you already handle inbound messages and follow-up.',
+    desc: 'Use Prybar to catch and answer them in one place.',
     icon: Smartphone,
   },
   {
     title: 'Reply faster, miss fewer jobs',
-    desc: 'The point is simple: fewer missed leads while you are on a ladder, in a truck, or between jobsites.',
+    desc: 'Miss fewer leads while you are in the truck or on the job.',
     icon: MessageSquareText,
   },
 ];
 
 const STEPS = [
-  'A homeowner completes a Naili brief and asks to be matched with local pros.',
-  'If you cover that ZIP and trade, Naili routes the lead through Prybar first.',
-  'You see the homeowner context before the first conversation, so you can respond faster and walk into the quote with the scope already framed.',
+  'A homeowner finishes a Naili brief and asks for local pros.',
+  'If you cover that ZIP and trade, Naili routes the lead through Prybar.',
+  'You see the project context before the first call.',
 ];
 
 const CONTRACTOR_FAQS = [
@@ -87,7 +87,7 @@ export default function ForContractorsPage() {
                 Free homeowner leads, with the brief already done.
               </h1>
               <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 sm:text-xl">
-                Naili sends real homeowner leads, free, with the project already scoped. To receive those leads automatically and respond fast, sign up for Prybar.
+                Naili sends free homeowner leads with the project already scoped. Use Prybar to receive them and reply fast.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
@@ -136,9 +136,9 @@ export default function ForContractorsPage() {
         <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:px-8">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">How the loop works</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Naili brings the lead in. Prybar helps you close it fast.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Naili brings the lead in. Prybar helps you move fast.</h2>
             <p className="mt-3 text-lg leading-relaxed text-slate-600">
-              This is not another lead marketplace charging you for junk. The homeowner already did the work to define the project. Prybar is what lets you respond without missing the moment.
+              Not another junk lead marketplace. The homeowner already did the scope work.
             </p>
           </div>
           <div className="rounded-[2rem] border border-slate-200 bg-[#f8f9fc] p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
@@ -158,9 +158,9 @@ export default function ForContractorsPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)] lg:p-10">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built for real operators</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fake testimonials, no paid-looking fluff.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">No fluff. Just the promise.</h2>
             <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-              As real Naili leads turn into real Prybar jobs, this page will fill with contractor quotes, close stories, and honest numbers. Until then, we are keeping the promise simple: free leads, clearer context, and faster response loops.
+              Free leads, clearer context, and faster response.
             </p>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
@@ -186,7 +186,7 @@ export default function ForContractorsPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Contractor FAQ</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">The questions a skeptical contractor should ask.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Questions contractors should ask.</h2>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             {CONTRACTOR_FAQS.map((faq) => (

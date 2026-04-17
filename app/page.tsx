@@ -30,18 +30,11 @@ export const metadata: Metadata = {
   },
 };
 
-const TRUST_POINTS = [
-  'Photo-aware project briefs',
-  'Private by default',
-  'No contractor calls until you opt in',
-  'Matched pros start with your brief',
-];
-
 const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Upload a real photo',
-    desc: 'Show naili the room, exterior, or project area you want to change. One good image is enough to start.',
+    desc: 'One clear photo is enough to start.',
     icon: Camera,
     image: '/imagery/step-upload-photo.webp',
     alt: 'Homeowner taking a project photo in a living room before starting a renovation plan.',
@@ -49,7 +42,7 @@ const HOW_IT_WORKS = [
   {
     step: '02',
     title: 'Describe what you want',
-    desc: 'Tell naili what you want the space to feel like, what needs fixing, and what budget you want to respect.',
+    desc: 'Add style, fixes, and budget.',
     icon: Sparkles,
     image: '/imagery/step-describe-project.webp',
     alt: 'Project notes, finish samples, and color swatches laid out on a kitchen table.',
@@ -57,7 +50,7 @@ const HOW_IT_WORKS = [
   {
     step: '03',
     title: 'Get the full brief',
-    desc: 'See concepts, a smart estimate, materials guidance, and a contractor-ready brief built from your actual photo.',
+    desc: 'Get concepts, cost range, and scope.',
     icon: FileText,
     image: '/imagery/step-get-plan.webp',
     alt: 'Renovation planning materials, a laptop, and estimate paperwork arranged on a table.',
@@ -65,7 +58,7 @@ const HOW_IT_WORKS = [
   {
     step: '04',
     title: 'Get matched to local pros',
-    desc: 'When you are ready, naili uses that brief to match you with 2–3 local pros who can quote from the same scope.',
+    desc: 'Request 2–3 local pros when ready.',
     icon: Users,
     image: '/imagery/step-hire-confidence.webp',
     alt: 'Homeowner meeting a contractor at the front door with a clipboard in hand.',
@@ -200,16 +193,16 @@ export default function HomePage() {
               naili vision + shield
             </div>
             <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-              Skip the sales visits. Get your project priced and matched to pros who want it.
+              Start with a photo. Get clear scope before the sales calls.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/78 sm:text-xl">
-              Upload a photo, describe what you want, and naili builds your estimate, materials plan, and contractor-ready brief. Then we match you with 2–3 local pros who&apos;ve seen the brief before they even call.
+              Upload a space. Get a cost range, a clear brief, and matched pros when you want them.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
               <Link
                 href="/vision/start"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-6 py-3.5 text-base font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.28)] transition-opacity hover:opacity-95"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-7 py-4 text-base font-semibold text-white shadow-[0_18px_44px_rgba(31,124,247,0.32)] transition-opacity hover:opacity-95 sm:w-auto"
               >
                 <Camera className="h-5 w-5" />
                 Upload my project photo
@@ -217,9 +210,9 @@ export default function HomePage() {
               </Link>
               <Link
                 href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 px-6 py-3.5 text-base font-semibold text-white transition-colors hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 px-2 py-2 text-sm font-semibold text-white/88 transition-colors hover:text-white sm:justify-start"
               >
-                How it works
+                See how it works
               </Link>
             </div>
 
@@ -262,23 +255,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-slate-200 bg-white/70 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 py-4 text-sm font-medium text-slate-600 sm:px-6 lg:px-8">
-          {TRUST_POINTS.map((item) => (
-            <div key={item} className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#1f7cf7]" />
-              {item}
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section id="how-it-works" className="bg-[#f8f9fc] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">How it works</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Built for the jump from planning to matched pros.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">naili helps homeowners show up informed, specific, and much harder to jerk around, then uses that work to create a warmer lead for the right contractor.</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">4 quick steps.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">Take one photo, answer a few questions, and keep moving.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {HOW_IT_WORKS.map((item) => (
@@ -305,7 +287,7 @@ export default function HomePage() {
           <div className="mb-8 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Before + concept</p>
             <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">See the direction faster.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">Real spaces in, cleaner project concepts out.</p>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">Real spaces in, cleaner direction out.</p>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
             {EXAMPLE_SLIDERS.map((example, index) => (
@@ -335,8 +317,8 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Project types</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Pick the closest job type and keep moving.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">Kitchen, bath, paint, outdoor, or something custom. naili uses that choice to frame the first pass faster.</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Choose the closest job type.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">Pick the nearest match and keep moving.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {PROJECT_TYPES.map((type) => (
@@ -357,7 +339,7 @@ export default function HomePage() {
           <div className="max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">naili shield</p>
             <h2 className="mt-3 text-3xl font-bold sm:text-4xl">Still verify before you hire.</h2>
-            <p className="mt-4 text-lg leading-relaxed text-white/74">Matching helps you start cleaner. Shield helps you stay careful. Verify contractor licenses, scan quotes, review risky contract language, and slow bad decisions down before deposits or signatures happen.</p>
+            <p className="mt-4 text-lg leading-relaxed text-white/74">Verify licenses, scan quotes, and catch risky paperwork before deposits or signatures.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/shield" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d0d1a] transition-colors hover:bg-slate-100">
                 Explore shield <ArrowRight className="h-4 w-4" />
@@ -393,7 +375,7 @@ export default function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">For contractors</p>
             <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Free homeowner leads, already scoped.</h2>
             <p className="mt-3 max-w-2xl text-lg leading-relaxed text-slate-600">
-              If you are a contractor, naili can send warm homeowner leads with the brief already written. To receive those leads automatically and respond fast, sign up for Prybar.
+              For contractors, Naili can send leads with the photo, scope, and estimate context already attached.
             </p>
           </div>
           <div className="rounded-[2rem] border border-slate-200 bg-[#f8f9fc] p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
@@ -416,8 +398,8 @@ export default function HomePage() {
           <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Cost guides</p>
-              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Real guides for the most common project questions.</h2>
-              <p className="mt-3 text-lg leading-relaxed text-slate-600">Start broad with real ranges, then upload your own project when you want a tighter estimate and a brief that matches your actual space.</p>
+              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Cost guides for common projects.</h2>
+              <p className="mt-3 text-lg leading-relaxed text-slate-600">Start broad, then upload your own space for a tighter range.</p>
             </div>
             <Link href="/cost-guides" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
               Browse all guides <ArrowRight className="h-4 w-4" />
@@ -439,11 +421,8 @@ export default function HomePage() {
       <section className="bg-[#f8f9fc] py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)] lg:p-10">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built honestly</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">We would rather launch clean than fake traction.</h2>
-            <p className="mt-3 max-w-3xl text-lg leading-relaxed text-slate-600">
-              As Naili briefs turn into real contractor conversations and real Prybar signups, this section will fill with actual homeowner and contractor results. Until then, we are being explicit about what is live today and what still needs to be earned.
-            </p>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Live now</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">What you can use today.</h2>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               <div className="rounded-[1.5rem] border border-slate-200 bg-[#f8f9fc] p-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Live now</p>
@@ -469,7 +448,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">FAQ</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Questions homeowners usually ask before they start.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Questions before you start.</h2>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             {HOME_FAQS.map((faq) => (
@@ -486,7 +465,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl text-center mx-auto">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Pricing</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start with a photo, upgrade only if you want more planning depth.</h2>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Start free. Upgrade if you want more.</h2>
           </div>
           <div className="grid gap-5 lg:grid-cols-2">
             <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
@@ -500,7 +479,7 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/vision/start"
-                className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95"
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[linear-gradient(135deg,#1f7cf7_0%,#48c7f1_100%)] px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,124,247,0.24)] transition-opacity hover:opacity-95 sm:w-auto"
               >
                 Upload my project photo
                 <ArrowRight className="h-4 w-4" />
@@ -517,7 +496,7 @@ export default function HomePage() {
               </ul>
               <Link
                 href="/auth/signup"
-                className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl border border-[#9adfff] bg-white px-5 py-3 text-sm font-semibold text-[#0f5fc6] transition-colors hover:bg-[#eef8ff]"
+                className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#9adfff] bg-white px-5 py-3 text-sm font-semibold text-[#0f5fc6] transition-colors hover:bg-[#eef8ff] sm:w-auto"
               >
                 Create account
                 <ArrowRight className="h-4 w-4" />
@@ -532,15 +511,15 @@ export default function HomePage() {
           <div className="rounded-[2rem] border border-slate-200 bg-[linear-gradient(135deg,#0d2340_0%,#123964_45%,#165ca8_75%,#48c7f1_100%)] p-8 text-white shadow-[0_24px_90px_rgba(15,23,42,0.18)] sm:p-10">
             <div className="max-w-3xl">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">Start with a real project</p>
-              <h2 className="mt-3 text-3xl font-bold sm:text-4xl">If you have a photo and a project in mind, you have enough to start.</h2>
+              <h2 className="mt-3 text-3xl font-bold sm:text-4xl">A photo is enough to start.</h2>
               <p className="mt-4 text-lg leading-relaxed text-white/74">
-                Start with Vision for planning and scope clarity, then use Shield when it is time to verify the contractor and the paperwork.
+                Use Vision for the plan. Use Shield before you hire.
               </p>
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/vision/start"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100 sm:w-auto"
               >
                 <Camera className="h-5 w-5" />
                 Upload my project photo

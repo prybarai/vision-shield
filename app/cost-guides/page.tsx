@@ -30,10 +30,10 @@ export default function CostGuidesIndexPage() {
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/60">naili cost guides</p>
           <h1 className="mt-3 max-w-4xl text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-            Real project cost guides, then a custom estimate when you want one.
+            Cost guides for common projects.
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/78 sm:text-xl">
-            Start with the broad ranges, then upload your own space when you want a tighter brief, estimate, and contractor handoff.
+            Start with the broad range, then upload your own space for a tighter estimate.
           </p>
           <div className="mt-8">
             <Link href="/vision/start" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-[#0d2340] transition-colors hover:bg-slate-100">
@@ -47,8 +47,8 @@ export default function CostGuidesIndexPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Built for real planning</p>
-            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Five launch guides, each with clearer ranges, review context, and a path into Naili.</h2>
-            <p className="mt-3 text-lg leading-relaxed text-slate-600">These are broad planning guides, not final quotes. Each guide is reviewed, sourced, and paired with a direct path to upload your own space when you want a tighter range.</p>
+            <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">Five launch guides, ready to scan fast.</h2>
+            <p className="mt-3 text-lg leading-relaxed text-slate-600">Broad guides, not final quotes. Each one leads straight into Naili when you want project-specific numbers.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {COST_GUIDES.map((guide) => (

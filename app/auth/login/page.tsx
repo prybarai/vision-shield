@@ -66,7 +66,7 @@ export default function LoginPage() {
             <Logo theme="dark" className="mb-4" markClassName="h-12 w-[3.25rem]" taglineClassName="text-slate-300" />
             <h1 className="text-3xl font-bold mb-3">Welcome back to naili</h1>
             <p className="text-white/74 leading-relaxed mb-6">
-              Reopen saved projects, review estimates, and step back into contractor decisions without losing your place.
+              Reopen projects, review estimates, and pick up where you left off.
             </p>
             <div className="space-y-3 text-sm text-white/78">
               <div className="flex items-start gap-2"><Sparkles className="mt-0.5 h-4 w-4 text-[#a8eb57]" /><span>Vision results stay organized in one place.</span></div>
@@ -78,7 +78,7 @@ export default function LoginPage() {
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-8">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-[#0d0d1a]">Sign in</h2>
-            <p className="text-sm text-slate-500 mt-1">Use a magic link for the fastest login, or enter your password.</p>
+            <p className="text-sm text-slate-500 mt-1">Use a magic link or password.</p>
           </div>
 
           <div className="flex gap-2 rounded-2xl bg-[#f3f4ff] p-1 mb-6">

@@ -98,9 +98,9 @@ export default function ConnectPage() {
           <div>
             <h2 className="font-semibold text-slate-900 mb-2">What happens next</h2>
             <ul className="space-y-2 text-sm text-slate-700">
-              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">1.</span> Your request is stored with your timing and budget preferences.</li>
-              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">2.</span> You can keep using Shield while you decide who to trust.</li>
-              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">3.</span> If contractor routing is active, your request can move into follow-up from there.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">1.</span> We save your request with your timing and budget.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">2.</span> You can keep using Shield while you decide.</li>
+              <li className="flex items-start gap-2"><span className="text-[#1f7cf7]">3.</span> If routing is active, follow-up can start from there.</li>
             </ul>
           </div>
           <div className="rounded-xl bg-white/70 p-4 text-sm text-slate-700 flex items-start gap-3">
@@ -125,7 +125,7 @@ export default function ConnectPage() {
       <div className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7 shadow-sm mb-6">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Find a vetted contractor</h1>
         <p className="text-slate-600 leading-relaxed">
-          Use this when you want a safer second option after checking a contractor, scanning a quote, or deciding the first bid does not feel right. Like the rest of naili, this starts private by default.
+          Use this when you want a safer second option. It starts private by default.
         </p>
       </div>
 
@@ -188,7 +188,7 @@ export default function ConnectPage() {
         <Button type="submit" className="w-full" size="lg" loading={loading}>Request vetted options</Button>
 
         <p className="text-xs text-slate-500 text-center leading-relaxed">
-          If contractor routing is not configured yet, naili still saves your request without sending your details anywhere.
+          If routing is not configured yet, naili still saves your request without sending your details anywhere.
         </p>
       </form>
     </div>
