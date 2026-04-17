@@ -110,6 +110,47 @@ function getRegionalNotes(zip: string, _multiplier: number) {
   return getRegionalPricingContext(zip).notes;
 }
 
+function getRegionalAdjustment(category: string, zip: string) {
+  const context = getRegionalPricingContext(zip);
+  const materialPassThrough: Record<string, number> = {
+    interior_paint: 0.18,
+    exterior_paint: 0.2,
+    flooring: 0.42,
+    bathroom: 0.52,
+    kitchen: 0.58,
+    deck_patio: 0.35,
+    roofing: 0.34,
+    landscaping: 0.3,
+    custom_project: 0.4,
+  };
+  const materialMultiplier = 1 + ((context.multiplier - 1) * (materialPassThrough[category] ?? 0.35));
+
+  return {
+    laborMultiplier: context.multiplier,
+    materialMultiplier: Number(materialMultiplier.toFixed(2)),
+  };
+}
+
+function applyRegionalCosts(category: string, zip: string, labor: number, materials: number) {
+  const adjustment = getRegionalAdjustment(category, zip);
+  const adjustedLabor = labor * adjustment.laborMultiplier;
+  const adjustedMaterials = materials * adjustment.materialMultiplier;
+  const totalBefore = Math.max(labor + materials, 1);
+  const totalAfter = adjustedLabor + adjustedMaterials;
+
+  return {
+    labor: adjustedLabor,
+    materials: adjustedMaterials,
+    effectiveMultiplier: Number((totalAfter / totalBefore).toFixed(2)),
+  };
+}
+
+function applyRegionalToTotal(category: string, zip: string, total: number, laborShare: number) {
+  const labor = total * laborShare;
+  const materials = total - labor;
+  return applyRegionalCosts(category, zip, labor, materials);
+}
+
 function getQualityMultiplier(qualityTier: string, category?: string) {
   const categoryGroup = category === 'bathroom' || category === 'kitchen'
     ? 'remodel'
@@ -421,7 +462,6 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
 
   const paintScope = scopeAnswers.paint_scope || 'walls_only';
   const prepLevel = scopeAnswers.prep_level || 'light';
-  const zipMultiplier = getZipMultiplier(zip);
   const openingAdjustments = getPaintOpeningAdjustments(analysis?.scope_signals.window_count_visible);
   const wallAreaMultiplier = areaBucketMultiplier(analysis?.area_signals.wall_area_bucket, 0.85, 1.15);
 
@@ -454,16 +494,18 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
     labor *= openingAdjustments.trimLaborFactor;
   }
 
-  const midBeforeRegional = (labor + materials) * qualityAdjustment[qualityTier as QualityTier];
   const minimumByScope: Record<string, number> = {
     walls_only: room.key === 'small' ? 500 : room.key === 'medium' ? 900 : 1300,
     walls_and_ceiling: room.key === 'small' ? 800 : room.key === 'medium' ? 1200 : 1800,
     walls_ceiling_trim: room.key === 'small' ? 1100 : room.key === 'medium' ? 1700 : 2500,
   };
-  const mid = Math.max(midBeforeRegional * zipMultiplier, minimumByScope[paintScope] ?? 700);
+  const regionalized = applyRegionalCosts('interior_paint', zip, labor, materials);
+  const regionalLabor = regionalized.labor;
+  const regionalMaterials = regionalized.materials;
+  const mid = Math.max(regionalLabor + regionalMaterials, minimumByScope[paintScope] ?? 700);
   const spread = analysis?.confidence === 'low' ? 0.23 : room.key === 'small' && paintScope === 'walls_only' ? 0.16 : 0.19;
   const range = buildRange(mid, spread);
-  const laborShare = Math.min(0.82, Math.max(0.66, labor / Math.max(labor + materials, 1)));
+  const laborShare = Math.min(0.82, Math.max(0.66, regionalLabor / Math.max(regionalLabor + regionalMaterials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
 
   assumptions.push(
@@ -486,7 +528,8 @@ function estimateInteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
       'Exact wall measurements, trim detail, and number of doors/windows should be confirmed onsite before quoting',
     ],
     estimate_basis: withAnalysisBasis('Planning estimate based on likely paintable wall area, selected paint scope, prep intensity, visible window/opening deductions, trim-detail labor allowance, and ZIP-based pricing.', analysis),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -517,10 +560,15 @@ function estimateFlooring(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
   const demoRate = demoRequired === 'yes' ? (materialType === 'tile' ? 2.5 : 1.5) : 0;
   const transitionsAllowance = materialType === 'tile' ? 1.0 : 0.55;
   const wideComplexityFactor = analysis?.estimated_dimensions.width_bucket === 'wide' ? 1.05 : 1;
-  const zipMultiplier = getZipMultiplier(zip);
-  const labor = area * (rates.labor + demoRate + transitionsAllowance * 0.65) * wideComplexityFactor;
-  const materials = area * (rates.materials + transitionsAllowance * 0.35);
-  const mid = (labor + materials) * zipMultiplier;
+  const regionalized = applyRegionalCosts(
+    'flooring',
+    zip,
+    area * (rates.labor + demoRate + transitionsAllowance * 0.65) * wideComplexityFactor,
+    area * (rates.materials + transitionsAllowance * 0.35),
+  );
+  const labor = regionalized.labor;
+  const materials = regionalized.materials;
+  const mid = labor + materials;
   const spread = analysis?.confidence === 'low' ? 0.22 : materialType === 'tile' || demoRequired === 'yes' ? 0.18 : 0.14;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.68, Math.max(0.52, labor / Math.max(labor + materials, 1)));
@@ -547,7 +595,8 @@ function estimateFlooring(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
       'Tile layout, pattern changes, or moving heavy furniture/appliances can raise labor meaningfully',
     ],
     estimate_basis: withAnalysisBasis('Planning estimate based on likely room square footage, selected flooring installed price band, demolition scope, transitions/trim allowance, and ZIP-based pricing.', analysis),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -559,9 +608,9 @@ function estimateBathroom(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
   const baseMidByScope = getScopeMids('bathroom');
   const sizeMultiplierBySize: Record<string, number> = { small: 0.85, medium: 1.0, large: 1.25 };
   const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.16 : analysis?.current_condition === 'poor' ? 1.1 : analysis?.current_condition === 'dated' ? 1.05 : 1.0;
-  const zipMultiplier = getZipMultiplier(zip);
   const scopeMid = baseMidByScope[scopeLevel] ?? baseMidByScope.mid_refresh ?? 22000;
-  const mid = scopeMid * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier, 'bathroom') * conditionMultiplier * zipMultiplier;
+  const regionalized = applyRegionalToTotal('bathroom', zip, scopeMid * sizeMultiplierBySize[bathroomSize] * getQualityMultiplier(qualityTier, 'bathroom') * conditionMultiplier, 0.62);
+  const mid = regionalized.labor + regionalized.materials;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.24 : 0.2);
   const breakdown = buildEstimateBreakdown(range, 0.62);
   const assumptions = [
@@ -579,7 +628,8 @@ function estimateBathroom(scopeAnswers: ScopeAnswers, qualityTier: string, zip: 
       'Older bathrooms often uncover hidden substrate or water damage once opened up',
     ],
     estimate_basis: withAnalysisBasis('Scope-based planning estimate using bathroom remodel tier, size multiplier, visible condition, finish level, and ZIP multiplier.', analysis),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -591,9 +641,9 @@ function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
   const baseMidByScope = getScopeMids('kitchen');
   const sizeMultiplierBySize: Record<string, number> = { small: 0.85, medium: 1.0, large: 1.3 };
   const conditionMultiplier = analysis?.current_condition === 'damaged' ? 1.18 : analysis?.current_condition === 'poor' ? 1.12 : analysis?.current_condition === 'dated' ? 1.06 : 1.0;
-  const zipMultiplier = getZipMultiplier(zip);
   const scopeMid = baseMidByScope[scopeLevel] ?? baseMidByScope.mid_refresh ?? 42500;
-  const mid = scopeMid * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier, 'kitchen') * conditionMultiplier * zipMultiplier;
+  const regionalized = applyRegionalToTotal('kitchen', zip, scopeMid * sizeMultiplierBySize[kitchenSize] * getQualityMultiplier(qualityTier, 'kitchen') * conditionMultiplier, 0.58);
+  const mid = regionalized.labor + regionalized.materials;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.22 : 0.18);
   const breakdown = buildEstimateBreakdown(range, 0.58);
   const assumptions = [
@@ -611,7 +661,8 @@ function estimateKitchen(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
       'Countertop selection and custom storage details often change pricing late in planning',
     ],
     estimate_basis: withAnalysisBasis('Scope-based planning estimate using kitchen remodel tier, size multiplier, visible condition, finish level, and ZIP multiplier.', analysis),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -671,7 +722,6 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
   const baseMid = baseMidByScope[landscapeScope]?.[yardSize] ?? baseMidByScope.lawn_and_beds.medium;
   const hardscapeAdder = hardscapeAdders[hardscapeScope]?.[yardSize] ?? 0;
   const systemsAdder = systemsAdders[irrigationLighting]?.[yardSize] ?? 0;
-  const zipMultiplier = getZipMultiplier(zip);
   const qualityMultiplier = getQualityMultiplier(qualityTier, 'landscaping');
   const complexity = analysis?.complexity ?? 'moderate';
   const accessMultiplier = analysis?.scope_signals.access_difficulty === 'difficult'
@@ -680,7 +730,13 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
       ? 1.03
       : 1;
   const yardAreaMultiplier = areaBucketMultiplier(analysis?.area_signals.yard_area_bucket, 0.9, 1.18);
-  const mid = (baseMid + hardscapeAdder + systemsAdder) * qualityMultiplier * (complexityMultiplier[complexity] ?? 1.08) * accessMultiplier * yardAreaMultiplier * zipMultiplier;
+  const regionalized = applyRegionalToTotal(
+    'landscaping',
+    zip,
+    (baseMid + hardscapeAdder + systemsAdder) * qualityMultiplier * (complexityMultiplier[complexity] ?? 1.08) * accessMultiplier * yardAreaMultiplier,
+    0.6,
+  );
+  const mid = regionalized.labor + regionalized.materials;
   const spread = analysis?.confidence === 'low' ? 0.24 : hardscapeScope === 'new_hardscape' || landscapeScope === 'full_yard' ? 0.2 : 0.17;
   const range = buildRange(mid, spread);
   const breakdown = buildEstimateBreakdown(range, hardscapeScope === 'new_hardscape' ? 0.6 : 0.64);
@@ -718,7 +774,8 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
       'Exact bed area, plant count, sun exposure, soil condition, and any hardscape changes should be field-verified before quoting',
     ],
     estimate_basis: withAnalysisBasis('Planning estimate based on visible yard scope, landscape program, preserved hardscape assumptions, systems allowances, and ZIP-based pricing.', analysis, 4),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -762,8 +819,10 @@ function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: stri
 
   if (analysis?.scope_signals.access_difficulty === 'difficult') labor *= 1.1;
 
-  const zipMultiplier = getZipMultiplier(zip);
-  const mid = (labor + materials) * zipMultiplier;
+  const regionalized = applyRegionalCosts('deck_patio', zip, labor, materials);
+  labor = regionalized.labor;
+  materials = regionalized.materials;
+  const mid = labor + materials;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.22 : hasRailing ? 0.18 : 0.15);
   const laborShare = Math.min(0.72, Math.max(0.58, labor / Math.max(labor + materials, 1)));
   const breakdown = buildEstimateBreakdown(range, laborShare);
@@ -786,7 +845,8 @@ function estimateDeck(scopeAnswers: ScopeAnswers, qualityTier: string, zip: stri
       'Soil conditions, attachment details, and site access should be verified before quoting',
     ],
     estimate_basis: withAnalysisBasis('Planning estimate based on likely deck area, selected decking material, railing scope, and ZIP-based pricing.', analysis),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -834,8 +894,10 @@ function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
   labor *= laborMultiplier;
   if (complexity === 'high') materials *= 1.04;
 
-  const zipMultiplier = getZipMultiplier(zip);
-  const mid = (labor + materials) * zipMultiplier;
+  const regionalized = applyRegionalCosts('roofing', zip, labor, materials);
+  labor = regionalized.labor;
+  materials = regionalized.materials;
+  const mid = labor + materials;
   const spread = analysis?.confidence === 'low' ? 0.22 : materialType === 'metal' || complexity === 'high' ? 0.17 : 0.14;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.74, Math.max(0.58, labor / Math.max(labor + materials, 1)));
@@ -862,7 +924,8 @@ function estimateRoofing(scopeAnswers: ScopeAnswers, qualityTier: string, zip: s
       'Insurance scope, chimney/skylight work, and exact measurements should be confirmed onsite',
     ],
     estimate_basis: withAnalysisBasis('Planning estimate based on likely roof size, selected roofing material, tear-off scope, measured labor adjustments for stories/access/complexity, and ZIP-based pricing.', analysis),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -926,8 +989,10 @@ function estimateExteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
     materials *= 1.04;
   }
 
-  const zipMultiplier = getZipMultiplier(zip);
-  const mid = (labor + materials) * zipMultiplier;
+  const regionalized = applyRegionalCosts('exterior_paint', zip, labor, materials);
+  labor = regionalized.labor;
+  materials = regionalized.materials;
+  const mid = labor + materials;
   const spread = analysis.confidence === 'low' ? 0.22 : complexity === 'high' || stories >= 3 ? 0.18 : 0.15;
   const range = buildRange(mid, spread);
   const laborShare = Math.min(0.8, Math.max(0.68, labor / Math.max(labor + materials, 1)));
@@ -954,7 +1019,8 @@ function estimateExteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
       'Exact elevations, trim detail, shutters, detached structures, and paint condition should be confirmed onsite',
     ],
     estimate_basis: withAnalysisBasis('Planning estimate based on exterior surface size bucket, visible openings, story count, trim-detail complexity, finish tier, and ZIP-based pricing.', analysis, 4),
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -962,7 +1028,6 @@ function estimateExteriorPaint(scopeAnswers: ScopeAnswers, qualityTier: string, 
 function estimateCustomProject(category: string, qualityTier: string, zip: string, analysis?: VisionAnalysis, notes?: string): EstimateResult | null {
   if (category !== 'custom_project') return null;
 
-  const zipMultiplier = getZipMultiplier(zip);
   const trade = analysis?.suggested_trade ?? 'unknown';
   const locationType = analysis?.suggested_location_type ?? 'unknown';
   const sizeBucket = analysis?.estimated_size_bucket ?? 'medium';
@@ -995,14 +1060,16 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
         ...mapped.risk_notes,
       ],
       estimate_basis: `Custom project estimate, very explicitly inferred as ${mappedCategory.replace(/_/g, ' ')} from the uploaded image analysis${trade !== 'unknown' ? ` and inferred ${trade.replace(/_/g, ' ')} trade signal` : ''}.`,
-      regional_notes: getRegionalNotes(zip, zipMultiplier),
+      regional_notes: getRegionalNotes(zip, mapped.region_multiplier ?? getZipMultiplier(zip)),
+      region_multiplier: mapped.region_multiplier,
       estimate_breakdown: mapped.estimate_breakdown,
     };
   }
 
   const baseMidBySize: Record<string, number> = { small: 3500, medium: 9000, large: 18000 };
   const complexityMultiplier: Record<string, number> = { simple: 1.0, moderate: 1.25, complex: 1.6 };
-  const mid = (baseMidBySize[sizeBucket] ?? 9000) * (complexityMultiplier[complexity] ?? 1.25) * getQualityMultiplier(qualityTier, 'custom_project') * zipMultiplier;
+  const regionalized = applyRegionalToTotal('custom_project', zip, (baseMidBySize[sizeBucket] ?? 9000) * (complexityMultiplier[complexity] ?? 1.25) * getQualityMultiplier(qualityTier, 'custom_project'), 0.68);
+  const mid = regionalized.labor + regionalized.materials;
   const range = buildRange(mid, analysis?.confidence === 'low' ? 0.26 : 0.22);
   const breakdown = buildEstimateBreakdown(range, 0.68);
   const assumptions = [
@@ -1024,7 +1091,8 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
     estimate_basis: trade && trade !== 'unknown'
       ? `Custom project estimate based on mixed-scope remodel assumptions with an explicitly inferred ${trade.replace(/_/g, ' ')} trade from uploaded image analysis.`
       : 'Custom project estimate based on mixed-scope remodel assumptions from uploaded image analysis.',
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
@@ -1043,16 +1111,8 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
   };
 
   let mid = baseMid[category] ?? 15000;
-  const zipMultiplier = getZipMultiplier(zip);
   const scopeMultiplier = inferScopeMultiplierFromNotes(category, notes);
   const analysisMultiplier = getFallbackAnalysisMultiplier(category, analysis);
-
-  mid *= getQualityMultiplier(qualityTier, category);
-  mid *= scopeMultiplier;
-  mid *= analysisMultiplier;
-  mid *= zipMultiplier;
-
-  const range = buildRange(mid, getFallbackSpread(category, analysis, notes));
   const laborShareByCategory: Record<string, number> = {
     roofing: 0.62,
     exterior_paint: 0.74,
@@ -1064,6 +1124,14 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
     interior_paint: 0.76,
     custom_project: 0.68,
   };
+
+  mid *= getQualityMultiplier(qualityTier, category);
+  mid *= scopeMultiplier;
+  mid *= analysisMultiplier;
+  const regionalized = applyRegionalToTotal(category, zip, mid, laborShareByCategory[category] ?? 0.62);
+  mid = regionalized.labor + regionalized.materials;
+
+  const range = buildRange(mid, getFallbackSpread(category, analysis, notes));
   const breakdown = buildEstimateBreakdown(range, laborShareByCategory[category] ?? 0.62);
 
   return {
@@ -1081,8 +1149,8 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
       'Final contractor pricing may vary based on measurements and material selections',
     ],
     estimate_basis: 'Deterministic planning estimate based on category benchmarks, homeowner notes, calibrated finish tier, and region-aware ZIP pricing.',
-    regional_notes: getRegionalNotes(zip, zipMultiplier),
-    region_multiplier: zipMultiplier,
+    regional_notes: getRegionalNotes(zip, regionalized.effectiveMultiplier),
+    region_multiplier: regionalized.effectiveMultiplier,
     estimate_breakdown: breakdown,
   };
 }
