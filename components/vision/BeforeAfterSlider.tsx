@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 import { ArrowLeftRight } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface Props {
   afterImage: string;
   beforeLabel?: string;
   afterLabel?: string;
+  priority?: boolean;
 }
 
 export default function BeforeAfterSlider({
@@ -15,6 +17,7 @@ export default function BeforeAfterSlider({
   afterImage,
   beforeLabel = 'Before',
   afterLabel = 'After',
+  priority = false,
 }: Props) {
   const [position, setPosition] = useState(56);
   const safePosition = Math.min(88, Math.max(12, position));
@@ -22,12 +25,12 @@ export default function BeforeAfterSlider({
   return (
     <div className="rounded-[1.75rem] overflow-hidden border border-white/10 bg-[#111426] shadow-[0_24px_80px_rgba(15,23,42,0.24)]">
       <div className="relative aspect-[4/3] bg-slate-950">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={beforeImage} alt={beforeLabel} className="absolute inset-0 h-full w-full object-cover" />
+        <Image src={beforeImage} alt={beforeLabel} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" priority={priority} />
 
         <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${safePosition}%` }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={afterImage} alt={afterLabel} className="h-full w-full object-cover" style={{ width: `${100 / (safePosition / 100)}%`, maxWidth: 'none' }} />
+          <div className="relative h-full" style={{ width: `${100 / (safePosition / 100)}%`, maxWidth: 'none' }}>
+            <Image src={afterImage} alt={afterLabel} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" priority={priority} />
+          </div>
         </div>
 
         <div className="absolute inset-y-0" style={{ left: `calc(${safePosition}% - 1px)` }}>

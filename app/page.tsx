@@ -18,6 +18,7 @@ import {
   Users,
   Wrench,
 } from 'lucide-react';
+import BeforeAfterSlider from '@/components/vision/BeforeAfterSlider';
 import { absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -88,24 +89,26 @@ const COST_GUIDE_LINKS = [
   { title: 'How much does a kitchen remodel cost?', href: '/cost-guides/kitchen-remodel-cost' },
 ];
 
-const EXAMPLE_CARDS = [
-  {
-    eyebrow: 'Bathroom',
-    title: 'Start with a better brief, not a vague wish list',
-    before: 'Homeowner wants a cleaner, calmer bathroom but does not know what scope to ask contractors to price.',
-    after: 'naili organizes the scope, range, materials direction, and walk-through questions before the first quote.',
-  },
-  {
-    eyebrow: 'Kitchen',
-    title: 'Same footprint, fewer wasted conversations',
-    before: 'The homeowner has inspiration but no shared scope, so every contractor imagines a different job.',
-    after: 'naili gives every bidder the same starting brief, which makes quote comparisons much cleaner.',
-  },
+const EXAMPLE_SLIDERS = [
   {
     eyebrow: 'Exterior',
-    title: 'Match pros who already understand the project',
-    before: 'The homeowner has to explain the job from scratch on every call and still wonders what is missing.',
-    after: 'naili gets the project scoped first, then matches them to pros who can step in with context.',
+    title: 'From plain yard to a more usable outdoor plan',
+    beforeImage: '/imagery/example-backyard-before.webp',
+    afterImage: '/imagery/example-backyard-after.webp',
+    beforeLabel: 'Before photo',
+    afterLabel: 'Illustrative after',
+    summary:
+      'A real backyard photo becomes a more concrete direction for planting, lighting, layout, and contractor conversations.',
+  },
+  {
+    eyebrow: 'Interior',
+    title: 'From awkward spare room to a calmer finished direction',
+    beforeImage: '/imagery/example-attic-before.webp',
+    afterImage: '/imagery/example-attic-after.webp',
+    beforeLabel: 'Before photo',
+    afterLabel: 'Illustrative after',
+    summary:
+      'The room stays the same size and shape, but the visual direction gets cleaner, more specific, and easier to price.',
   },
 ];
 
@@ -306,30 +309,34 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Why the brief matters</p>
-              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">From unclear project to quote-ready scope.</h2>
-              <p className="mt-3 text-lg leading-relaxed text-slate-600">The faster you get from fuzzy idea to shared scope, the better every contractor conversation gets.</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">Real starting photos</p>
+              <h2 className="mt-3 text-3xl font-bold text-[#0d0d1a] sm:text-4xl">See how a rough space turns into a clearer direction.</h2>
+              <p className="mt-3 text-lg leading-relaxed text-slate-600">These examples start with real before photos. The “after” side shows illustrative concepts, not completed customer projects, so homeowners can see how Naili sharpens the brief before quotes begin.</p>
             </div>
             <Link href="/vision/start" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
               Start a project now <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid gap-4 lg:grid-cols-3">
-            {EXAMPLE_CARDS.map((card) => (
-              <div key={card.title} className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {EXAMPLE_SLIDERS.map((example, index) => (
+              <div key={example.title} className="overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.06)]">
                 <div className="bg-[linear-gradient(135deg,rgba(31,124,247,0.1),rgba(72,199,241,0.1))] p-6">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">{card.eyebrow}</p>
-                  <h3 className="mt-2 text-xl font-bold text-[#0d0d1a]">{card.title}</h3>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#48c7f1]">{example.eyebrow}</p>
+                  <h3 className="mt-2 text-xl font-bold text-[#0d0d1a]">{example.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600">{example.summary}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-0 border-t border-slate-200">
-                  <div className="border-r border-slate-200 p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Before</p>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-700">{card.before}</p>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">After</p>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-700">{card.after}</p>
-                  </div>
+                <div className="p-4 sm:p-5">
+                  <BeforeAfterSlider
+                    beforeImage={example.beforeImage}
+                    afterImage={example.afterImage}
+                    beforeLabel={example.beforeLabel}
+                    afterLabel={example.afterLabel}
+                    priority={index === 0}
+                  />
+                </div>
+                <div className="border-t border-slate-200 bg-[#f8f9fc] px-6 py-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Honest note</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">Real homeowner before photo. The after view is an illustrative planning concept, not a finished project photo.</p>
                 </div>
               </div>
             ))}
