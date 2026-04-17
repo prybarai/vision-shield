@@ -125,7 +125,7 @@ export default function ConnectPage() {
       <div className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7 shadow-sm mb-6">
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Find a vetted contractor</h1>
         <p className="text-slate-600 leading-relaxed">
-          Use this when you want a safer second option after checking a contractor, scanning a quote, or deciding the first bid does not feel right.
+          Use this when you want a safer second option after checking a contractor, scanning a quote, or deciding the first bid does not feel right. Like the rest of naili, this starts private by default.
         </p>
       </div>
 
@@ -138,7 +138,7 @@ export default function ConnectPage() {
           </div>
           <div className="mt-4 space-y-4">
             <Input label="Email" type="email" value={form.email} onChange={e => update('email', e.target.value)} required hint="Used for follow-up only." />
-            <Input label="Phone" type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="(555) 555-5555" required hint="Helpful if a vetted contractor is ready to reach out." />
+            <Input label="Phone (optional)" type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="(555) 555-5555" hint="Helpful, but we only share it after you confirm a specific contractor." />
             <Input label="Project ZIP code" value={form.zip_code} onChange={e => update('zip_code', e.target.value)} required hint="Helps route you to the right market when routing is available." />
           </div>
         </Card>
