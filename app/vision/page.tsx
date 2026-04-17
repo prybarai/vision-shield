@@ -73,9 +73,6 @@ export default function VisionPage() {
           </div>
 
           <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)]">
-            <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#0d2340]/55 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/90 backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 text-[#a8eb57]" /> Illustrative scene
-            </div>
             <Image src="/imagery/vision-hero.webp" alt="Homeowner reviewing a kitchen renovation idea while standing in the space." width={1600} height={1200} className="h-full w-full object-cover" priority />
           </div>
         </div>

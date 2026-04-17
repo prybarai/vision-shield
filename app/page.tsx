@@ -237,9 +237,6 @@ export default function HomePage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="relative overflow-hidden rounded-[1.75rem] border border-white/12 bg-white/10 shadow-[0_24px_90px_rgba(15,23,42,0.18)] backdrop-blur-xl sm:col-span-2">
-              <div className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-white/15 bg-[#0d2340]/55 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white/90 backdrop-blur">
-                <Camera className="h-3.5 w-3.5 text-[#a8eb57]" /> Illustrative scene
-              </div>
               <Image
                 src="/imagery/home-hero.webp"
                 alt="Homeowner photographing a dated bathroom before starting a renovation plan."
