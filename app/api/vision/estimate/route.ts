@@ -148,6 +148,44 @@ function inferScopeMultiplierFromNotes(category: string, notes?: string) {
   return 1;
 }
 
+function getFallbackAnalysisMultiplier(category: string, analysis?: VisionAnalysis) {
+  if (!analysis) return 1;
+
+  let multiplier = 1;
+
+  if (analysis.estimated_size_bucket === 'small') multiplier *= 0.86;
+  if (analysis.estimated_size_bucket === 'large') multiplier *= category === 'kitchen' || category === 'bathroom' ? 1.22 : 1.16;
+
+  if (analysis.current_condition === 'dated') multiplier *= 1.05;
+  if (analysis.current_condition === 'poor') multiplier *= 1.1;
+  if (analysis.current_condition === 'damaged') multiplier *= 1.16;
+
+  if (analysis.complexity === 'simple') multiplier *= 0.95;
+  if (analysis.complexity === 'complex') multiplier *= 1.12;
+
+  if ((category === 'roofing' || category === 'exterior_paint') && analysis.scope_signals.stories === 2) multiplier *= 1.05;
+  if ((category === 'roofing' || category === 'exterior_paint') && (analysis.scope_signals.stories ?? 1) >= 3) multiplier *= 1.1;
+  if (analysis.scope_signals.access_difficulty === 'difficult') multiplier *= 1.05;
+
+  return Number(multiplier.toFixed(2));
+}
+
+function getFallbackSpread(category: string, analysis?: VisionAnalysis, notes?: string) {
+  let spread = category === 'kitchen' || category === 'bathroom'
+    ? 0.2
+    : category === 'roofing' || category === 'deck_patio'
+      ? 0.18
+      : 0.16;
+
+  if (analysis?.confidence === 'low') spread += 0.04;
+  if (analysis?.confidence === 'high') spread -= 0.02;
+  if (analysis?.complexity === 'complex') spread += 0.03;
+  if (/(gut|full remodel|layout change|structural|premium|luxury)/i.test(notes || '')) spread += 0.03;
+  if (/(repair|touch up|cosmetic|single room|partial)/i.test(notes || '')) spread -= 0.02;
+
+  return Math.min(0.28, Math.max(0.12, Number(spread.toFixed(2))));
+}
+
 function areaBucketMultiplier(bucket: AreaBucket, low = 0.85, high = 1.15) {
   if (bucket === 'low') return low;
   if (bucket === 'high') return high;
@@ -941,7 +979,7 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
     : null;
 
   if (mappedCategory) {
-    const mapped = fallbackEstimate(mappedCategory, qualityTier, zip, notes);
+    const mapped = fallbackEstimate(mappedCategory, qualityTier, zip, notes, analysis);
     const assumptions = [
       `Custom project scope was inferred most closely as ${mappedCategory.replace(/_/g, ' ')} from uploaded photo analysis and homeowner notes`,
       ...mapped.assumptions,
@@ -991,7 +1029,7 @@ function estimateCustomProject(category: string, qualityTier: string, zip: strin
   };
 }
 
-function fallbackEstimate(category: string, qualityTier: string, zip: string, notes?: string): EstimateResult {
+function fallbackEstimate(category: string, qualityTier: string, zip: string, notes?: string, analysis?: VisionAnalysis): EstimateResult {
   const baseMid: Record<string, number> = {
     roofing: 14000,
     exterior_paint: 6500,
@@ -1007,12 +1045,14 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
   let mid = baseMid[category] ?? 15000;
   const zipMultiplier = getZipMultiplier(zip);
   const scopeMultiplier = inferScopeMultiplierFromNotes(category, notes);
+  const analysisMultiplier = getFallbackAnalysisMultiplier(category, analysis);
 
   mid *= getQualityMultiplier(qualityTier, category);
   mid *= scopeMultiplier;
+  mid *= analysisMultiplier;
   mid *= zipMultiplier;
 
-  const range = buildRange(mid, 0.22);
+  const range = buildRange(mid, getFallbackSpread(category, analysis, notes));
   const laborShareByCategory: Record<string, number> = {
     roofing: 0.62,
     exterior_paint: 0.74,
@@ -1033,6 +1073,8 @@ function fallbackEstimate(category: string, qualityTier: string, zip: string, no
       `Typical labor rates for ZIP ${zip}`,
       `Standard scope for a ${category.replace(/_/g, ' ')} project`,
       notes ? 'Included homeowner notes in planning assumptions' : 'No unusual site constraints assumed',
+      analysis?.estimated_size_bucket ? `Photo analysis suggested a ${analysis.estimated_size_bucket} scope size` : 'No photo size bucket was available for fallback sizing',
+      analysis?.current_condition && analysis.current_condition !== 'unknown' ? `Visible condition reads ${analysis.current_condition}` : 'Visible condition was treated as standard',
     ],
     risk_notes: [
       'Hidden damage, code upgrades, or site conditions can increase costs',
@@ -1082,7 +1124,7 @@ export async function POST(req: NextRequest) {
     let result = estimateDeterministically(params.category, params.scope_answers, params.quality_tier, params.zip_code, analysis, params.notes);
 
     if (!result) {
-      result = fallbackEstimate(params.category, params.quality_tier, params.zip_code, params.notes);
+      result = fallbackEstimate(params.category, params.quality_tier, params.zip_code, params.notes, analysis);
     }
 
     if (analysis) {
