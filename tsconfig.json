@@ -24,9 +24,22 @@
   "app/**/*.ts",
   "app/**/*.tsx",
   "components/*.tsx",
-  "lib/utils.ts",
-  "lib/useProjectStorage.ts",
+  "components/ui/**/*.tsx",
+  "components/vision/**/*.tsx",
+  "lib/**/*.ts",
+  "lib/**/*.tsx",
+  "types/**/*.ts",
   ".next/types/**/*.ts"
  ],
- "exclude": ["node_modules", "legacy_disabled/**/*"]
+ "exclude": [
+  "node_modules",
+  "legacy_disabled/**/*",
+  "components/layout/**/*",
+  "components/providers/**/*",
+  "components/shield/**/*",
+  "components/vision/MaterialsCartPolished.tsx",
+  "components/vision/NailiOrchestrator.tsx",
+  "components/vision/ProjectAutoSaver.tsx",
+  "components/vision/VisionRevealPolished.tsx"
+ ]
 }

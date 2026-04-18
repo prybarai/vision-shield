@@ -156,7 +156,7 @@ export default function VisionResultsView({
   const materialsMid = estimate?.estimate_breakdown?.materials_mid ?? (estimate ? Math.round(estimate.mid_estimate * 0.3) : 0);
   const permitsMid = estimate ? derivePermitAllowance(estimate) : 0;
   const contingencyMid = estimate ? deriveContingency(estimate) : 0;
-  const matchHref = `/vision/results/${projectId}/connect?zip=${encodeURIComponent(project.zip_code)}`;
+  const matchHref = `/pro?zip=${encodeURIComponent(project.zip_code)}`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -488,8 +488,8 @@ export default function VisionResultsView({
             >
               Request local contractor options <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
-            <Link href="/shield/check" className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/15">
-              Verify a contractor first
+            <Link href="/pro" className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/15">
+              Explore pro support
             </Link>
           </div>
         </div>
