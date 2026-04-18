@@ -1,109 +1,146 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { formatCurrencyRange } from "@/lib/utils";
 
-const CASES = [
- {
- room: "Bathroom",
- mood: "Spa Calm · Organic Minimal",
- before: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=800&q=80",
- after: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=800&q=80",
- range: "$480 – $1,450",
- verdict: "DIY",
- },
- {
- room: "Kitchen",
- mood: "Warm Modern · Entertaining Ready",
- before: "https://images.unsplash.com/photo-1556909172-8c2f041fca00?w=800&q=80",
- after: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
- range: "$4,200 – $9,800",
- verdict: "Pro",
- },
- {
- room: "Living room",
- mood: "Quiet Luxury · Light + Airy",
- before: "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=800&q=80",
- after: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
- range: "$680 – $2,100",
- verdict: "DIY",
- },
-];
+type ProjectRow = {
+ id: string;
+ project_category: string;
+ created_at: string;
+ uploaded_image_urls: string[] | null;
+ generated_image_urls: string[] | null;
+ notes?: string | null;
+};
 
-export default function Showcase() {
+type EstimateRow = {
+ project_id: string;
+ low_estimate: number;
+ high_estimate: number;
+ created_at: string;
+};
+
+function toTitle(value: string) {
+ return value.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+export default async function Showcase() {
+ const { data: projectsData } = await supabaseAdmin
+  .from("projects")
+  .select("id, project_category, created_at, uploaded_image_urls, generated_image_urls, notes")
+  .order("created_at", { ascending: false })
+  .limit(3);
+
+ const projects = (projectsData || []) as ProjectRow[];
+ const projectIds = projects.map((project) => project.id);
+
+ const { data: estimatesData } = projectIds.length > 0
+  ? await supabaseAdmin
+    .from("estimates")
+    .select("project_id, low_estimate, high_estimate, created_at")
+    .in("project_id", projectIds)
+    .order("created_at", { ascending: false })
+  : { data: [] as EstimateRow[] };
+
+ const estimateByProject = new Map<string, EstimateRow>();
+ (estimatesData as EstimateRow[] | null || []).forEach((estimate) => {
+  if (!estimateByProject.has(estimate.project_id)) {
+   estimateByProject.set(estimate.project_id, estimate);
+  }
+ });
+
  return (
- <section className="section relative bg-canvas-200/60 border-y border-hairline">
- <div className="max-w-7xl mx-auto">
- <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
- <div className="max-w-xl">
- <span className="mono-label">recent transformations</span>
- <h2 className="font-display text-4xl md:text-5xl tracking-tight text-ink mt-2 leading-[1.05]">
- Real homes. Naili-read rooms.
- </h2>
- </div>
- <Link href="/my-projects" className="btn-ghost self-start md:self-end">
- Open Vision Board
- <ArrowRight className="w-4 h-4" />
- </Link>
- </div>
+  <section className="section relative border-y border-hairline bg-canvas-200/60">
+   <div className="mx-auto max-w-7xl">
+    <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+     <div className="max-w-2xl">
+      <span className="mono-label">recent real projects</span>
+      <h2 className="mt-2 font-display text-4xl leading-[1.05] tracking-tight text-ink md:text-5xl">
+       Recent projects created in the real Naili pipeline.
+      </h2>
+      <p className="mt-4 text-sm text-ink-600 md:text-base">
+       These cards are pulled from actual project records and live estimates, not placeholder cases.
+      </p>
+     </div>
+     <Link href="/my-projects" className="btn-ghost self-start md:self-end">
+      Open Vision Board
+      <ArrowRight className="w-4 h-4" />
+     </Link>
+    </div>
 
- <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
- {CASES.map((c, i) => (
- <motion.div
- key={c.room}
- initial={{ opacity: 0, y: 14 }}
- whileInView={{ opacity: 1, y: 0 }}
- viewport={{ once: true, margin: "-5% 0px" }}
- transition={{ duration: 0.7, delay: i * 0.1, ease: [0.2, 0.8, 0.2, 1] }}
- className="group relative rounded-3xl overflow-hidden bg-canvas-50 border border-hairline hover:shadow-lift transition-all duration-500"
- >
- {/* Split image */}
- <div className="relative aspect-[4/3] overflow-hidden">
- {/* eslint-disable-next-line @next/next/no-img-element */}
- <img
- src={c.before}
- alt={`${c.room} before`}
- className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
- />
- <div
- className="absolute inset-0 transition-all duration-700 group-hover:[clip-path:inset(0_0_0_0%)]"
- style={{ clipPath: "inset(0 0 0 50%)" }}
- >
- {/* eslint-disable-next-line @next/next/no-img-element */}
- <img
- src={c.after}
- alt={`${c.room} after`}
- className="absolute inset-0 w-full h-full object-cover"
- />
- </div>
+    {projects.length === 0 ? (
+     <div className="rounded-3xl border border-hairline bg-canvas-50 p-8 text-center text-ink-600 shadow-soft">
+      No real projects yet. Start one above and it will appear here.
+     </div>
+    ) : (
+     <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      {projects.map((project) => {
+       const estimate = estimateByProject.get(project.id);
+       const beforeImage = project.uploaded_image_urls?.[0] || project.generated_image_urls?.[0] || null;
+       const afterImage = project.generated_image_urls?.[0] || null;
 
- {/* Labels */}
- <div className="absolute top-3 left-3">
- <span className="mono-label !text-canvas-50 bg-graphite-700/70 backdrop-blur px-2 py-0.5 rounded">current</span>
- </div>
- <div className="absolute top-3 right-3">
- <span className="mono-label !text-ink bg-sand/90 backdrop-blur px-2 py-0.5 rounded">vision</span>
- </div>
+       return (
+        <Link
+         key={project.id}
+         href={`/vision/results/${project.id}`}
+         className="group relative overflow-hidden rounded-3xl border border-hairline bg-canvas-50 transition-all duration-500 hover:shadow-lift"
+        >
+         <div className="relative aspect-[4/3] overflow-hidden bg-graphite-700">
+          {beforeImage ? (
+           // eslint-disable-next-line @next/next/no-img-element
+           <img
+            src={beforeImage}
+            alt={`${toTitle(project.project_category)} project`}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+           />
+          ) : (
+           <div className="absolute inset-0 flex items-center justify-center text-sm text-canvas-50/70">No image yet</div>
+          )}
 
- {/* Verdict badge */}
- <div className="absolute bottom-3 right-3 bg-graphite-700/80 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10">
- <span className="mono-label !text-mint">{c.verdict.toLowerCase()} viable</span>
- </div>
- </div>
+          {afterImage && beforeImage && afterImage !== beforeImage && (
+           <div
+            className="absolute inset-0 transition-all duration-700 group-hover:[clip-path:inset(0_0_0_0%)]"
+            style={{ clipPath: "inset(0 0 0 50%)" }}
+           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+             src={afterImage}
+             alt={`${toTitle(project.project_category)} concept`}
+             className="absolute inset-0 h-full w-full object-cover"
+            />
+           </div>
+          )}
 
- {/* Meta */}
- <div className="p-5">
- <span className="mono-label">{c.mood}</span>
- <div className="flex items-end justify-between mt-1">
- <h3 className="font-display text-2xl text-ink tracking-tight">{c.room} refresh</h3>
- <span className="font-display text-lg text-ink-600 tabular-nums">{c.range}</span>
- </div>
- </div>
- </motion.div>
- ))}
- </div>
- </div>
- </section>
+          <div className="absolute left-3 top-3 rounded-full bg-graphite-700/75 px-2 py-0.5 backdrop-blur">
+           <span className="mono-label !text-canvas-50">{toTitle(project.project_category)}</span>
+          </div>
+          {afterImage && beforeImage && afterImage !== beforeImage && (
+           <div className="absolute right-3 top-3 rounded-full bg-sand/90 px-2 py-0.5 backdrop-blur">
+            <span className="mono-label !text-ink">concept ready</span>
+           </div>
+          )}
+         </div>
+
+         <div className="p-5">
+          <div className="flex items-end justify-between gap-3">
+           <h3 className="font-display text-2xl tracking-tight text-ink">{toTitle(project.project_category)}</h3>
+           <span className="mono-label">{new Date(project.created_at).toLocaleDateString()}</span>
+          </div>
+          <p className="mt-3 line-clamp-2 text-sm text-ink-600">
+           {project.notes?.trim() || "Open this real project to review the live estimate, concept, and brief."}
+          </p>
+          <div className="mt-4 border-t border-hairline pt-4">
+           <span className="mono-label">estimate</span>
+           <div className="mt-1 font-display text-lg text-ink">
+            {estimate ? formatCurrencyRange(estimate.low_estimate, estimate.high_estimate) : "Generating"}
+           </div>
+          </div>
+        </div>
+       </Link>
+       );
+      })}
+     </div>
+    )}
+   </div>
+  </section>
  );
 }
