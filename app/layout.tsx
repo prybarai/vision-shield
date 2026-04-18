@@ -1,10 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
  title: "Naili — The intelligence layer for home transformation",
  description:
  "Upload a photo of your space. Get a vision, a scope, and a realistic next move — whether that means DIY or bringing in the right pro.",
+};
+
+export const viewport: Viewport = {
  themeColor: "#F6F3EE",
 };
 
