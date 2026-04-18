@@ -1,62 +1,23 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import Header from '@/components/layout/Header';
-import Footer from '@/components/layout/Footer';
-import QueryProvider from '@/components/providers/QueryProvider';
-import PostHogProvider from '@/components/providers/PostHogProvider';
-import { SITE_URL } from '@/lib/site';
-
-const inter = Inter({ subsets: ['latin'] });
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: {
-    default: 'naili — Nail the vision. Know the cost.',
-    template: '%s | naili',
-  },
-  description:
-    'naili helps homeowners plan home projects with confidence — AI-powered estimates, contractor verification, and contract protection. Nail it before anyone shows up.',
-  keywords: [
-    'home renovation estimate',
-    'contractor verification',
-    'home project planning',
-    'AI home estimate',
-    'how much does renovation cost',
-    'find trusted contractor',
-    'naili',
-  ],
-  metadataBase: new URL(SITE_URL),
-  openGraph: {
-    siteName: 'naili',
-    title: 'naili — Nail the vision. Know the cost.',
-    description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
-    url: SITE_URL,
-    images: ['/og-naili.png'],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'naili — Nail the vision. Know the cost.',
-    description: 'AI-powered home project planning. Know what it costs, trust who you hire.',
-    images: ['/og-naili.png'],
-  },
+ title: "Naili — The intelligence layer for home transformation",
+ description:
+ "Upload a photo of your space. Get a vision, a scope, and a realistic next move — whether that means DIY or bringing in the right pro.",
+ themeColor: "#F6F3EE",
 };
 
 export default function RootLayout({
-  children,
+ children,
 }: {
-  children: React.ReactNode;
+ children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-[#f8f9fc] text-[#0d0d1a] flex flex-col`}>
-        <PostHogProvider>
-          <QueryProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </QueryProvider>
-        </PostHogProvider>
-      </body>
-    </html>
-  );
+ return (
+ <html lang="en">
+ <body className="relative min-h-screen overflow-x-hidden">
+ {children}
+ </body>
+ </html>
+ );
 }
