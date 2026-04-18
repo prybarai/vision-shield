@@ -3,6 +3,7 @@
 import { ProjectProvider } from '@/lib/ProjectContext';
 import StepNavigator from '@/components/vision/StepNavigator';
 import ProjectAutoSaver from '@/components/vision/ProjectAutoSaver';
+import ImageUpload from '@/components/vision/ImageUpload';
 import VisionReveal from '@/components/vision/VisionReveal';
 import StyleQuizBubbles from '@/components/vision/StyleQuizBubbles';
 import ProjectFateCard from '@/components/vision/ProjectFateCard';
@@ -11,17 +12,14 @@ import MaterialsCart from '@/components/vision/MaterialsCart';
 import { useProject, useProjectActions } from '@/lib/ProjectContext';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Upload, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 function UnifiedFlowContent() {
   const { state, goToStep } = useProject();
   const { setUploadedImage, setUserDescription } = useProjectActions();
   const [showClarificationModal, setShowClarificationModal] = useState(false);
 
-  const handleUpload = () => {
-    // Simulate upload
-    setUploadedImage('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
-    setUserDescription('Small bathroom refresh with new vanity, lighting, and tile');
+  const handleUploadComplete = (imageUrl: string) => {
     goToStep('quiz');
   };
 
@@ -43,63 +41,7 @@ function UnifiedFlowContent() {
     switch (state.currentStep) {
       case 'upload':
         return (
-          <div className="text-center">
-            <div className="mx-auto max-w-2xl">
-              <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#1E3A8A]/10 to-[#FF6B35]/10 px-4 py-2">
-                <Sparkles className="h-4 w-4 text-[#1E3A8A]" />
-                <span className="text-sm font-semibold text-[#1E3A8A]">Step 1: The Magic Begins</span>
-              </div>
-              <h2 className="text-3xl font-bold text-slate-900">
-                Upload a photo of your space
-              </h2>
-              <p className="mt-3 text-lg text-slate-600">
-                Naili will scan it with AI and create a visual concept you can swipe between
-              </p>
-
-              <div className="mt-10">
-                <div className="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-12">
-                  <div className="mx-auto max-w-sm">
-                    <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#eef8ff]">
-                      <Upload className="h-10 w-10 text-[#1E3A8A]" />
-                    </div>
-                    <h3 className="mb-3 text-xl font-semibold text-slate-900">Demo Mode</h3>
-                    <p className="mb-6 text-slate-600">
-                      Using a sample bathroom photo to show the Naili experience
-                    </p>
-                    <button
-                      onClick={handleUpload}
-                      className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#1E3A8A] to-[#FF6B35] px-6 py-3 font-semibold text-white transition-all hover:scale-105 hover:shadow-lg"
-                    >
-                      <Sparkles className="h-5 w-5" />
-                      Start the Demo Experience
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                  <h4 className="mb-3 font-semibold text-slate-900">What happens next?</h4>
-                  <ul className="space-y-3 text-left text-sm text-slate-700">
-                    <li className="flex gap-3">
-                      <span className="text-[#1E3A8A]">✨</span>
-                      <span><strong>LIDAR Scan Effect:</strong> Watch as AI analyzes every detail of your photo</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="text-[#1E3A8A]">🎨</span>
-                      <span><strong>Style Quiz:</strong> Pick 3 vibes to personalize your concept</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="text-[#1E3A8A]">⚖️</span>
-                      <span><strong>Project Fate:</strong> See if Naili recommends DIY or professional help</span>
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="text-[#1E3A8A]">🛒</span>
-                      <span><strong>Shopping List:</strong> Get curated materials with affiliate links</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ImageUpload onUploadComplete={handleUploadComplete} />
         );
 
       case 'quiz':
