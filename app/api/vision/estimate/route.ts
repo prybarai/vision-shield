@@ -695,28 +695,31 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
   const landscapeScope = scopeAnswers.landscape_scope || 'lawn_and_beds';
   const hardscapeScope = scopeAnswers.hardscape_scope || 'preserve_existing';
   const irrigationLighting = scopeAnswers.irrigation_lighting || 'none';
+  const isFrontExterior = analysis?.project_area === 'front_exterior';
+  const visibleConstraints = getVisibleSiteConstraints(analysis);
+  const hasFixedFrontHardscape = visibleConstraints.some((item) => item === 'driveway' || item === 'walkway' || item === 'steps');
 
   if (!analysis && Object.keys(scopeAnswers).length === 0) return null;
 
   const baseMidByScope: Record<string, Record<SizeKey, number>> = {
-    refresh_beds: { small: 3200, medium: 6500, large: 11000 },
-    lawn_and_beds: { small: 6200, medium: 12000, large: 22000 },
-    full_yard: { small: 9800, medium: 19000, large: 36000 },
+    refresh_beds: { small: 2600, medium: 5200, large: 8800 },
+    lawn_and_beds: { small: 4800, medium: 9200, large: 16800 },
+    full_yard: { small: 7600, medium: 14500, large: 25500 },
   };
   const hardscapeAdders: Record<string, Record<SizeKey, number>> = {
     preserve_existing: { small: 0, medium: 0, large: 0 },
-    light_updates: { small: 1800, medium: 4200, large: 7600 },
-    new_hardscape: { small: 7000, medium: 14000, large: 26000 },
+    light_updates: { small: 1200, medium: 2800, large: 5200 },
+    new_hardscape: { small: 4200, medium: 9000, large: 17000 },
   };
   const systemsAdders: Record<string, Record<SizeKey, number>> = {
     none: { small: 0, medium: 0, large: 0 },
-    irrigation: { small: 1800, medium: 3500, large: 6200 },
-    irrigation_and_lighting: { small: 3800, medium: 7200, large: 12400 },
+    irrigation: { small: 1200, medium: 2400, large: 4200 },
+    irrigation_and_lighting: { small: 2400, medium: 4700, large: 7800 },
   };
   const complexityMultiplier: Record<string, number> = {
-    simple: 0.96,
-    moderate: 1.08,
-    complex: 1.22,
+    simple: 0.95,
+    moderate: 1.02,
+    complex: 1.12,
   };
 
   const baseMid = baseMidByScope[landscapeScope]?.[yardSize] ?? baseMidByScope.lawn_and_beds.medium;
@@ -730,17 +733,24 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
       ? 1.03
       : 1;
   const yardAreaMultiplier = areaBucketMultiplier(analysis?.area_signals.yard_area_bucket, 0.9, 1.18);
+  const frontExteriorMultiplier = isFrontExterior ? 0.84 : 1;
+  const preservedHardscapeMultiplier = hasFixedFrontHardscape && hardscapeScope === 'preserve_existing' ? 0.93 : 1;
   const regionalized = applyRegionalToTotal(
     'landscaping',
     zip,
-    (baseMid + hardscapeAdder + systemsAdder) * qualityMultiplier * (complexityMultiplier[complexity] ?? 1.08) * accessMultiplier * yardAreaMultiplier,
+    (baseMid + hardscapeAdder + systemsAdder)
+      * qualityMultiplier
+      * (complexityMultiplier[complexity] ?? 1.02)
+      * accessMultiplier
+      * yardAreaMultiplier
+      * frontExteriorMultiplier
+      * preservedHardscapeMultiplier,
     0.6,
   );
   const mid = regionalized.labor + regionalized.materials;
   const spread = analysis?.confidence === 'low' ? 0.24 : hardscapeScope === 'new_hardscape' || landscapeScope === 'full_yard' ? 0.2 : 0.17;
   const range = buildRange(mid, spread);
   const breakdown = buildEstimateBreakdown(range, hardscapeScope === 'new_hardscape' ? 0.6 : 0.64);
-  const visibleConstraints = getVisibleSiteConstraints(analysis);
 
   const assumptions = [
     `${yardSize} landscaping scope sized around a ${landscapeScope.replace(/_/g, ' ')}`,
@@ -760,6 +770,9 @@ function estimateLandscaping(scopeAnswers: ScopeAnswers, qualityTier: string, zi
     visibleConstraints.length > 0
       ? `Visible fixed-site constraints like ${visibleConstraints.join(', ')} were treated as keep-in-place elements unless explicitly changed`
       : 'Visible hardscape and circulation areas were treated as keep-in-place unless explicitly changed',
+    isFrontExterior
+      ? 'Front-exterior photo signal kept the pricing anchored to a curb-appeal scale unless larger work was explicitly selected'
+      : 'Landscape footprint was treated as the visible outdoor project area rather than the whole property unless explicitly selected',
     analysis?.scope_signals.access_difficulty === 'difficult'
       ? 'Difficult site access increased installation labor modestly'
       : 'Normal landscaping access assumed',
