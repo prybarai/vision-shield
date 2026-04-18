@@ -324,6 +324,15 @@ const PHOTO_TIPS = [
   'Avoid heavy filters, screenshots, or blurry images',
 ];
 
+const STEP_DISPLAY_LABELS: Record<Step, string> = {
+  entry: 'Photo',
+  category: 'Project',
+  scope: 'Scope',
+  style: 'Style',
+  quality: 'Finish',
+  loading: 'Analyze',
+};
+
 export default function VisionStartFlow() {
   const router = useRouter();
   const [step, setStep] = useState<Step>('entry');
@@ -656,35 +665,49 @@ export default function VisionStartFlow() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6">
       {step !== 'loading' && (
-        <div className="mb-8 rounded-3xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-8 overflow-hidden rounded-[2rem] border border-sky-100 bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_48%,#f2fbff_100%)] p-5 shadow-[0_20px_70px_rgba(15,23,42,0.08)] sm:p-7">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#1f7cf7] mb-1">naili vision</p>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Start your project from a real photo</h1>
-              <p className="text-sm sm:text-base text-slate-600 mt-2 max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#0f5fc6] shadow-sm">
+                <Sparkles className="h-3.5 w-3.5" />
+                naili vision
+              </div>
+              <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Start your project from a real photo</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
                 naili reads the actual photo with your request first, then turns that analysis into a cost range, materials plan, contractor brief, and a fast first concept.
               </p>
             </div>
-            <div className="flex items-center gap-2 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              <ShieldCheck className="h-4 w-4 text-slate-900" />
-              Private by default, no contractor outreach yet
+            <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[360px]">
+              <div className="rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Estimate</div>
+                <div className="mt-1 font-semibold text-slate-900">ZIP-adjusted pricing</div>
+              </div>
+              <div className="flex items-center gap-2 rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm">
+                <ShieldCheck className="h-4 w-4 text-slate-900" />
+                Private by default
+              </div>
             </div>
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2 overflow-x-auto pb-1">
             {visibleSteps.map((s, i) => (
               <div key={s} className="flex items-center gap-2 min-w-fit">
-                <div
-                  className={cn(
-                    'w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors',
-                    currentVisibleStepIndex > i
-                      ? 'bg-[#1f7cf7] text-white'
-                      : currentVisibleStepIndex === i
-                      ? 'bg-[#1f7cf7] text-white ring-4 ring-[#d7f4ff]'
-                      : 'bg-slate-200 text-slate-500'
-                  )}
-                >
-                  {currentVisibleStepIndex > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                <div className="flex min-w-[72px] flex-col items-center gap-2">
+                  <div
+                    className={cn(
+                      'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors',
+                      currentVisibleStepIndex > i
+                        ? 'bg-[#1f7cf7] text-white'
+                        : currentVisibleStepIndex === i
+                        ? 'bg-[#1f7cf7] text-white ring-4 ring-[#d7f4ff]'
+                        : 'bg-slate-200 text-slate-500'
+                    )}
+                  >
+                    {currentVisibleStepIndex > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
+                  </div>
+                  <div className={cn('text-xs font-semibold', currentVisibleStepIndex >= i ? 'text-slate-900' : 'text-slate-400')}>
+                    {STEP_DISPLAY_LABELS[s]}
+                  </div>
                 </div>
                 {i < visibleSteps.length - 1 && (
                   <div className={cn('h-0.5 w-8 sm:w-12', currentVisibleStepIndex > i ? 'bg-[#1f7cf7]' : 'bg-slate-200')} />
@@ -697,9 +720,10 @@ export default function VisionStartFlow() {
 
       {step === 'entry' && (
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-          <Card className="p-5 sm:p-6">
+          <Card className="border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-5 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-6">
             <div className="mb-5">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Show naili your space</h2>
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#eef8ff] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#0f5fc6]">01 Upload your photo</div>
+              <h2 className="mb-2 mt-3 text-2xl font-bold text-slate-900">Show naili your space</h2>
               <p className="text-slate-600">One clear photo is enough to start. Add your ZIP code so the estimate uses local pricing, not a generic national average.</p>
             </div>
 
@@ -774,6 +798,31 @@ export default function VisionStartFlow() {
           </Card>
 
           <div className="space-y-4">
+            <Card className="border-sky-100 bg-[linear-gradient(135deg,#eef8ff_0%,#ffffff_58%,#f7fef0_100%)] p-5 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0f5fc6]">Typical first-pass range</p>
+                  <h3 className="mt-2 text-2xl font-bold text-slate-900">$4k to $18k</h3>
+                  <p className="mt-2 text-sm text-slate-600">A fast planning estimate based on the photo, project type, finish level, and your ZIP code.</p>
+                </div>
+                <div className="rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">ZIP-adjusted</div>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
+                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
+                  <div className="text-slate-400">Budget</div>
+                  <div className="mt-1 font-semibold text-slate-900">Range</div>
+                </div>
+                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
+                  <div className="text-slate-400">Materials</div>
+                  <div className="mt-1 font-semibold text-slate-900">Allowances</div>
+                </div>
+                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
+                  <div className="text-slate-400">Output</div>
+                  <div className="mt-1 font-semibold text-slate-900">Brief</div>
+                </div>
+              </div>
+            </Card>
+
             <Card className="p-5 sm:p-6">
               <div className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
                 <Info className="h-4 w-4 text-[#1f7cf7]" />
@@ -789,7 +838,7 @@ export default function VisionStartFlow() {
               </ul>
             </Card>
 
-            <Card className="p-5 sm:p-6 bg-slate-900 text-white">
+            <Card className="bg-slate-900 p-5 text-white shadow-[0_18px_48px_rgba(15,23,42,0.18)] sm:p-6">
               <div className="flex items-center gap-2 font-semibold mb-3">
                 <Sparkles className="h-4 w-4 text-[#8be0f7]" />
                 What you&apos;ll get first
@@ -828,7 +877,7 @@ export default function VisionStartFlow() {
                     setNotes('');
                   }
                 }}
-                className="text-left cursor-pointer p-4 sm:p-5"
+                className="text-left cursor-pointer p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5"
               >
                 <div className="text-3xl mb-3">{cat.emoji}</div>
                 <div className="font-semibold text-slate-900 text-sm sm:text-base">{cat.label}</div>
@@ -867,7 +916,7 @@ export default function VisionStartFlow() {
                       hover
                       selected={scopeAnswers[question.key] === option.value}
                       onClick={() => updateScopeAnswer(question.key, option.value)}
-                      className="cursor-pointer p-4"
+                      className="cursor-pointer p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg"
                     >
                       <div className="font-semibold text-slate-900">{option.label}</div>
                       {option.description && <div className="text-xs text-slate-500 mt-1">{option.description}</div>}
@@ -906,7 +955,7 @@ export default function VisionStartFlow() {
                 hover
                 selected={style === key}
                 onClick={() => setStyle(key)}
-                className="cursor-pointer p-4"
+                className="cursor-pointer p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <div className="w-8 h-8 rounded-full mb-3 ring-4 ring-white shadow-sm" style={{ background: opt.color }} />
                 <div className="font-semibold text-slate-900">{opt.label}</div>
@@ -938,7 +987,7 @@ export default function VisionStartFlow() {
                 hover
                 selected={qualityTier === tier.value}
                 onClick={() => setQualityTier(tier.value)}
-                className="cursor-pointer p-5"
+                className="cursor-pointer border-slate-200 p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <div className="text-2xl mb-2">{tier.emoji}</div>
                 <div className="font-bold text-slate-900 text-lg mb-1">{tier.label}</div>
