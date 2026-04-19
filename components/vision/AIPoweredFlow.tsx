@@ -375,7 +375,7 @@ export default function AIPoweredFlow() {
             className="mt-8 w-full max-w-md text-lg py-4 bg-gradient-to-r from-sand-dark to-sand"
             size="lg"
             onClick={() => {
-              if              if (!uploadedFile) {
+              if (!uploadedFile) {
                 setError('Please upload a photo or video first.');
                 return;
               }
