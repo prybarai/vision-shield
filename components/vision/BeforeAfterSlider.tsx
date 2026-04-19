@@ -23,8 +23,8 @@ export default function BeforeAfterSlider({
   const safePosition = Math.min(88, Math.max(12, position));
 
   return (
-    <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.08)]">
-      <div className="relative aspect-[4/3] bg-slate-100">
+    <div className="overflow-hidden rounded-[1.5rem] border border-hairline bg-canvas-50 shadow-lift">
+      <div className="relative aspect-[4/3] bg-canvas-200/70">
         <Image src={beforeImage} alt={beforeLabel} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" priority={priority} />
 
         <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${safePosition}%` }}>
@@ -34,29 +34,29 @@ export default function BeforeAfterSlider({
         </div>
 
         <div className="absolute inset-y-0" style={{ left: `calc(${safePosition}% - 1px)` }}>
-          <div className="relative h-full w-[2px] bg-white/95 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]">
-            <div className="absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-700 shadow-[0_10px_24px_rgba(15,23,42,0.12)] backdrop-blur">
+          <div className="relative h-full w-[2px] bg-canvas-50/95 shadow-[0_0_0_1px_rgba(23,24,28,0.08)]">
+            <div className="absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-panel bg-canvas-50/90 text-ink-600 shadow-soft backdrop-blur">
               <ArrowLeftRight className="h-4 w-4" />
             </div>
           </div>
         </div>
 
-        <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 backdrop-blur">
+        <div className="absolute left-4 top-4 rounded-full border border-panel bg-canvas-50/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-600 backdrop-blur">
           {afterLabel}
         </div>
-        <div className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-700 backdrop-blur">
+        <div className="absolute right-4 top-4 rounded-full border border-panel bg-canvas-50/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-600 backdrop-blur">
           {beforeLabel}
         </div>
       </div>
 
-      <div className="border-t border-slate-200 bg-white px-4 py-3">
+      <div className="border-t border-hairline bg-canvas-50 px-4 py-3">
         <input
           type="range"
           min={12}
           max={88}
           value={position}
           onChange={(event) => setPosition(Number(event.target.value))}
-          className="w-full accent-[#1f7cf7]"
+          className="w-full accent-[var(--sand)]"
           aria-label="Compare before and after images"
         />
       </div>

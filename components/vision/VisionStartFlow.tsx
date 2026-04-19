@@ -725,10 +725,10 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6">
       {step !== 'loading' && (
-        <div className="mb-8 overflow-hidden rounded-[2rem] border border-sky-100 bg-[linear-gradient(135deg,#ffffff_0%,#f7fbff_48%,#f2fbff_100%)] p-5 shadow-[0_20px_70px_rgba(15,23,42,0.08)] sm:p-7">
+        <div className="mb-8 overflow-hidden rounded-[2rem] border border-hairline bg-[linear-gradient(135deg,#fbf8f4_0%,#f6f3ee_52%,#f1ece5_100%)] p-5 shadow-lift sm:p-7">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#0f5fc6] shadow-sm">
+              <div className="inline-flex items-center gap-2 rounded-full border border-panel bg-canvas-50/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-ink-600 shadow-soft">
                 <Sparkles className="h-3.5 w-3.5" />
                 naili vision
               </div>
@@ -738,12 +738,12 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
               </p>
             </div>
             <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[360px]">
-              <div className="rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Estimate</div>
-                <div className="mt-1 font-semibold text-slate-900">ZIP-adjusted pricing</div>
+              <div className="rounded-2xl border border-panel bg-canvas-50/90 px-4 py-3 text-sm text-ink-600 shadow-soft">
+                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-500">Estimate</div>
+                <div className="mt-1 font-semibold text-ink">ZIP-adjusted pricing</div>
               </div>
-              <div className="flex items-center gap-2 rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm text-slate-700 shadow-sm">
-                <ShieldCheck className="h-4 w-4 text-slate-900" />
+              <div className="flex items-center gap-2 rounded-2xl border border-panel bg-canvas-50/90 px-4 py-3 text-sm text-ink-600 shadow-soft">
+                <ShieldCheck className="h-4 w-4 text-ink" />
                 Private by default
               </div>
             </div>
@@ -757,10 +757,10 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                     className={cn(
                       'flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition-colors',
                       currentVisibleStepIndex > i
-                        ? 'bg-[#1f7cf7] text-white'
+                        ? 'bg-ink text-canvas-50'
                         : currentVisibleStepIndex === i
-                        ? 'bg-[#1f7cf7] text-white ring-4 ring-[#d7f4ff]'
-                        : 'bg-slate-200 text-slate-500'
+                        ? 'bg-ink text-canvas-50 ring-4 ring-[rgba(216,185,138,0.18)]'
+                        : 'bg-canvas-200 text-ink-500'
                     )}
                   >
                     {currentVisibleStepIndex > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
@@ -770,7 +770,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                   </div>
                 </div>
                 {i < visibleSteps.length - 1 && (
-                  <div className={cn('h-0.5 w-8 sm:w-12', currentVisibleStepIndex > i ? 'bg-[#1f7cf7]' : 'bg-slate-200')} />
+                  <div className={cn('h-0.5 w-8 sm:w-12', currentVisibleStepIndex > i ? 'bg-sand-dark' : 'bg-canvas-300')} />
                 )}
               </div>
             ))}
@@ -780,9 +780,9 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
       {step === 'entry' && (
         <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-          <Card className="border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#fbfdff_100%)] p-5 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-6">
+          <Card className="bg-[linear-gradient(180deg,#fbf8f4_0%,#f6f3ee_100%)] p-5 sm:p-6">
             <div className="mb-5">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#eef8ff] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#0f5fc6]">01 Upload your photo</div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-canvas-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">01 Upload your photo</div>
               <h2 className="mb-2 mt-3 text-2xl font-bold text-slate-900">Show naili your space</h2>
               <p className="text-slate-600">One clear photo is enough to start. Add your ZIP code so the estimate uses local pricing, not a generic national average.</p>
             </div>
@@ -791,7 +791,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
               {...getRootProps()}
               className={cn(
                 'border-2 border-dashed rounded-3xl p-5 sm:p-7 text-center cursor-pointer transition-colors',
-                isDragActive ? 'border-[#1f7cf7] bg-[#eef8ff]' : 'border-slate-300 hover:border-[#48c7f1] hover:bg-slate-50'
+                isDragActive ? 'border-sand-dark bg-canvas-200' : 'border-panel hover:border-sand hover:bg-canvas-50'
               )}
             >
               <input {...getInputProps()} />
@@ -799,15 +799,15 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 <div>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={uploadPreview} alt="Upload preview" className="max-h-72 w-full object-cover mx-auto rounded-2xl mb-4" />
-                  <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between rounded-2xl bg-slate-50 px-4 py-3 text-left">
+                  <div className="flex flex-col gap-3 rounded-2xl bg-canvas-200/70 px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{uploadedFile?.name}</p>
+                      <p className="truncate text-sm font-semibold text-slate-900">{uploadedFile?.name}</p>
                       <p className="text-xs text-slate-500">You can replace this photo if you want a better angle.</p>
                     </div>
                     <div className="flex gap-2">
                       <button
                         type="button"
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                        className="inline-flex items-center gap-2 rounded-xl border border-panel bg-canvas-50 px-3 py-2 text-sm font-medium text-ink-600 hover:bg-canvas-200"
                       >
                         <ImagePlus className="h-4 w-4" />
                         Replace
@@ -818,7 +818,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                           e.stopPropagation();
                           removeUpload();
                         }}
-                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                        className="inline-flex items-center gap-2 rounded-xl border border-panel bg-canvas-50 px-3 py-2 text-sm font-medium text-ink-600 hover:bg-canvas-200"
                       >
                         <Trash2 className="h-4 w-4" />
                         Remove
@@ -828,7 +828,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 </div>
               ) : (
                 <>
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#eef8ff] text-[#1f7cf7]">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-canvas-200 text-sand-dark">
                     <Upload className="h-8 w-8" />
                   </div>
                   <p className="text-slate-900 font-semibold text-lg">Drag and drop a photo, or click to browse</p>
@@ -851,7 +851,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
             </div>
 
             {(prefillProjectId || (prefillStatus !== 'idle' && prefillStatus !== 'dismissed')) && (
-              <div className="mt-4 rounded-2xl border border-[#d7f4ff] bg-[#eef8ff] p-4 text-sm text-[#0d2340]">
+              <div className="mt-4 rounded-2xl border border-panel bg-canvas-50 p-4 text-sm text-ink">
                 <div className="font-semibold">
                   {prefillStatus === 'loading'
                     ? 'Loading the saved project photo...'
@@ -861,7 +861,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                     ? 'We loaded the project settings, but could not reuse the saved photo automatically. Please re-upload if needed.'
                     : 'Editing from a saved project.'}
                 </div>
-                {prefillProjectId && <div className="mt-1 text-xs text-[#123964]">Project source: {prefillProjectId}</div>}
+                {prefillProjectId && <div className="mt-1 text-xs text-ink-600">Project source: {prefillProjectId}</div>}
               </div>
             )}
 
@@ -873,25 +873,25 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
           </Card>
 
           <div className="space-y-4">
-            <Card className="border-sky-100 bg-[linear-gradient(135deg,#eef8ff_0%,#ffffff_58%,#f7fef0_100%)] p-5 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-6">
+            <Card className="bg-[linear-gradient(135deg,#f1ece5_0%,#fbf8f4_58%,#f6f3ee_100%)] p-5 sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0f5fc6]">What the first pass gives you</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-600">What the first pass gives you</p>
                   <h3 className="mt-2 text-2xl font-bold text-slate-900">Photo-grounded planning, not a canned quote.</h3>
                   <p className="mt-2 text-sm text-slate-600">Naili uses your actual photo, project type, finish level, and ZIP code to build the first working plan before any contractor visit.</p>
                 </div>
-                <div className="rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">Real inputs only</div>
+                <div className="rounded-2xl bg-canvas-50 px-3 py-2 text-xs font-semibold text-ink-600 shadow-soft">Real inputs only</div>
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
-                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
+                <div className="rounded-2xl bg-canvas-50 px-3 py-3 shadow-soft">
                   <div className="text-slate-400">Estimate</div>
                   <div className="mt-1 font-semibold text-slate-900">Range + assumptions</div>
                 </div>
-                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
+                <div className="rounded-2xl bg-canvas-50 px-3 py-3 shadow-soft">
                   <div className="text-slate-400">Materials</div>
                   <div className="mt-1 font-semibold text-slate-900">Allowances list</div>
                 </div>
-                <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
+                <div className="rounded-2xl bg-canvas-50 px-3 py-3 shadow-soft">
                   <div className="text-slate-400">Brief</div>
                   <div className="mt-1 font-semibold text-slate-900">Contractor handoff</div>
                 </div>
@@ -899,23 +899,23 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
             </Card>
 
             <Card className="p-5 sm:p-6">
-              <div className="flex items-center gap-2 text-slate-900 font-semibold mb-3">
-                <Info className="h-4 w-4 text-[#1f7cf7]" />
+              <div className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
+                <Info className="h-4 w-4 text-sand-dark" />
                 Best photo tips
               </div>
               <ul className="space-y-3 text-sm text-slate-600">
                 {PHOTO_TIPS.map((tip) => (
                   <li key={tip} className="flex items-start gap-2">
-                    <CheckCircle className="h-4 w-4 text-[#7ccf43] mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-mint" />
                     <span>{tip}</span>
                   </li>
                 ))}
               </ul>
             </Card>
 
-            <Card className="bg-slate-900 p-5 text-white shadow-[0_18px_48px_rgba(15,23,42,0.18)] sm:p-6">
-              <div className="flex items-center gap-2 font-semibold mb-3">
-                <Sparkles className="h-4 w-4 text-[#8be0f7]" />
+            <Card className="bg-graphite-700 p-5 text-white shadow-[0_18px_48px_rgba(15,23,42,0.18)] sm:p-6">
+              <div className="mb-3 flex items-center gap-2 font-semibold">
+                <Sparkles className="h-4 w-4 text-sand-light" />
                 What you&apos;ll get first
               </div>
               <ul className="space-y-2 text-sm text-slate-300">
@@ -1067,7 +1067,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 <div className="text-2xl mb-2">{tier.emoji}</div>
                 <div className="font-bold text-slate-900 text-lg mb-1">{tier.label}</div>
                 <div className="text-sm text-slate-600 mb-4 leading-relaxed">{tier.desc}</div>
-                <div className="text-xs font-medium text-[#0f5fc6] bg-[#eef8ff] rounded-lg px-2.5 py-1.5 inline-block">{tier.modifier}</div>
+                <div className="inline-block rounded-lg bg-canvas-200 px-2.5 py-1.5 text-xs font-medium text-ink-600">{tier.modifier}</div>
               </Card>
             ))}
           </div>
@@ -1083,7 +1083,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 : 'Useful details include pets, existing damage, finish preferences, materials you want to avoid, or anything a contractor should notice fast.'}
             </p>
             <textarea
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#48c7f1] resize-none"
+              className="w-full resize-none rounded-2xl border border-panel bg-canvas-50 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sand/30"
               rows={isCustomProject ? 5 : 4}
               placeholder={isCustomProject ? 'e.g. Replace the old pergola with a covered outdoor kitchen, improve lighting near the patio, and make it easier to entertain.' : 'e.g. Need durable flooring because of a dog, want warmer tones, and current trim has a lot of visible wear.'}
               value={notes}
@@ -1101,10 +1101,10 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
       )}
 
       {step === 'loading' && (
-        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#0d2340_0%,#123964_40%,#165ca8_70%,#48c7f1_100%)] px-6 py-10 text-center text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-14">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(72,199,241,0.24),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(168,235,87,0.16),transparent_24%)]" />
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#1b1d22_0%,#242831_46%,#1b1d22_100%)] px-6 py-10 text-center text-white shadow-[0_24px_90px_rgba(15,23,42,0.26)] sm:px-8 sm:py-14">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(216,185,138,0.22),transparent_32%),radial-gradient(circle_at_bottom_left,rgba(184,216,200,0.16),transparent_24%)]" />
           <div className="absolute -left-10 top-8 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
-          <div className="absolute bottom-0 right-0 h-56 w-56 rounded-full bg-[#1f7cf7]/10 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-56 w-56 rounded-full bg-[rgba(216,185,138,0.10)] blur-3xl" />
 
           <div className="relative mx-auto max-w-5xl">
             <div className="inline-flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/10 backdrop-blur mb-8">
@@ -1125,16 +1125,16 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                     className={cn(
                       'flex items-center gap-3 rounded-[1.5rem] border px-4 py-4 backdrop-blur transition-all',
                       i < progressStep
-                        ? 'border-[#b6ef72]/30 bg-[#a8eb57]/12 text-[#effdd8]'
+                        ? 'border-[rgba(184,216,200,0.32)] bg-[rgba(184,216,200,0.12)] text-[rgba(239,253,216,0.95)]'
                         : i === progressStep
-                        ? 'border-white/20 bg-white/12 text-white'
+                        ? 'border-[rgba(216,185,138,0.26)] bg-white/12 text-white'
                         : 'border-white/10 bg-white/6 text-white/45'
                     )}
                   >
                     {i < progressStep ? (
-                      <CheckCircle className="h-5 w-5 flex-shrink-0 text-[#b6ef72]" />
+                      <CheckCircle className="h-5 w-5 flex-shrink-0 text-mint-glow" />
                     ) : i === progressStep ? (
-                      <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin text-[#a8eb57]" />
+                      <Loader2 className="h-5 w-5 flex-shrink-0 animate-spin text-sand-light" />
                     ) : (
                       <div className="h-5 w-5 flex-shrink-0 rounded-full border-2 border-white/30" />
                     )}
@@ -1149,7 +1149,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                   <div className="space-y-3">
                     {analysisHighlights.map((item, index) => (
                       <div key={`${item}-${index}`} className="flex items-start gap-2 text-sm text-white/80">
-                        <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#a8eb57]" />
+                        <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-sand-light" />
                         <span>{item}</span>
                       </div>
                     ))}

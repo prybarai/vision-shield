@@ -95,8 +95,8 @@ export default function ConceptsLoader({
           )}
         </Button>
         {error && (
-          <div className="flex items-start gap-2 rounded-xl border border-[#d7f4ff] bg-[#eef8ff] px-3 py-2 text-sm text-[#0d2340]">
-            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#0f5fc6]" />
+          <div className="flex items-start gap-2 rounded-2xl border border-[rgba(216,185,138,0.28)] bg-canvas-50 px-3 py-2 text-sm text-ink">
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sand" />
             <p>{error}</p>
           </div>
         )}
@@ -107,25 +107,25 @@ export default function ConceptsLoader({
   if (hasImages) return null;
 
   return (
-    <div className={cn('space-y-4 rounded-2xl border border-[#bdefff] bg-[#eef8ff] p-6', className)}>
+    <div className={cn('space-y-4 rounded-[1.75rem] border border-[rgba(216,185,138,0.22)] bg-[linear-gradient(135deg,rgba(251,248,244,0.96),rgba(246,243,238,0.94))] p-6 shadow-soft', className)}>
       <div className="flex items-start gap-3">
         {loading ? (
-          <Loader2 className="mt-0.5 h-5 w-5 flex-shrink-0 animate-spin text-[#1f7cf7]" />
+          <Loader2 className="mt-0.5 h-5 w-5 flex-shrink-0 animate-spin text-sand-dark" />
         ) : (
-          <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#1f7cf7]" />
+          <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-sand-dark" />
         )}
         <div>
-          <p className="text-sm font-medium text-[#0d2340]">Your planning results are ready.</p>
-          <p className="mt-1 text-sm text-[#123964]">
+          <p className="text-sm font-medium text-ink">Your planning results are ready.</p>
+          <p className="mt-1 text-sm text-ink-600">
             We&apos;re generating a photo-grounded concept in the background so you don&apos;t have to wait on this page.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 rounded-xl border border-[#d7f4ff] bg-white/70 p-3">
-          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#0f5fc6]" />
-          <p className="text-sm text-[#0d2340]">{error}</p>
+        <div className="flex items-start gap-2 rounded-2xl border border-[rgba(216,185,138,0.28)] bg-canvas-50 p-3">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-sand-dark" />
+          <p className="text-sm text-ink">{error}</p>
         </div>
       )}
 
