@@ -24,13 +24,23 @@ function toTitle(value: string) {
 }
 
 export default async function Showcase() {
+ // Only fetch projects that have valid before/after images
  const { data: projectsData } = await supabaseAdmin
   .from("projects")
   .select("id, project_category, created_at, uploaded_image_urls, generated_image_urls, notes")
   .order("created_at", { ascending: false })
-  .limit(3);
+  .limit(6); // Fetch more to filter
 
- const projects = (projectsData || []) as ProjectRow[];
+ // Filter to only projects with valid before/after pairs
+ const projects = ((projectsData || []) as ProjectRow[])
+  .filter(project => {
+   const hasBefore = project.uploaded_image_urls?.[0] && project.uploaded_image_urls[0].trim().length > 0;
+   const hasAfter = project.generated_image_urls?.[0] && project.generated_image_urls[0].trim().length > 0;
+   const imagesDifferent = project.uploaded_image_urls?.[0] !== project.generated_image_urls?.[0];
+   return hasBefore && hasAfter && imagesDifferent;
+  })
+  .slice(0, 3); // Take top 3 valid projects
+
  const projectIds = projects.map((project) => project.id);
 
  const { data: estimatesData } = projectIds.length > 0
@@ -75,8 +85,8 @@ export default async function Showcase() {
      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
       {projects.map((project) => {
        const estimate = estimateByProject.get(project.id);
-       const beforeImage = project.uploaded_image_urls?.[0] || project.generated_image_urls?.[0] || null;
-       const afterImage = project.generated_image_urls?.[0] || null;
+       const beforeImage = project.uploaded_image_urls?.[0];
+       const afterImage = project.generated_image_urls?.[0];
 
        return (
         <Link

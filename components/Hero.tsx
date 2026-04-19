@@ -37,25 +37,23 @@ export default function Hero() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, delay: 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-      className="font-display text-5xl leading-[1.02] tracking-tight text-ink md:text-6xl lg:text-7xl"
+      className="font-display text-5xl leading-[1.02] tracking-tight text-gray-900 md:text-6xl lg:text-7xl"
      >
-      See what your space
+      Transform any room
       <br />
-      <span className="italic text-signature">could become</span>
-      <span className="text-ink">.</span>
+      <span className="italic text-signature bg-gradient-to-r from-sand-dark to-sand bg-clip-text text-transparent">in minutes</span>
+      <span className="text-gray-900">.</span>
       <br />
-      Then price the real next move.
+      <span className="text-gray-700">Then know exactly what it costs.</span>
      </motion.h1>
 
      <motion.p
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.9, delay: 0.3 }}
-      className="mt-6 max-w-lg text-lg leading-relaxed text-ink-600 md:text-xl"
+      className="mt-6 max-w-lg text-lg leading-relaxed text-gray-600 md:text-xl"
      >
-      Upload a photo. Naili turns it into a visual concept, a scoped plan,
-      and a grounded next step, whether that means DIY or bringing in the
-      right pro.
+      Upload one photo. Get a visual transformation, local cost estimate, and contractor-ready plan—all in under 2 minutes.
      </motion.p>
 
      <motion.div
@@ -64,13 +62,13 @@ export default function Hero() {
       transition={{ duration: 0.8, delay: 0.45 }}
       className="mt-8 flex flex-wrap items-center gap-3"
      >
-      <Link href="#upload" className="btn-primary">
-       Upload Your Space
-       <ArrowRight className="w-4 h-4" />
+      <Link href="#upload" className="btn-primary bg-gradient-to-r from-sand-dark to-sand border-0 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+       Start your transformation
+       <ArrowRight className="w-5 h-5 ml-2" />
       </Link>
-      <Link href="#how" className="btn-ghost">
-       <Play className="w-3.5 h-3.5 fill-ink" />
-       See how it works
+      <Link href="#how" className="btn-ghost border-gray-300 text-gray-700 hover:border-gray-400 hover:text-gray-900">
+       <Play className="w-3.5 h-3.5 fill-gray-700" />
+       See examples
       </Link>
      </motion.div>
 
@@ -102,8 +100,8 @@ export default function Hero() {
 
 function TruthChip({ label }: { label: string }) {
  return (
-  <div className="inline-flex items-center gap-2 rounded-full border border-panel bg-canvas-50/80 px-3 py-1.5 text-xs text-ink-600">
-   <span className="h-1.5 w-1.5 rounded-full bg-mint" />
+  <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm">
+   <span className="h-2 w-2 rounded-full bg-green-500" />
    <span>{label}</span>
   </div>
  );

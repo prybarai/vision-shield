@@ -2,9 +2,9 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import UploadStage from "@/components/UploadStage";
-import HowItWorks from "@/components/HowItWorks";
 import Showcase from "@/components/Showcase";
 import TrustBand from "@/components/TrustBand";
+import AddictiveFlow from "@/components/AddictiveFlow";
 
 export default function HomePage() {
  return (
@@ -13,7 +13,7 @@ export default function HomePage() {
  <Hero />
  <TrustBand />
  <UploadStage />
- <HowItWorks />
+ <AddictiveFlow />
  <Showcase />
  <Footer />
  </main>
