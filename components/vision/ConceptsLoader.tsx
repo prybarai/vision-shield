@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Loader2, Sparkles } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { cn } from '@/lib/utils';
 
 interface ConceptsLoaderProps {
   projectId: string;
@@ -13,6 +14,9 @@ interface ConceptsLoaderProps {
   notes?: string;
   referenceImageUrl?: string;
   hasImages: boolean;
+  mode?: 'auto' | 'manual';
+  buttonLabel?: string;
+  className?: string;
 }
 
 export default function ConceptsLoader({
@@ -23,18 +27,21 @@ export default function ConceptsLoader({
   notes,
   referenceImageUrl,
   hasImages,
+  mode = 'auto',
+  buttonLabel = 'Generate concept',
+  className,
 }: ConceptsLoaderProps) {
   const router = useRouter();
-  const startedRef = useRef(false);
+  const autoStartedRef = useRef(false);
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(hasImages);
   const [error, setError] = useState<string | null>(null);
 
   const runGeneration = useCallback(async () => {
-    if (startedRef.current || done) return;
-    startedRef.current = true;
+    if (loading) return;
+
     setLoading(true);
     setError(null);
+
     try {
       const res = await fetch('/api/vision/generate-concepts', {
         method: 'POST',
@@ -51,47 +58,78 @@ export default function ConceptsLoader({
       });
 
       if (!res.ok) throw new Error('Failed to generate concepts');
-      setDone(true);
       router.refresh();
     } catch (e) {
       console.error(e);
-      setError('Your concept is taking longer than expected. You can refresh later to try again.');
-      startedRef.current = false;
+      setError(
+        mode === 'manual'
+          ? 'We could not refresh the concept just yet. Try again in a moment.'
+          : 'Your concept is taking longer than expected. You can refresh later to try again.'
+      );
+      autoStartedRef.current = false;
     } finally {
       setLoading(false);
     }
-  }, [category, done, notes, projectId, qualityTier, referenceImageUrl, router, style]);
+  }, [category, loading, mode, notes, projectId, qualityTier, referenceImageUrl, router, style]);
 
   useEffect(() => {
-    if (!hasImages) runGeneration();
-  }, [hasImages, runGeneration]);
+    if (mode !== 'auto' || hasImages || autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    void runGeneration();
+  }, [hasImages, mode, runGeneration]);
+
+  if (mode === 'manual') {
+    return (
+      <div className={cn('space-y-2', className)}>
+        <Button size="sm" variant="secondary" onClick={runGeneration} disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Regenerating...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-4 w-4" />
+              {buttonLabel}
+            </>
+          )}
+        </Button>
+        {error && (
+          <div className="flex items-start gap-2 rounded-xl border border-[#d7f4ff] bg-[#eef8ff] px-3 py-2 text-sm text-[#0d2340]">
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#0f5fc6]" />
+            <p>{error}</p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (hasImages) return null;
 
   return (
-    <div className="bg-[#eef8ff] border border-[#bdefff] rounded-2xl p-6 space-y-4">
+    <div className={cn('space-y-4 rounded-2xl border border-[#bdefff] bg-[#eef8ff] p-6', className)}>
       <div className="flex items-start gap-3">
         {loading ? (
-          <Loader2 className="h-5 w-5 text-[#1f7cf7] flex-shrink-0 mt-0.5 animate-spin" />
+          <Loader2 className="mt-0.5 h-5 w-5 flex-shrink-0 animate-spin text-[#1f7cf7]" />
         ) : (
-          <Sparkles className="h-5 w-5 text-[#1f7cf7] flex-shrink-0 mt-0.5" />
+          <Sparkles className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#1f7cf7]" />
         )}
         <div>
-          <p className="text-[#0d2340] text-sm font-medium">Your planning results are ready.</p>
-          <p className="text-[#123964] text-sm mt-1">
+          <p className="text-sm font-medium text-[#0d2340]">Your planning results are ready.</p>
+          <p className="mt-1 text-sm text-[#123964]">
             We&apos;re generating a photo-grounded concept in the background so you don&apos;t have to wait on this page.
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="bg-white/70 border border-[#d7f4ff] rounded-xl p-3 flex items-start gap-2">
-          <AlertCircle className="h-4 w-4 text-[#0f5fc6] flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 rounded-xl border border-[#d7f4ff] bg-white/70 p-3">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#0f5fc6]" />
           <p className="text-sm text-[#0d2340]">{error}</p>
         </div>
       )}
 
-      {!loading && !done && (
+      {!loading && (
         <div>
           <Button size="sm" onClick={runGeneration}>Generate concept</Button>
         </div>

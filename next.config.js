@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
 
+let supabaseHostname;
+try {
+ supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : undefined;
+} catch {
+ supabaseHostname = undefined;
+}
+
 const nextConfig = {
  reactStrictMode: true,
  webpack: (config) => {
@@ -28,6 +37,7 @@ const nextConfig = {
   remotePatterns: [
    { protocol: "https", hostname: "placehold.co" },
    { protocol: "https", hostname: "images.unsplash.com" },
+   ...(supabaseHostname ? [{ protocol: 'https', hostname: supabaseHostname }] : []),
   ],
  },
 };

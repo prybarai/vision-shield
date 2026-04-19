@@ -9,8 +9,10 @@ import {
   Download,
   Eye,
   FileText,
+  FolderOpen,
   ImageIcon,
   MapPin,
+  PenSquare,
   ShieldCheck,
   Sparkles,
   TrendingUp,
@@ -157,6 +159,15 @@ export default function VisionResultsView({
   const permitsMid = estimate ? derivePermitAllowance(estimate) : 0;
   const contingencyMid = estimate ? deriveContingency(estimate) : 0;
   const matchHref = `/pro?zip=${encodeURIComponent(project.zip_code)}`;
+  const reviseHref = `/vision/start?${new URLSearchParams({
+    from: projectId,
+    category: project.project_category,
+    zip: project.zip_code,
+    style: project.style_preference || 'modern',
+    quality: project.quality_tier,
+    notes: project.notes || '',
+    image: originalImage || '',
+  }).toString()}`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
@@ -216,8 +227,22 @@ export default function VisionResultsView({
                 <Button className="w-full border border-white/20 bg-white/10 text-white hover:bg-white/15" onClick={() => window.print()}>
                   <Download className="mr-2 h-4 w-4" /> Print brief
                 </Button>
+                <Link
+                  href={reviseHref}
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+                >
+                  <PenSquare className="mr-2 h-4 w-4" /> Refine this plan
+                </Link>
               </div>
-              <ShareButton shareUrl={shareUrl} variant="dark" />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <ShareButton shareUrl={shareUrl} variant="dark" />
+                <Link
+                  href="/my-projects"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+                >
+                  <FolderOpen className="mr-2 h-4 w-4" /> Open saved projects
+                </Link>
+              </div>
               <Link
                 href={matchHref}
                 onClick={() => posthog.capture('naili_match_cta_clicked', { project_id: projectId, placement: 'hero_link' })}
@@ -249,16 +274,31 @@ export default function VisionResultsView({
       </section>
 
       <section className="mt-10 print:hidden">
-        <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Concept images</h2>
             <p className="mt-1 text-sm text-slate-500">A visual direction grounded in the original photo, not a generic style template.</p>
           </div>
-          {hasAnyConcepts && selectedConceptUrl && (
-            <a href={selectedConceptUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
-              <Eye className="h-4 w-4" /> Open selected concept
-            </a>
-          )}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {hasAnyConcepts && selectedConceptUrl && (
+              <a href={selectedConceptUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#48c7f1] hover:text-[#1f7cf7]">
+                <Eye className="h-4 w-4" /> Open selected concept
+              </a>
+            )}
+            {originalImage && (
+              <ConceptsLoader
+                projectId={projectId}
+                category={project.project_category}
+                style={project.style_preference || 'modern'}
+                qualityTier={project.quality_tier}
+                notes={project.notes || undefined}
+                referenceImageUrl={originalImage}
+                hasImages={hasAnyConcepts}
+                mode="manual"
+                buttonLabel="Regenerate concept"
+              />
+            )}
+          </div>
         </div>
 
         {hasAnyConcepts && selectedConceptUrl && originalImage ? (

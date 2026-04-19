@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone, type FileRejection } from 'react-dropzone';
 import {
@@ -39,6 +39,12 @@ type ScopeQuestion = {
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const SUPPORTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const SUPPORTED_IMAGE_LABEL = 'JPG, PNG, or WEBP up to 10MB';
+
+function revokePreviewUrl(url: string | null) {
+  if (url?.startsWith('blob:')) {
+    URL.revokeObjectURL(url);
+  }
+}
 
 async function readApiError(response: Response, fallback: string) {
   try {
@@ -333,7 +339,17 @@ const STEP_DISPLAY_LABELS: Record<Step, string> = {
   loading: 'Analyze',
 };
 
-export default function VisionStartFlow() {
+type VisionStartPrefill = {
+  from?: string;
+  zip?: string;
+  category?: string;
+  style?: string;
+  quality?: string;
+  notes?: string;
+  image?: string;
+};
+
+export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: VisionStartPrefill }) {
   const router = useRouter();
   const [step, setStep] = useState<Step>('entry');
   const [zipCode, setZipCode] = useState('');
@@ -347,6 +363,53 @@ export default function VisionStartFlow() {
   const [progressStep, setProgressStep] = useState(0);
   const [analysisHighlights, setAnalysisHighlights] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [prefillStatus, setPrefillStatus] = useState<'idle' | 'loading' | 'loaded' | 'error' | 'dismissed'>('idle');
+  const prefillProjectId = initialPrefill?.from?.trim() || '';
+
+  useEffect(() => {
+    const nextZip = initialPrefill?.zip?.trim();
+    const nextCategory = initialPrefill?.category?.trim();
+    const nextStyle = initialPrefill?.style?.trim();
+    const nextQuality = initialPrefill?.quality?.trim();
+    const nextNotes = initialPrefill?.notes?.trim();
+    const nextImage = initialPrefill?.image?.trim();
+
+    if (nextZip && !zipCode) setZipCode(nextZip);
+    if (nextCategory && !category && nextCategory in PROJECT_CATEGORIES) setCategory(nextCategory as ProjectCategory);
+    if (nextStyle && style === 'modern' && nextStyle in STYLE_OPTIONS) setStyle(nextStyle as StylePreference);
+    if (nextQuality && qualityTier === 'mid' && QUALITY_TIERS.some((tier) => tier.value === nextQuality)) {
+      setQualityTier(nextQuality as QualityTier);
+    }
+    if (nextNotes && !notes) setNotes(nextNotes);
+
+    if (!nextImage || uploadedFile || uploadPreview || prefillStatus !== 'idle') return;
+
+    let cancelled = false;
+    setPrefillStatus('loading');
+
+    void fetch(nextImage)
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`Image fetch failed with ${response.status}`);
+        const blob = await response.blob();
+        const fileType = SUPPORTED_IMAGE_TYPES.includes(blob.type) ? blob.type : 'image/jpeg';
+        const extension = fileType === 'image/jpeg' ? 'jpg' : fileType.split('/')[1] || 'jpg';
+        const file = new File([blob], `naili-source.${extension}`, { type: fileType });
+
+        if (cancelled) return;
+        setUploadedFile(file);
+        setUploadPreview(nextImage);
+        setPrefillStatus('loaded');
+      })
+      .catch((prefillError) => {
+        console.error('failed to prefill uploaded image', prefillError);
+        if (cancelled) return;
+        setPrefillStatus('error');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [category, initialPrefill, notes, prefillStatus, qualityTier, style, uploadPreview, uploadedFile, zipCode]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -361,9 +424,7 @@ export default function VisionStartFlow() {
         return;
       }
 
-      if (uploadPreview) {
-        URL.revokeObjectURL(uploadPreview);
-      }
+      revokePreviewUrl(uploadPreview);
       setUploadedFile(file);
       const url = URL.createObjectURL(file);
       setUploadPreview(url);
@@ -380,11 +441,10 @@ export default function VisionStartFlow() {
   }, []);
 
   const removeUpload = () => {
-    if (uploadPreview) {
-      URL.revokeObjectURL(uploadPreview);
-    }
+    revokePreviewUrl(uploadPreview);
     setUploadedFile(null);
     setUploadPreview(null);
+    setPrefillStatus((current) => (current === 'loading' ? current : 'dismissed'));
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -790,6 +850,21 @@ export default function VisionStartFlow() {
               </p>
             </div>
 
+            {(prefillProjectId || (prefillStatus !== 'idle' && prefillStatus !== 'dismissed')) && (
+              <div className="mt-4 rounded-2xl border border-[#d7f4ff] bg-[#eef8ff] p-4 text-sm text-[#0d2340]">
+                <div className="font-semibold">
+                  {prefillStatus === 'loading'
+                    ? 'Loading the saved project photo...'
+                    : prefillStatus === 'loaded'
+                    ? 'Saved project details loaded. You can adjust anything before generating again.'
+                    : prefillStatus === 'error'
+                    ? 'We loaded the project settings, but could not reuse the saved photo automatically. Please re-upload if needed.'
+                    : 'Editing from a saved project.'}
+                </div>
+                {prefillProjectId && <div className="mt-1 text-xs text-[#123964]">Project source: {prefillProjectId}</div>}
+              </div>
+            )}
+
             {error && <div className="mt-4 bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-sm">{error}</div>}
 
             <Button className="w-full mt-6" size="lg" onClick={handleEntryNext} disabled={!uploadedFile || !zipCode.trim()}>
@@ -801,24 +876,24 @@ export default function VisionStartFlow() {
             <Card className="border-sky-100 bg-[linear-gradient(135deg,#eef8ff_0%,#ffffff_58%,#f7fef0_100%)] p-5 shadow-[0_16px_44px_rgba(15,23,42,0.06)] sm:p-6">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0f5fc6]">Typical first-pass range</p>
-                  <h3 className="mt-2 text-2xl font-bold text-slate-900">$4k to $18k</h3>
-                  <p className="mt-2 text-sm text-slate-600">A fast planning estimate based on the photo, project type, finish level, and your ZIP code.</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0f5fc6]">What the first pass gives you</p>
+                  <h3 className="mt-2 text-2xl font-bold text-slate-900">Photo-grounded planning, not a canned quote.</h3>
+                  <p className="mt-2 text-sm text-slate-600">Naili uses your actual photo, project type, finish level, and ZIP code to build the first working plan before any contractor visit.</p>
                 </div>
-                <div className="rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">ZIP-adjusted</div>
+                <div className="rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">Real inputs only</div>
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
                 <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
-                  <div className="text-slate-400">Budget</div>
-                  <div className="mt-1 font-semibold text-slate-900">Range</div>
+                  <div className="text-slate-400">Estimate</div>
+                  <div className="mt-1 font-semibold text-slate-900">Range + assumptions</div>
                 </div>
                 <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
                   <div className="text-slate-400">Materials</div>
-                  <div className="mt-1 font-semibold text-slate-900">Allowances</div>
+                  <div className="mt-1 font-semibold text-slate-900">Allowances list</div>
                 </div>
                 <div className="rounded-2xl bg-white px-3 py-3 shadow-sm">
-                  <div className="text-slate-400">Output</div>
-                  <div className="mt-1 font-semibold text-slate-900">Brief</div>
+                  <div className="text-slate-400">Brief</div>
+                  <div className="mt-1 font-semibold text-slate-900">Contractor handoff</div>
                 </div>
               </div>
             </Card>
