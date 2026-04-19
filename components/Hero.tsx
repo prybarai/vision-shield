@@ -119,7 +119,7 @@ function HeroPreview() {
     {/* Actual before/after example: Backyard transformation */}
     <div className="absolute inset-0">
      <img
-      src="https://images.unsplash.com/photo-1573869909398-39a0f1c90e43?w=1200&q=80"
+      src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&q=80"
       alt="Backyard before landscaping"
       className="absolute inset-0 h-full w-full object-cover"
       draggable={false}
@@ -128,7 +128,7 @@ function HeroPreview() {
 
     <div className="absolute inset-0" style={{ clipPath: "inset(0 0 0 50%)" }}>
      <img
-      src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80"
+      src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80"
       alt="Same backyard after landscaping"
       className="absolute inset-0 h-full w-full object-cover"
       draggable={false}

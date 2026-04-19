@@ -165,8 +165,8 @@ export default function AIPoweredFlow() {
 
       if (!uploadRes.ok) throw new Error('Failed to upload file');
       
-      // Start AI analysis
-      await fetch('/api/ai/analyze', {
+      // Start AI analysis (don't wait for it to complete)
+      fetch('/api/ai/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -176,9 +176,12 @@ export default function AIPoweredFlow() {
           description: description,
           zip_code: zipCode.trim(),
         }),
+      }).catch(err => {
+        console.error('AI analysis failed (but continuing):', err);
+        // Continue anyway - we'll show mock data
       });
 
-      // Redirect to AI results page
+      // Redirect to AI results page immediately
       router.push(`/ai/results/${projectId}`);
     } catch (err) {
       console.error(err);
