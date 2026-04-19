@@ -206,7 +206,7 @@ As a ${skillLabel.toLowerCase()}, you can tackle this project:
               </h2>
               
               <div className="space-y-4">
-                {analysis.materials_list.items.map((item: any, index: number) => (
+                {analysis.materials_list.items.map((item: {name: string, quantity: string, estimated_cost: number, where_to_buy: string}, index: number) => (
                   <div key={index} className="flex items-start justify-between p-4 rounded-xl bg-gray-50">
                     <div>
                       <div className="font-medium text-gray-900">{item.name}</div>
@@ -224,7 +224,7 @@ As a ${skillLabel.toLowerCase()}, you can tackle this project:
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total materials estimate:</span>
                   <span className="text-2xl font-bold text-gray-900">
-                    ${analysis.materials_list.items.reduce((sum: number, item: any) => sum + item.estimated_cost, 0)}
+                    ${analysis.materials_list.items.reduce((sum: number, item: {estimated_cost: number}) => sum + item.estimated_cost, 0)}
                   </span>
                 </div>
               </div>
@@ -267,7 +267,7 @@ As a ${skillLabel.toLowerCase()}, you can tackle this project:
                     {Object.entries(analysis.cost_estimate.breakdown).map(([key, value]) => (
                       <div key={key} className="flex justify-between text-sm">
                         <span className="text-gray-600 capitalize">{key}:</span>
-                        <span className="font-medium text-gray-900">${value}</span>
+                        <span className="font-medium text-gray-900">${value as number}</span>
                       </div>
                     ))}
                   </div>
