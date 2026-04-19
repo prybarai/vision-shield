@@ -66,7 +66,7 @@ export default async function AIResultsPage({ params }: PageProps) {
   const skillLabel = SKILL_LEVEL_LABELS[project.skill_level as keyof typeof SKILL_LEVEL_LABELS] || 'Handy';
 
   // Mock data for demo (remove when AI is fully working)
-  const mockAnalysis = {
+  const mockAnalysis: any = {
     ai_analysis: `Based on your ${project.project_type} project, I can see this is a ${project.skill_level}-level task. ${project.description ? `You mentioned: "${project.description}"` : ''}
 
 For this type of project, here's what I recommend:
@@ -114,8 +114,21 @@ As a ${skillLabel.toLowerCase()}, you can tackle this project:
 4. Don't rush - quality matters most`
   };
 
-  const analysis = aiAnalysis || mockAnalysis;
+  const analysis: any = aiAnalysis || mockAnalysis;
   const isMock = !aiAnalysis;
+  
+  // Ensure analysis has required structure
+  if (!analysis.cost_estimate?.breakdown) {
+    analysis.cost_estimate = {
+      ...analysis.cost_estimate,
+      breakdown: {
+        materials: 0,
+        labor: 0,
+        tools: 0,
+        contingency: 0
+      }
+    };
+  }
 
   return (
     <main className="min-h-screen bg-canvas">
