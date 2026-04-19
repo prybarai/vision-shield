@@ -17,47 +17,47 @@ import {
 const steps = [
   {
     id: 1,
-    title: "Upload your space",
-    description: "One photo is all we need. Show us any room, inside or out.",
+    title: "Upload anything",
+    description: "Photo or video of any home project, issue, or idea.",
     icon: "📸",
     color: "from-blue-400/20 to-cyan-400/20",
     borderColor: "border-blue-200",
-    highlight: "AI reads your actual space, not a template."
+    highlight: "AI understands rooms, yards, plumbing, electrical, more."
   },
   {
     id: 2,
-    title: "See the vision",
-    description: "Watch your room transform in seconds. No waiting, no guessing.",
-    icon: "✨",
+    title: "AI diagnosis",
+    description: "Our AI analyzes what you're showing and understands the need.",
+    icon: "🤖",
     color: "from-purple-400/20 to-pink-400/20",
     borderColor: "border-purple-200",
-    highlight: "Realistic concepts grounded in your photo."
+    highlight: "Identifies issues, suggests solutions, shows possibilities."
   },
   {
     id: 3,
-    title: "Know the cost",
-    description: "Get a ZIP-adjusted estimate before you talk to anyone.",
-    icon: "💰",
+    title: "Your path forward",
+    description: "DIY weekend project or hire a pro? We give you both options.",
+    icon: "🛠️",
     color: "from-emerald-400/20 to-green-400/20",
     borderColor: "border-emerald-200",
-    highlight: "Local pricing, not national averages."
+    highlight: "Materials list with purchase options or pro matching."
   },
   {
     id: 4,
-    title: "Share & compare",
-    description: "One-click brief to compare quotes apples-to-apples.",
+    title: "Complete plan",
+    description: "Cost estimate, timeline, materials, and next steps.",
     icon: "📋",
     color: "from-amber-400/20 to-orange-400/20",
     borderColor: "border-amber-200",
-    highlight: "Contractor-ready in 60 seconds."
+    highlight: "Everything you need to decide and execute."
   }
 ];
 
 const magicMoments = [
-  "AI spots hidden potential in your space",
-  "Watch your vision come to life in real-time",
-  "Get pricing that actually makes sense",
-  "Share results that get you better bids"
+  "AI diagnoses plumbing, electrical, structural issues",
+  "See your yard transformed with landscaping ideas",
+  "Get DIY instructions tailored to your skill level",
+  "Compare pro bids with AI-generated specifications"
 ];
 
 export default function AddictiveFlow() {
@@ -79,10 +79,10 @@ export default function AddictiveFlow() {
             <span className="text-sm font-semibold text-ink-600">The magical flow</span>
           </div>
           <h2 className="font-display text-4xl leading-tight tracking-tight text-ink md:text-5xl">
-            See it. Price it. <span className="italic text-signature">Love it.</span>
+            Diagnose. Plan. <span className="italic text-signature">Execute.</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-ink-600">
-            The addictive part? Watching your home transform in minutes, then having everything you need to make it real.
+            The addictive part? Having an AI that actually understands your home and gives you the complete plan—DIY or pro.
           </p>
         </div>
 
@@ -175,11 +175,11 @@ export default function AddictiveFlow() {
 
           <div className="space-y-4">
             <Link
-              href="/vision/start"
+              href="#upload"
               className="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4"
             >
               <Sparkles className="h-5 w-5" />
-              Start your first transformation
+              Try AI home analysis
               <ArrowRight className="h-5 w-5" />
             </Link>
             <p className="text-sm text-ink-500">
@@ -196,10 +196,10 @@ export default function AddictiveFlow() {
           className="mt-16 rounded-2xl border border-sand/30 bg-gradient-to-br from-sand/10 to-mint/10 p-8 text-center"
         >
           <p className="text-lg font-medium text-ink">
-            "I came for one room. I stayed for my whole house."
+            "I showed it a leaky faucet. It gave me the repair parts list and three local plumbers."
           </p>
           <p className="mt-2 text-sm text-ink-600">
-            That's the addictive part. Once you see what's possible, every room becomes a canvas.
+            That's the power. An AI that actually helps with real home problems and projects.
           </p>
         </motion.div>
       </div>

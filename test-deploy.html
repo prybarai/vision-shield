@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Deployment Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        .pass { background: #d4edda; }
+        .fail { background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Naili Deployment Test</h1>
+    
+    <div class="test">
+        <h3>Test 1: Check for "The magical flow" text</h3>
+        <div id="test1">Checking...</div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Check for "Step 1 of 3" (simplified flow)</h3>
+        <div id="test2">Checking...</div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Check for "Transform any room in minutes"</h3>
+        <div id="test3">Checking...</div>
+    </div>
+    
+    <script>
+        async function runTests() {
+            try {
+                const response = await fetch('https://naili.ai');
+                const html = await response.text();
+                
+                // Test 1: "The magical flow" from AddictiveFlow component
+                const test1 = html.includes('The magical flow');
+                document.getElementById('test1').innerHTML = 
+                    test1 ? '<span class="pass">✓ PASS: New AddictiveFlow component detected</span>' : 
+                    '<span class="fail">✗ FAIL: Old version detected</span>';
+                
+                // Test 2: "Step 1 of 3" from simplified flow
+                const test2 = html.includes('Step 1 of 3');
+                document.getElementById('test2').innerHTML = 
+                    test2 ? '<span class="pass">✓ PASS: Simplified 3-step flow detected</span>' : 
+                    '<span class="fail">✗ FAIL: Old multi-step flow detected</span>';
+                
+                // Test 3: New hero text
+                const test3 = html.includes('Transform any room');
+                document.getElementById('test3').innerHTML = 
+                    test3 ? '<span class="pass">✓ PASS: New hero text detected</span>' : 
+                    '<span class="fail">✗ FAIL: Old hero text detected</span>';
+                    
+            } catch (error) {
+                document.body.innerHTML = '<h2>Error testing deployment: ' + error + '</h2>';
+            }
+        }
+        
+        runTests();
+    </script>
+</body>
+</html>

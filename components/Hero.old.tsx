@@ -78,10 +78,10 @@ export default function Hero() {
       transition={{ duration: 1, delay: 0.7 }}
       className="mt-10 flex flex-wrap items-center gap-3"
      >
-      <TruthChip label="Any home project" />
-      <TruthChip label="AI diagnosis" />
-      <TruthChip label="DIY vs Pro options" />
-      <TruthChip label="Materials + pricing" />
+      <TruthChip label="Real photo upload" />
+      <TruthChip label="ZIP-adjusted estimate" />
+      <TruthChip label="Contractor-ready brief" />
+      <TruthChip label="Optional concept render" />
      </motion.div>
     </div>
 
@@ -116,20 +116,19 @@ function HeroPreview() {
     className="relative aspect-[4/3.2] overflow-hidden rounded-3xl bg-graphite-700"
     style={{ boxShadow: "0 40px 80px rgba(23,24,28,0.20), 0 0 0 1px rgba(23,24,28,0.08)" }}
    >
-    {/* Actual before/after example: Backyard transformation */}
-    <div className="absolute inset-0">
-     <img
-      src="https://images.unsplash.com/photo-1573869909398-39a0f1c90e43?w=1200&q=80"
-      alt="Backyard before landscaping"
-      className="absolute inset-0 h-full w-full object-cover"
-      draggable={false}
-     />
-    </div>
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img
+     src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80"
+     alt="Living room before renovation"
+     className="absolute inset-0 h-full w-full object-cover"
+     draggable={false}
+    />
 
     <div className="absolute inset-0" style={{ clipPath: "inset(0 0 0 50%)" }}>
+     {/* eslint-disable-next-line @next/next/no-img-element */}
      <img
-      src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=1200&q=80"
-      alt="Same backyard after landscaping"
+      src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80&auto=format&fit=crop&crop=focalpoint&fp-x=0.7&fp-y=0.5&con=30&sat=-30&blur=20"
+      alt="Same living room after modern transformation"
       className="absolute inset-0 h-full w-full object-cover"
       draggable={false}
      />
@@ -137,14 +136,14 @@ function HeroPreview() {
     </div>
 
     <div className="absolute bottom-3 left-3 rounded-full border border-white/10 bg-graphite-700/80 px-2.5 py-1.5 backdrop-blur-md">
-     <span className="mono-label !text-canvas-50">Real project example</span>
+     <span className="mono-label !text-canvas-50">illustrative product preview</span>
     </div>
 
     <div className="absolute left-3 top-3">
-     <span className="mono-label rounded bg-graphite-700/70 px-2 py-1 !text-canvas-50 backdrop-blur">Before: Overgrown yard</span>
+     <span className="mono-label rounded bg-graphite-700/70 px-2 py-1 !text-canvas-50 backdrop-blur">example current</span>
     </div>
     <div className="absolute right-3 top-3">
-     <span className="mono-label rounded bg-sand/90 px-2 py-1 !text-ink backdrop-blur">After: Landscaped oasis</span>
+     <span className="mono-label rounded bg-sand/90 px-2 py-1 !text-ink backdrop-blur">example vision</span>
     </div>
 
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
