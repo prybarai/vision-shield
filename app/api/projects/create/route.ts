@@ -15,10 +15,8 @@ const schema = z.object({
   zip_code: z.string().min(5),
   session_id: z.string().optional(),
   
-  // New AI-powered flow fields
-  project_type: z.enum(['diagnose', 'renovate', 'landscape', 'repair', 'design', 'custom']).optional().default('custom'),
-  skill_level: z.enum(['beginner', 'handy', 'experienced', 'pro']).optional().default('handy'),
-  is_video: z.boolean().optional().default(false),
+  // Note: project_type and skill_level columns don't exist in database
+  // Using project_category and notes fields instead
   description: z.string().optional(),
 });
 
@@ -28,9 +26,34 @@ export async function POST(req: NextRequest) {
     const params = schema.parse(body);
     
     // Set status based on project type
-    const projectData = {
-      ...params,
-      status: params.project_type === 'custom' ? 'draft' : 'ai_processing',
+    // Extract fields that might be in params but aren't in database schema
+    const paramsAny = params as any;
+    const project_type = paramsAny.project_type;
+    const description = paramsAny.description;
+    
+    // Create project data with only valid database fields
+    const projectData: any = {
+      location_type: params.location_type,
+      project_category: params.project_category,
+      style_preference: params.style_preference,
+      quality_tier: params.quality_tier,
+      zip_code: params.zip_code,
+      status: 'draft',
+    };
+    
+    // Add optional fields if they exist
+    if (params.address) projectData.address = params.address;
+    if (params.notes) projectData.notes = params.notes;
+    if (params.session_id) projectData.session_id = params.session_id;
+    
+    // Map project_type to project_category if provided
+    if (project_type && project_type !== 'custom') {
+      projectData.project_category = project_type;
+    }
+    
+    // Add description to notes if provided
+    if (description) {
+      projectData.notes = description;
     };
     
     const { data, error } = await supabaseAdmin

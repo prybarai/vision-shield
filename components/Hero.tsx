@@ -53,7 +53,7 @@ export default function Hero() {
       transition={{ duration: 0.9, delay: 0.3 }}
       className="mt-6 max-w-lg text-lg leading-relaxed text-gray-600 md:text-xl"
      >
-      Upload a photo of anything: a room, your yard, a plumbing issue. Our AI diagnoses what's needed, shows you the vision, and gives you the complete plan—DIY or pro.
+      Upload a photo of your space. Our AI analyzes what's visible, creates a realistic renovation plan with cost estimates, material lists, and visual concepts—then helps you decide between DIY or hiring a pro.
      </motion.p>
 
      <motion.div
@@ -113,53 +113,46 @@ function HeroPreview() {
    <div className="pointer-events-none absolute -inset-10 rounded-full bg-sand/20 blur-3xl" />
 
    <div
-    className="relative aspect-[4/3.2] overflow-hidden rounded-3xl bg-graphite-700"
+    className="relative aspect-[4/3.2] overflow-hidden rounded-3xl bg-graphite-700 p-8"
     style={{ boxShadow: "0 40px 80px rgba(23,24,28,0.20), 0 0 0 1px rgba(23,24,28,0.08)" }}
    >
-    {/* Actual before/after example: Backyard transformation */}
-    <div className="absolute inset-0">
-     <img
-      src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=1200&q=80"
-      alt="Backyard before landscaping"
-      className="absolute inset-0 h-full w-full object-cover"
-      draggable={false}
-     />
-    </div>
-
-    <div className="absolute inset-0" style={{ clipPath: "inset(0 0 0 50%)" }}>
-     <img
-      src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80"
-      alt="Same backyard after landscaping"
-      className="absolute inset-0 h-full w-full object-cover"
-      draggable={false}
-     />
-     <div className="absolute inset-0 bg-gradient-to-br from-sand/15 via-transparent to-mint/10" />
-    </div>
-
-    <div className="absolute bottom-3 left-3 rounded-full border border-white/10 bg-graphite-700/80 px-2.5 py-1.5 backdrop-blur-md">
-     <span className="mono-label !text-canvas-50">Real project example</span>
-    </div>
-
-    <div className="absolute left-3 top-3">
-     <span className="mono-label rounded bg-graphite-700/70 px-2 py-1 !text-canvas-50 backdrop-blur">Before: Overgrown yard</span>
-    </div>
-    <div className="absolute right-3 top-3">
-     <span className="mono-label rounded bg-sand/90 px-2 py-1 !text-ink backdrop-blur">After: Landscaped oasis</span>
-    </div>
-
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-     <div className="scan-line animate-scan-sweep" />
-    </div>
-
-    <div className="absolute bottom-0 top-0 left-1/2 w-px bg-canvas-50/80 shadow-[0_0_12px_rgba(251,248,244,0.7)]" />
-    <div className="absolute left-1/2 top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-canvas-50 shadow-lift">
-     <div className="flex gap-0.5 text-ink">
-      <svg width="6" height="10" viewBox="0 0 8 12" fill="currentColor">
-       <path d="M7 1L1 6l6 5V1z" />
-      </svg>
-      <svg width="6" height="10" viewBox="0 0 8 12" fill="currentColor">
-       <path d="M1 1l6 5-6 5V1z" />
-      </svg>
+    <div className="flex flex-col h-full items-center justify-center text-center text-canvas-50">
+     <div className="mb-6">
+      <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sand/20 to-mint/20 px-4 py-2 mb-4">
+       <span className="text-sm font-semibold text-sand-light">How it works</span>
+      </div>
+      <h3 className="text-2xl font-bold mb-3">Photo → AI Analysis → Complete Plan</h3>
+     </div>
+     
+     <div className="grid grid-cols-3 gap-4 w-full max-w-md">
+      <div className="flex flex-col items-center">
+       <div className="w-12 h-12 rounded-full bg-graphite-600 flex items-center justify-center mb-2">
+        <span className="text-lg font-bold text-sand">1</span>
+       </div>
+       <span className="text-sm font-medium">Upload photo</span>
+      </div>
+      
+      <div className="flex flex-col items-center">
+       <div className="w-12 h-12 rounded-full bg-graphite-600 flex items-center justify-center mb-2">
+        <span className="text-lg font-bold text-sand">2</span>
+       </div>
+       <span className="text-sm font-medium">AI analyzes</span>
+      </div>
+      
+      <div className="flex flex-col items-center">
+       <div className="w-12 h-12 rounded-full bg-graphite-600 flex items-center justify-center mb-2">
+        <span className="text-lg font-bold text-sand">3</span>
+       </div>
+       <span className="text-sm font-medium">Get your plan</span>
+      </div>
+     </div>
+     
+     <div className="mt-8 text-sm text-canvas-50/70 max-w-md">
+      <p>Our AI examines your photo, understands the space, and creates a complete renovation plan with estimates, materials, and visual concepts.</p>
+     </div>
+     
+     <div className="mt-6 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+      <span className="mono-label !text-canvas-50/80">No misleading examples — real AI analysis</span>
      </div>
     </div>
    </div>

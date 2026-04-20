@@ -65,10 +65,10 @@ export default async function Showcase() {
      <div className="max-w-2xl">
       <span className="mono-label">recent real projects</span>
       <h2 className="mt-2 font-display text-4xl leading-[1.05] tracking-tight text-ink md:text-5xl">
-       Recent projects created in the real Naili pipeline.
+       Real projects with AI analysis
       </h2>
       <p className="mt-4 text-sm text-ink-600 md:text-base">
-       These cards are pulled from actual project records and live estimates, not placeholder cases.
+       Actual user projects where our AI analyzed photos and generated renovation plans with estimates.
       </p>
      </div>
      <Link href="/my-projects" className="btn-ghost self-start md:self-end">
