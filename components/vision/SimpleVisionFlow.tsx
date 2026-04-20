@@ -94,8 +94,21 @@ export default function SimpleVisionFlow({ initialPrefill }: PageProps) {
     setIsGenerating(true);
 
     try {
+      // First, get the project to get image URL and ZIP code
+      const projectResponse = await fetch(`/api/projects/get?id=${projectId}`);
+      if (!projectResponse.ok) {
+        throw new Error('Failed to fetch project details');
+      }
+      const { project } = await projectResponse.json();
+      
+      // Get the first uploaded image URL
+      const imageUrl = project.uploaded_image_urls?.[0];
+      if (!imageUrl) {
+        throw new Error('No image found for this project');
+      }
+
       // Update project with user selections
-      const response = await fetch('/api/projects/update', {
+      const updateResponse = await fetch('/api/projects/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,16 +121,19 @@ export default function SimpleVisionFlow({ initialPrefill }: PageProps) {
         }),
       });
 
-      if (!response.ok) {
+      if (!updateResponse.ok) {
         throw new Error('Failed to update project');
       }
 
-      // Start AI analysis
+      // Start AI analysis with all required parameters
       const analysisResponse = await fetch('/api/vision/analyze-photo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          project_id: projectId,
+          image_url: imageUrl,
+          category: category,
+          zip_code: project.zip_code || '10001', // Default if missing
+          notes: notes,
         }),
       });
 
