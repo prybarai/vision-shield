@@ -125,20 +125,79 @@ export default function SimpleVisionFlow({ initialPrefill }: PageProps) {
         throw new Error('Failed to update project');
       }
 
-      // Start AI analysis with all required parameters
-      const analysisResponse = await fetch('/api/vision/analyze-photo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image_url: imageUrl,
-          category: category,
-          zip_code: project.zip_code || '10001', // Default if missing
-          notes: notes,
+      // Start the complete AI pipeline
+      const requests = [
+        // 1. Analyze photo
+        fetch('/api/vision/analyze-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: imageUrl,
+            category: category,
+            zip_code: project.zip_code || '10001',
+            notes: notes,
+          }),
         }),
-      });
-
-      if (!analysisResponse.ok) {
-        throw new Error('Failed to start AI analysis');
+        
+        // 2. Create estimate
+        fetch('/api/vision/estimate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: projectId,
+            category: category,
+            quality_tier: quality,
+            zip_code: project.zip_code || '10001',
+            notes: notes,
+          }),
+        }),
+        
+        // 3. Create materials list
+        fetch('/api/vision/materials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: projectId,
+            category: category,
+            quality_tier: quality,
+          }),
+        }),
+        
+        // 4. Create project brief
+        fetch('/api/vision/brief', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: projectId,
+            category: category,
+            style_preference: style,
+            quality_tier: quality,
+            notes: notes,
+          }),
+        }),
+        
+        // 5. Generate concept images
+        fetch('/api/vision/generate-concepts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: projectId,
+            image_url: imageUrl,
+            category: category,
+            style_preference: style,
+            notes: notes,
+          }),
+        }),
+      ];
+      
+      // Wait for all AI processes to complete
+      const responses = await Promise.all(requests);
+      
+      // Check if any failed
+      const failed = responses.filter(r => !r.ok);
+      if (failed.length > 0) {
+        console.error('Some AI processes failed:', failed);
+        // Continue anyway - some parts might have worked
       }
 
       // Redirect to results page
