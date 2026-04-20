@@ -88,12 +88,12 @@ export default function SimpleUploadFlow() {
       const { project } = await createResponse.json();
       const projectId = project.id;
 
-      // Step 2: Upload the file
+      // Step 2: Upload the file to the correct bucket
       const formData = new FormData();
       formData.append('file', uploadedFile);
       formData.append('project_id', projectId);
 
-      const uploadResponse = await fetch('/api/projects/upload-file', {
+      const uploadResponse = await fetch('/api/projects/upload-image', {
         method: 'POST',
         body: formData,
       });

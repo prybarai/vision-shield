@@ -48,10 +48,10 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage - use project-images bucket (not project-files)
     const { data: uploadData, error: uploadError } = await supabaseAdmin
       .storage
-      .from('project-files')
+      .from('project-images')
       .upload(filePath, buffer, {
         contentType: file.type,
         upsert: false,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     if (uploadError) {
       console.error('Supabase upload error:', uploadError);
       return NextResponse.json(
-        { error: 'Failed to upload file' },
+        { error: `Failed to upload file: ${uploadError.message}` },
         { status: 500 }
       );
     }
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     // Get public URL
     const { data: { publicUrl } } = supabaseAdmin
       .storage
-      .from('project-files')
+      .from('project-images')
       .getPublicUrl(filePath);
 
     // Update project with file URL and additional info
