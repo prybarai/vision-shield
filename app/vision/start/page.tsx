@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import SimpleVisionFlow from '@/components/vision/SimpleVisionFlow';
+import VisionStartFlow from '@/components/vision/VisionStartFlow';
 
 export const metadata: Metadata = {
   title: 'Start your project',
@@ -30,7 +30,7 @@ export default function VisionStartPage({ searchParams }: PageProps) {
             <h1 className="text-3xl font-bold text-gray-900 mb-3">Complete your project details</h1>
             <p className="text-lg text-gray-600">A few quick questions to help our AI create the best plan for you</p>
           </div>
-          <SimpleVisionFlow initialPrefill={searchParams} />
+          <VisionStartFlow initialPrefill={searchParams} />
         </div>
       </section>
       <Footer />
