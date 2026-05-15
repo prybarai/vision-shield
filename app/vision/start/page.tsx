@@ -4,8 +4,9 @@ import Footer from '@/components/Footer';
 import VisionStartFlow from '@/components/vision/VisionStartFlow';
 
 export const metadata: Metadata = {
-  title: 'Start your project',
-  description: 'Upload a real photo, get a grounded estimate, and build a contractor-ready plan.',
+  title: 'Start Your Project — Naili',
+  description:
+    'Upload a photo, answer a few questions, and get an AI-powered renovation plan with cost estimates and design concepts.',
 };
 
 type PageProps = {
@@ -26,9 +27,14 @@ export default function VisionStartPage({ searchParams }: PageProps) {
       <Nav />
       <section className="px-4 pb-16 pt-28 sm:px-6 md:pt-32 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Complete your project details</h1>
-            <p className="text-lg text-gray-600">A few quick questions to help our AI create the best plan for you</p>
+          <div className="mb-10 text-center">
+            <h1 className="font-display text-3xl tracking-tight text-ink mb-3">
+              Complete your project details
+            </h1>
+            <p className="text-lg text-ink-600">
+              A few quick questions to help our AI create the best plan for your
+              space
+            </p>
           </div>
           <VisionStartFlow initialPrefill={searchParams} />
         </div>

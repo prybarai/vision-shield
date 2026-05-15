@@ -732,8 +732,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 <Sparkles className="h-3.5 w-3.5" />
                 naili vision
               </div>
-              <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Start your project from a real photo</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+              <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl">Start your project from a real photo</h1>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-600 sm:text-base">
                 naili reads the actual photo with your request first, then turns that analysis into a cost range, materials plan, contractor brief, and a fast first concept.
               </p>
             </div>
@@ -765,7 +765,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                   >
                     {currentVisibleStepIndex > i ? <CheckCircle className="h-4 w-4" /> : i + 1}
                   </div>
-                  <div className={cn('text-xs font-semibold', currentVisibleStepIndex >= i ? 'text-slate-900' : 'text-slate-400')}>
+                  <div className={cn('text-xs font-semibold', currentVisibleStepIndex >= i ? 'text-ink' : 'text-ink-400')}>
                     {STEP_DISPLAY_LABELS[s]}
                   </div>
                 </div>
@@ -783,8 +783,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
           <Card className="bg-[linear-gradient(180deg,#fbf8f4_0%,#f6f3ee_100%)] p-5 sm:p-6">
             <div className="mb-5">
               <div className="inline-flex items-center gap-2 rounded-full bg-canvas-200 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-ink-600">01 Upload your photo</div>
-              <h2 className="mb-2 mt-3 text-2xl font-bold text-slate-900">Show naili your space</h2>
-              <p className="text-slate-600">One clear photo is enough to start. Add your ZIP code so the estimate uses local pricing, not a generic national average.</p>
+              <h2 className="mb-2 mt-3 text-2xl font-bold text-ink">Show naili your space</h2>
+              <p className="text-ink-600">One clear photo is enough to start. Add your ZIP code so the estimate uses local pricing, not a generic national average.</p>
             </div>
 
             <div
@@ -801,8 +801,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                   <img src={uploadPreview} alt="Upload preview" className="max-h-72 w-full object-cover mx-auto rounded-2xl mb-4" />
                   <div className="flex flex-col gap-3 rounded-2xl bg-canvas-200/70 px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-900">{uploadedFile?.name}</p>
-                      <p className="text-xs text-slate-500">You can replace this photo if you want a better angle.</p>
+                      <p className="truncate text-sm font-semibold text-ink">{uploadedFile?.name}</p>
+                      <p className="text-xs text-ink-500">You can replace this photo if you want a better angle.</p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -831,8 +831,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-canvas-200 text-sand-dark">
                     <Upload className="h-8 w-8" />
                   </div>
-                  <p className="text-slate-900 font-semibold text-lg">Drag and drop a photo, or click to browse</p>
-                  <p className="text-sm text-slate-500 mt-2">JPG, PNG, or WEBP. A clean, well-lit image gives the best planning output.</p>
+                  <p className="text-ink font-semibold text-lg">Drag and drop a photo, or click to browse</p>
+                  <p className="text-sm text-ink-500 mt-2">JPG, PNG, or WEBP. A clean, well-lit image gives the best planning output.</p>
                 </>
               )}
             </div>
@@ -845,7 +845,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 onChange={e => setZipCode(e.target.value)}
                 required
               />
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-ink-500">
                 Used for regional pricing and labor assumptions, not for contractor outreach.
               </p>
             </div>
@@ -877,33 +877,33 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-600">What the first pass gives you</p>
-                  <h3 className="mt-2 text-2xl font-bold text-slate-900">Photo-grounded planning, not a canned quote.</h3>
-                  <p className="mt-2 text-sm text-slate-600">Naili uses your actual photo, project type, finish level, and ZIP code to build the first working plan before any contractor visit.</p>
+                  <h3 className="mt-2 text-2xl font-bold text-ink">Photo-grounded planning, not a canned quote.</h3>
+                  <p className="mt-2 text-sm text-ink-600">Naili uses your actual photo, project type, finish level, and ZIP code to build the first working plan before any contractor visit.</p>
                 </div>
                 <div className="rounded-2xl bg-canvas-50 px-3 py-2 text-xs font-semibold text-ink-600 shadow-soft">Real inputs only</div>
               </div>
               <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
                 <div className="rounded-2xl bg-canvas-50 px-3 py-3 shadow-soft">
-                  <div className="text-slate-400">Estimate</div>
-                  <div className="mt-1 font-semibold text-slate-900">Range + assumptions</div>
+                  <div className="text-ink-400">Estimate</div>
+                  <div className="mt-1 font-semibold text-ink">Range + assumptions</div>
                 </div>
                 <div className="rounded-2xl bg-canvas-50 px-3 py-3 shadow-soft">
-                  <div className="text-slate-400">Materials</div>
-                  <div className="mt-1 font-semibold text-slate-900">Allowances list</div>
+                  <div className="text-ink-400">Materials</div>
+                  <div className="mt-1 font-semibold text-ink">Allowances list</div>
                 </div>
                 <div className="rounded-2xl bg-canvas-50 px-3 py-3 shadow-soft">
-                  <div className="text-slate-400">Brief</div>
-                  <div className="mt-1 font-semibold text-slate-900">Contractor handoff</div>
+                  <div className="text-ink-400">Brief</div>
+                  <div className="mt-1 font-semibold text-ink">Contractor handoff</div>
                 </div>
               </div>
             </Card>
 
             <Card className="p-5 sm:p-6">
-              <div className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
+              <div className="mb-3 flex items-center gap-2 font-semibold text-ink">
                 <Info className="h-4 w-4 text-sand-dark" />
                 Best photo tips
               </div>
-              <ul className="space-y-3 text-sm text-slate-600">
+              <ul className="space-y-3 text-sm text-ink-600">
                 {PHOTO_TIPS.map((tip) => (
                   <li key={tip} className="flex items-start gap-2">
                     <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-mint" />
@@ -918,7 +918,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 <Sparkles className="h-4 w-4 text-sand-light" />
                 What you&apos;ll get first
               </div>
-              <ul className="space-y-2 text-sm text-slate-300">
+              <ul className="space-y-2 text-sm text-ink-400">
                 <li>Rough budget range</li>
                 <li>Materials list and allowances</li>
                 <li>Contractor-ready brief</li>
@@ -931,12 +931,12 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
       {step === 'category' && (
         <div>
-          <button onClick={() => setStep('entry')} className="flex items-center gap-1 text-slate-500 hover:text-slate-700 mb-6 text-sm">
+          <button onClick={() => setStep('entry')} className="flex items-center gap-1 text-ink-500 hover:text-ink-600 mb-6 text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">What are you planning?</h2>
-            <p className="text-slate-600">Choose the closest project type. If your situation is unusual, the custom project option still works well.</p>
+            <h2 className="text-3xl font-bold text-ink mb-2">What are you planning?</h2>
+            <p className="text-ink-600">Choose the closest project type. If your situation is unusual, the custom project option still works well.</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-8">
@@ -955,8 +955,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 className="text-left cursor-pointer p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg sm:p-5"
               >
                 <div className="text-3xl mb-3">{cat.emoji}</div>
-                <div className="font-semibold text-slate-900 text-sm sm:text-base">{cat.label}</div>
-                <div className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">{cat.description}</div>
+                <div className="font-semibold text-ink text-sm sm:text-base">{cat.label}</div>
+                <div className="text-xs sm:text-sm text-ink-500 mt-1 leading-relaxed">{cat.description}</div>
               </Card>
             ))}
           </div>
@@ -969,20 +969,20 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
       {step === 'scope' && category && (
         <div>
-          <button onClick={() => setStep('category')} className="flex items-center gap-1 text-slate-500 hover:text-slate-700 mb-6 text-sm">
+          <button onClick={() => setStep('category')} className="flex items-center gap-1 text-ink-500 hover:text-ink-600 mb-6 text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">A few quick scope details</h2>
-            <p className="text-slate-600">These answers help tighten the estimate faster, but you can skip them and let naili lean more heavily on the photo and your notes.</p>
+            <h2 className="text-3xl font-bold text-ink mb-2">A few quick scope details</h2>
+            <p className="text-ink-600">These answers help tighten the estimate faster, but you can skip them and let naili lean more heavily on the photo and your notes.</p>
           </div>
 
           <div className="space-y-6 mb-8">
             {scopeQuestions.map((question) => (
               <div key={question.key}>
                 <div className="mb-3">
-                  <h3 className="text-lg font-semibold text-slate-900">{question.label}</h3>
-                  {question.helper && <p className="text-sm text-slate-500 mt-1">{question.helper}</p>}
+                  <h3 className="text-lg font-semibold text-ink">{question.label}</h3>
+                  {question.helper && <p className="text-sm text-ink-500 mt-1">{question.helper}</p>}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {question.options.map((option) => (
@@ -993,8 +993,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                       onClick={() => updateScopeAnswer(question.key, option.value)}
                       className="cursor-pointer p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg"
                     >
-                      <div className="font-semibold text-slate-900">{option.label}</div>
-                      {option.description && <div className="text-xs text-slate-500 mt-1">{option.description}</div>}
+                      <div className="font-semibold text-ink">{option.label}</div>
+                      {option.description && <div className="text-xs text-ink-500 mt-1">{option.description}</div>}
                     </Card>
                   ))}
                 </div>
@@ -1015,12 +1015,12 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
       {step === 'style' && (
         <div>
-          <button onClick={() => setStep(hasScopeStep ? 'scope' : 'category')} className="flex items-center gap-1 text-slate-500 hover:text-slate-700 mb-6 text-sm">
+          <button onClick={() => setStep(hasScopeStep ? 'scope' : 'category')} className="flex items-center gap-1 text-ink-500 hover:text-ink-600 mb-6 text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Pick the overall style direction</h2>
-            <p className="text-slate-600">This mostly shapes the brief and concept direction. You can still use the planning outputs even if your style evolves later.</p>
+            <h2 className="text-3xl font-bold text-ink mb-2">Pick the overall style direction</h2>
+            <p className="text-ink-600">This mostly shapes the brief and concept direction. You can still use the planning outputs even if your style evolves later.</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
@@ -1033,8 +1033,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 className="cursor-pointer p-4 transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <div className="w-8 h-8 rounded-full mb-3 ring-4 ring-white shadow-sm" style={{ background: opt.color }} />
-                <div className="font-semibold text-slate-900">{opt.label}</div>
-                <div className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">{opt.description}</div>
+                <div className="font-semibold text-ink">{opt.label}</div>
+                <div className="text-xs sm:text-sm text-ink-500 mt-1 leading-relaxed">{opt.description}</div>
               </Card>
             ))}
           </div>
@@ -1047,12 +1047,12 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
       {step === 'quality' && (
         <div>
-          <button onClick={() => setStep('style')} className="flex items-center gap-1 text-slate-500 hover:text-slate-700 mb-6 text-sm">
+          <button onClick={() => setStep('style')} className="flex items-center gap-1 text-ink-500 hover:text-ink-600 mb-6 text-sm">
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-slate-900 mb-2">Set the finish level</h2>
-            <p className="text-slate-600">Choose the tier that feels closest to what you would actually buy, not the dream version unless that is truly the plan.</p>
+            <h2 className="text-3xl font-bold text-ink mb-2">Set the finish level</h2>
+            <p className="text-ink-600">Choose the tier that feels closest to what you would actually buy, not the dream version unless that is truly the plan.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -1062,28 +1062,28 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
                 hover
                 selected={qualityTier === tier.value}
                 onClick={() => setQualityTier(tier.value)}
-                className="cursor-pointer border-slate-200 p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                className="cursor-pointer border-hairline p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
               >
                 <div className="text-2xl mb-2">{tier.emoji}</div>
-                <div className="font-bold text-slate-900 text-lg mb-1">{tier.label}</div>
-                <div className="text-sm text-slate-600 mb-4 leading-relaxed">{tier.desc}</div>
+                <div className="font-bold text-ink text-lg mb-1">{tier.label}</div>
+                <div className="text-sm text-ink-600 mb-4 leading-relaxed">{tier.desc}</div>
                 <div className="inline-block rounded-lg bg-canvas-200 px-2.5 py-1.5 text-xs font-medium text-ink-600">{tier.modifier}</div>
               </Card>
             ))}
           </div>
 
           <Card className="mb-6 p-5 sm:p-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className="block text-sm font-medium text-ink-600 mb-2">
               {isCustomProject ? 'Describe what you want to change' : 'Anything specific we should account for?'}{' '}
-              {!isCustomProject && <span className="text-slate-400">(optional)</span>}
+              {!isCustomProject && <span className="text-ink-400">(optional)</span>}
             </label>
-            <p className="text-sm text-slate-500 mb-3">
+            <p className="text-sm text-ink-500 mb-3">
               {isCustomProject
                 ? 'Tell naili what you want updated, repaired, redesigned, or added. Specific notes help both the estimate and contractor brief.'
                 : 'Useful details include pets, existing damage, finish preferences, materials you want to avoid, or anything a contractor should notice fast.'}
             </p>
             <textarea
-              className="w-full resize-none rounded-2xl border border-panel bg-canvas-50 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sand/30"
+              className="w-full resize-none rounded-2xl border border-panel bg-canvas-50 px-4 py-3 text-ink placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sand/30"
               rows={isCustomProject ? 5 : 4}
               placeholder={isCustomProject ? 'e.g. Replace the old pergola with a covered outdoor kitchen, improve lighting near the patio, and make it easier to entertain.' : 'e.g. Need durable flooring because of a dog, want warmer tones, and current trim has a lot of visible wear.'}
               value={notes}
@@ -1096,7 +1096,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
           <Button className="w-full" size="lg" onClick={handleStart} disabled={isCustomProject && !notes.trim()}>
             Nail it
           </Button>
-          <p className="text-xs text-slate-500 text-center mt-3">You&apos;ll land on the results page as soon as the planning outputs are ready.</p>
+          <p className="text-xs text-ink-500 text-center mt-3">You&apos;ll land on the results page as soon as the planning outputs are ready.</p>
         </div>
       )}
 

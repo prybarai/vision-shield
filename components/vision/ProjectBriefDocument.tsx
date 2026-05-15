@@ -45,14 +45,14 @@ export default function ProjectBriefDocument({
       <div className="flex flex-col gap-6 border-b border-hairline pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-600">naili vision</p>
-          <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">{title}</h2>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">{subtitle}</p>
+          <h2 className="mt-3 text-3xl font-bold text-ink sm:text-4xl">{title}</h2>
+          <p className="mt-3 text-sm leading-relaxed text-ink-600 sm:text-base">{subtitle}</p>
         </div>
-        <div className="grid gap-2 text-sm text-slate-600 sm:min-w-[220px]">
-          <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-slate-900">Project:</span> {categoryLabel}</div>
-          <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-slate-900">Finish tier:</span> {project.quality_tier}</div>
-          <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-slate-900">ZIP:</span> {project.zip_code}</div>
-          {documentDate && <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-slate-900">Prepared:</span> {documentDate}</div>}
+        <div className="grid gap-2 text-sm text-ink-600 sm:min-w-[220px]">
+          <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-ink">Project:</span> {categoryLabel}</div>
+          <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-ink">Finish tier:</span> {project.quality_tier}</div>
+          <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-ink">ZIP:</span> {project.zip_code}</div>
+          {documentDate && <div className="rounded-2xl bg-canvas-200/70 px-4 py-3"><span className="font-semibold text-ink">Prepared:</span> {documentDate}</div>}
         </div>
       </div>
 
@@ -62,61 +62,61 @@ export default function ProjectBriefDocument({
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-600">Planning range</p>
               <h3 className="mt-2 text-2xl font-bold text-slate-950">{formatCurrencyRange(estimate.low_estimate, estimate.high_estimate)}</h3>
-              <p className="mt-2 text-sm text-slate-600">Most likely outcome: {formatCurrency(estimate.mid_estimate)}</p>
+              <p className="mt-2 text-sm text-ink-600">Most likely outcome: {formatCurrency(estimate.mid_estimate)}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[420px]">
               <div className="rounded-2xl bg-canvas-50 px-4 py-3 text-center shadow-soft">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Low</div>
-                <div className="mt-2 text-xl font-bold text-slate-900">{formatCurrency(estimate.low_estimate)}</div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">Low</div>
+                <div className="mt-2 text-xl font-bold text-ink">{formatCurrency(estimate.low_estimate)}</div>
               </div>
               <div className="rounded-2xl bg-canvas-50 px-4 py-3 text-center ring-2 ring-[rgba(216,185,138,0.16)] shadow-soft">
                 <div className="text-xs font-semibold uppercase tracking-wide text-ink-600">Mid</div>
                 <div className="mt-2 text-xl font-bold text-slate-950">{formatCurrency(estimate.mid_estimate)}</div>
               </div>
               <div className="rounded-2xl bg-canvas-50 px-4 py-3 text-center shadow-soft">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">High</div>
-                <div className="mt-2 text-xl font-bold text-slate-900">{formatCurrency(estimate.high_estimate)}</div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">High</div>
+                <div className="mt-2 text-xl font-bold text-ink">{formatCurrency(estimate.high_estimate)}</div>
               </div>
             </div>
           </div>
-          {estimate.estimate_basis && <p className="mt-4 text-sm leading-relaxed text-slate-600">{estimate.estimate_basis}</p>}
+          {estimate.estimate_basis && <p className="mt-4 text-sm leading-relaxed text-ink-600">{estimate.estimate_basis}</p>}
         </section>
       )}
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-5">
           <section className="brief-page-break-inside-avoid rounded-[1.5rem] bg-canvas-200/70 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Project summary</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Project summary</p>
             <p className="mt-3 text-base leading-relaxed text-slate-800">{brief?.summary || 'The estimate is ready. The written project summary is still finishing in the background.'}</p>
           </section>
 
           <section className="brief-page-break-inside-avoid rounded-[1.5rem] bg-canvas-200/70 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Homeowner goals</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Homeowner goals</p>
             <p className="mt-3 whitespace-pre-wrap text-base leading-relaxed text-slate-800">{brief?.homeowner_goals || project.notes || 'No extra homeowner notes were added yet.'}</p>
           </section>
 
           <section className="brief-page-break-inside-avoid rounded-[1.5rem] bg-canvas-200/70 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Walk-through notes</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Walk-through notes</p>
             <p className="mt-3 whitespace-pre-wrap text-base leading-relaxed text-slate-800">{brief?.contractor_notes || 'Use the original photo, concept direction, and estimate assumptions to confirm final scope onsite.'}</p>
           </section>
 
           {materialPreview.length > 0 && (
             <section className="brief-page-break-inside-avoid rounded-[1.5rem] border border-hairline p-5">
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Materials snapshot</p>
-                <span className="text-sm text-slate-500">{materials?.line_items.length} item{materials?.line_items.length === 1 ? '' : 's'}</span>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Materials snapshot</p>
+                <span className="text-sm text-ink-500">{materials?.line_items.length} item{materials?.line_items.length === 1 ? '' : 's'}</span>
               </div>
               <div className="mt-4 space-y-3">
                 {materialPreview.map((item, index) => (
                   <div key={`${item.item}-${index}`} className="rounded-2xl bg-canvas-200/70 px-4 py-3">
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <div className="text-sm font-semibold text-slate-900">{item.item}</div>
-                        <div className="text-xs uppercase tracking-wide text-slate-500">{item.category} • {item.finish_tier}</div>
+                        <div className="text-sm font-semibold text-ink">{item.item}</div>
+                        <div className="text-xs uppercase tracking-wide text-ink-500">{item.category} • {item.finish_tier}</div>
                       </div>
-                      <div className="text-sm font-semibold text-slate-700">{formatCurrencyRange(item.estimated_cost_low, item.estimated_cost_high)}</div>
+                      <div className="text-sm font-semibold text-ink-600">{formatCurrencyRange(item.estimated_cost_low, item.estimated_cost_high)}</div>
                     </div>
-                    {item.sourcing_notes && <p className="mt-2 text-sm text-slate-600">{item.sourcing_notes}</p>}
+                    {item.sourcing_notes && <p className="mt-2 text-sm text-ink-600">{item.sourcing_notes}</p>}
                   </div>
                 ))}
               </div>
@@ -126,38 +126,38 @@ export default function ProjectBriefDocument({
 
         <div className="space-y-5">
           <section className="brief-page-break-inside-avoid rounded-[1.5rem] border border-hairline p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Likely trades</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Likely trades</p>
             {displayTrades.length > 0 ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {displayTrades.map((trade, index) => (
-                  <span key={`${trade}-${index}`} className="rounded-full bg-canvas-200 px-3 py-1 text-sm font-medium text-slate-700">{trade}</span>
+                  <span key={`${trade}-${index}`} className="rounded-full bg-canvas-200 px-3 py-1 text-sm font-medium text-ink-600">{trade}</span>
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-sm text-slate-600">Likely trades are still being inferred from the project scope.</p>
+              <p className="mt-3 text-sm text-ink-600">Likely trades are still being inferred from the project scope.</p>
             )}
           </section>
 
           <section className="brief-page-break-inside-avoid rounded-[1.5rem] border border-hairline p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Questions for the walk-through</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Questions for the walk-through</p>
             {displayQuestions.length > 0 ? (
               <ol className="mt-3 space-y-3">
                 {displayQuestions.map((question, index) => (
-                  <li key={`${question}-${index}`} className="flex items-start gap-3 text-sm text-slate-700">
+                  <li key={`${question}-${index}`} className="flex items-start gap-3 text-sm text-ink-600">
                     <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-canvas-200 font-semibold text-ink-600">{index + 1}</span>
                     <span>{question}</span>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="mt-3 text-sm text-slate-600">Walk-through questions are still being assembled.</p>
+              <p className="mt-3 text-sm text-ink-600">Walk-through questions are still being assembled.</p>
             )}
           </section>
 
           {displayUnknowns.length > 0 && (
             <section className="brief-page-break-inside-avoid rounded-[1.5rem] border border-hairline p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Unknowns to verify onsite</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Unknowns to verify onsite</p>
+              <ul className="mt-3 space-y-2 text-sm text-ink-600">
                 {displayUnknowns.map((item, index) => (
                   <li key={`${item}-${index}`} className="flex gap-2"><span className="text-sand-dark">•</span><span>{item}</span></li>
                 ))}
@@ -167,8 +167,8 @@ export default function ProjectBriefDocument({
 
           {displayMeasurements.length > 0 && (
             <section className="brief-page-break-inside-avoid rounded-[1.5rem] border border-hairline p-5">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Measurements to confirm</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-700">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-ink-500">Measurements to confirm</p>
+              <ul className="mt-3 space-y-2 text-sm text-ink-600">
                 {displayMeasurements.map((item, index) => (
                   <li key={`${item}-${index}`} className="flex gap-2"><span className="text-sand-dark">•</span><span>{item}</span></li>
                 ))}

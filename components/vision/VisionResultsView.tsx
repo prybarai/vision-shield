@@ -258,26 +258,26 @@ export default function VisionResultsView({
       <section className="mt-8 grid gap-4 print:hidden md:grid-cols-3">
           <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink-500"><Wallet className="h-4 w-4 text-sand-dark" /> Smart estimate</div>
-          <div className="mt-3 text-lg font-semibold text-slate-900">{estimate ? formatCurrencyRange(estimate.low_estimate, estimate.high_estimate) : 'Still preparing'}</div>
-          <p className="mt-2 text-sm text-slate-600">Photo-aware cost planning grounded in your finish tier and ZIP code.</p>
+          <div className="mt-3 text-lg font-semibold text-ink">{estimate ? formatCurrencyRange(estimate.low_estimate, estimate.high_estimate) : 'Still preparing'}</div>
+          <p className="mt-2 text-sm text-ink-600">Photo-aware cost planning grounded in your finish tier and ZIP code.</p>
         </div>
         <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink-500"><FileText className="h-4 w-4 text-sand-dark" /> Contractor brief</div>
-          <div className="mt-3 text-lg font-semibold text-slate-900">{brief ? 'Ready to share before quotes' : 'Still drafting'}</div>
-          <p className="mt-2 text-sm text-slate-600">A cleaner walk-through summary, scope notes, and quote questions.</p>
+          <div className="mt-3 text-lg font-semibold text-ink">{brief ? 'Ready to share before quotes' : 'Still drafting'}</div>
+          <p className="mt-2 text-sm text-ink-600">A cleaner walk-through summary, scope notes, and quote questions.</p>
         </div>
         <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink-500"><TrendingUp className="h-4 w-4 text-mint" /> Local context</div>
-          <div className="mt-3 text-lg font-semibold text-slate-900">{regionSummary(estimate?.region_multiplier)}</div>
-          <p className="mt-2 text-sm text-slate-600">{qualityTierCopy(project.quality_tier)}</p>
+          <div className="mt-3 text-lg font-semibold text-ink">{regionSummary(estimate?.region_multiplier)}</div>
+          <p className="mt-2 text-sm text-ink-600">{qualityTierCopy(project.quality_tier)}</p>
         </div>
       </section>
 
       <section className="mt-10 print:hidden">
         <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Concept images</h2>
-            <p className="mt-1 text-sm text-slate-500">A visual direction grounded in the original photo, not a generic style template.</p>
+            <h2 className="font-display text-2xl tracking-tight text-ink sm:text-3xl">Concept images</h2>
+            <p className="mt-1 text-sm text-ink-500">A visual direction grounded in the original photo, not a generic style template.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {hasAnyConcepts && selectedConceptUrl && (
@@ -319,8 +319,8 @@ export default function VisionResultsView({
                   <img src={url} alt={`Concept ${index + 1}`} className="aspect-[4/3] w-full object-cover" />
                   <div className="flex items-center justify-between px-4 py-3">
                     <div>
-                      <div className="text-sm font-semibold text-slate-900">Concept {index + 1}</div>
-                      <div className="text-xs text-slate-500">Same layout, new finish direction</div>
+                      <div className="text-sm font-semibold text-ink">Concept {index + 1}</div>
+                      <div className="text-xs text-ink-500">Same layout, new finish direction</div>
                     </div>
                     {selectedConcept === index && <CheckCircle2 className="h-5 w-5 text-sand-dark" />}
                   </div>
@@ -334,7 +334,7 @@ export default function VisionResultsView({
               <a key={url} href={url} target="_blank" rel="noopener noreferrer" className="overflow-hidden rounded-[1.5rem] border border-hairline bg-canvas-50 shadow-soft">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt={`Concept ${index + 1}`} className="aspect-[4/3] w-full object-cover" />
-                <div className="px-4 py-3 text-sm font-semibold text-slate-900">Concept {index + 1}</div>
+                <div className="px-4 py-3 text-sm font-semibold text-ink">Concept {index + 1}</div>
               </a>
             ))}
           </div>
@@ -342,7 +342,7 @@ export default function VisionResultsView({
           <div className="rounded-[1.75rem] border border-hairline bg-canvas-50 p-6 shadow-soft">
             <div className="mb-4 flex items-start gap-3 rounded-2xl border border-panel bg-canvas-200/80 p-4 text-sm text-ink">
               <ImageIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-sand-dark" />
-              <p>Your estimate and brief are ready first. Concepts can take a bit longer, so you can keep planning while these finish in the background.</p>
+              <p>Your estimate and brief are ready. Design concepts take a bit longer to generate — you can keep planning while these finish in the background.</p>
             </div>
             <ConceptsLoader
               projectId={projectId}
@@ -360,8 +360,8 @@ export default function VisionResultsView({
       <section className="mt-10 rounded-[2rem] border border-hairline bg-canvas-50 p-6 shadow-soft print:hidden sm:p-8">
         <div className="mb-6 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Smart cost estimate</h2>
-            <p className="mt-1 text-sm text-slate-500">A planning estimate built from the visible scope, your notes, and local pricing, not a generic benchmark.</p>
+            <h2 className="font-display text-2xl tracking-tight text-ink sm:text-3xl">Smart cost estimate</h2>
+            <p className="mt-1 text-sm text-ink-500">A planning estimate built from the visible scope, your notes, and local pricing, not a generic benchmark.</p>
           </div>
           {estimate && <Badge variant="amber" className="w-fit">{qualityTierCopy(project.quality_tier)}</Badge>}
         </div>
@@ -370,21 +370,21 @@ export default function VisionResultsView({
           <>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-[1.5rem] bg-canvas-200/70 p-5 text-center">
-                <div className="text-sm font-medium text-slate-500">Low</div>
-                <div className="mt-2 text-3xl font-bold text-slate-900">{formatCurrency(estimate.low_estimate)}</div>
+                <div className="text-sm font-medium text-ink-500">Low</div>
+                <div className="mt-2 text-3xl font-bold text-ink">{formatCurrency(estimate.low_estimate)}</div>
               </div>
               <div className="rounded-[1.5rem] border border-[rgba(216,185,138,0.28)] bg-[linear-gradient(135deg,rgba(216,185,138,0.14),rgba(184,216,200,0.14))] p-5 text-center shadow-soft">
                 <div className="text-sm font-semibold text-ink">Mid, most likely</div>
-                <div className="mt-2 text-3xl font-bold text-slate-950">{formatCurrency(estimate.mid_estimate)}</div>
+                <div className="mt-2 text-3xl font-bold text-ink">{formatCurrency(estimate.mid_estimate)}</div>
               </div>
               <div className="rounded-[1.5rem] bg-canvas-200/70 p-5 text-center">
-                <div className="text-sm font-medium text-slate-500">High</div>
-                <div className="mt-2 text-3xl font-bold text-slate-900">{formatCurrency(estimate.high_estimate)}</div>
+                <div className="text-sm font-medium text-ink-500">High</div>
+                <div className="mt-2 text-3xl font-bold text-ink">{formatCurrency(estimate.high_estimate)}</div>
               </div>
             </div>
 
             <div className="mt-6 rounded-[1.5rem] border border-hairline bg-canvas-200/70 p-5">
-              <div className="mb-3 flex items-center justify-between text-sm font-medium text-slate-500">
+              <div className="mb-3 flex items-center justify-between text-sm font-medium text-ink-500">
                 <span>{formatCurrency(estimate.low_estimate)}</span>
                 <span>{formatCurrency(estimate.high_estimate)}</span>
               </div>
@@ -392,77 +392,77 @@ export default function VisionResultsView({
                 <div className="absolute inset-0 bg-[linear-gradient(90deg,#cbb69a_0%,#d8b98a_50%,#b8d8c8_100%)]" />
                 <div className="absolute top-1/2 h-8 w-8 -translate-y-1/2 rounded-full border-4 border-canvas-50 bg-graphite-700 shadow-soft" style={{ left: 'calc(50% - 16px)' }} />
               </div>
-              <p className="mt-3 text-sm text-slate-600">Regional adjustment: {regionSummary(estimate.region_multiplier)}</p>
+              <p className="mt-3 text-sm text-ink-600">Regional adjustment: {regionSummary(estimate.region_multiplier)}</p>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-4">
-              <div className="rounded-[1.5rem] border border-slate-200 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Labor</div>
-                <div className="mt-2 text-2xl font-bold text-slate-900">{formatCurrency(laborMid)}</div>
+              <div className="rounded-[1.5rem] border border-hairline p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">Labor</div>
+                <div className="mt-2 text-2xl font-bold text-ink">{formatCurrency(laborMid)}</div>
               </div>
-              <div className="rounded-[1.5rem] border border-slate-200 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Materials</div>
-                <div className="mt-2 text-2xl font-bold text-slate-900">{formatCurrency(materialsMid)}</div>
+              <div className="rounded-[1.5rem] border border-hairline p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">Materials</div>
+                <div className="mt-2 text-2xl font-bold text-ink">{formatCurrency(materialsMid)}</div>
               </div>
-              <div className="rounded-[1.5rem] border border-slate-200 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Permits / fees</div>
-                <div className="mt-2 text-2xl font-bold text-slate-900">{formatCurrency(permitsMid)}</div>
+              <div className="rounded-[1.5rem] border border-hairline p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">Permits / fees</div>
+                <div className="mt-2 text-2xl font-bold text-ink">{formatCurrency(permitsMid)}</div>
               </div>
-              <div className="rounded-[1.5rem] border border-slate-200 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Contingency</div>
-                <div className="mt-2 text-2xl font-bold text-slate-900">{formatCurrency(contingencyMid)}</div>
+              <div className="rounded-[1.5rem] border border-hairline p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-ink-500">Contingency</div>
+                <div className="mt-2 text-2xl font-bold text-ink">{formatCurrency(contingencyMid)}</div>
               </div>
             </div>
 
             <details className="mt-6 rounded-[1.5rem] border border-hairline bg-canvas-200/70 p-5">
-              <summary className="cursor-pointer list-none text-base font-semibold text-slate-900">What affects your final cost</summary>
+              <summary className="cursor-pointer list-none text-base font-semibold text-ink">What affects your final cost</summary>
               <div className="mt-4 grid gap-6 lg:grid-cols-2">
                 <div>
-                  <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Assumptions</h3>
-                  <ul className="space-y-2 text-sm text-slate-700">
+                  <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-ink-500">Assumptions</h3>
+                  <ul className="space-y-2 text-sm text-ink-600">
                     {estimateAssumptions.map((item, index) => (
                       <li key={index} className="flex gap-2"><span className="text-sand-dark">•</span><span>{item}</span></li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">Risk notes</h3>
-                  <ul className="space-y-2 text-sm text-slate-700">
+                  <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-ink-500">Risk notes</h3>
+                  <ul className="space-y-2 text-sm text-ink-600">
                     {riskNotes.map((item, index) => (
-                      <li key={index} className="flex gap-2"><span>⚠️</span><span>{item}</span></li>
+                      <li key={index} className="flex gap-2"><span className="text-sand-dark">•</span><span>{item}</span></li>
                     ))}
                   </ul>
                 </div>
               </div>
-              {estimate.estimate_basis && <p className="mt-4 text-sm text-slate-600">Estimate basis: {estimate.estimate_basis}</p>}
+              {estimate.estimate_basis && <p className="mt-4 text-sm text-ink-600">Estimate basis: {estimate.estimate_basis}</p>}
             </details>
             <Disclaimer text={DISCLAIMERS.estimate} className="mt-5" />
           </>
         ) : (
-          <div className="rounded-[1.5rem] border border-hairline bg-canvas-200/70 p-5 text-sm text-slate-600">Your estimate is still generating. This section usually fills in shortly after the core project plan lands.</div>
+          <div className="rounded-[1.5rem] border border-hairline bg-canvas-200/70 p-5 text-sm text-ink-600">Your estimate is being prepared. This usually completes within a few moments — your concept images and brief are ready in the meantime.</div>
         )}
       </section>
 
       <section className="mt-10 print:hidden">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Materials list</h2>
-            <p className="mt-1 text-sm text-slate-500">Specific line items to keep allowances, bids, and shopping conversations grounded.</p>
+            <h2 className="font-display text-2xl tracking-tight text-ink sm:text-3xl">Materials list</h2>
+            <p className="mt-1 text-sm text-ink-500">Specific line items to keep allowances, bids, and shopping conversations grounded.</p>
           </div>
           {materials && <Badge variant="blue">{materials.line_items.length} line items</Badge>}
         </div>
         {materials ? (
           <MaterialsAccordion materials={materials} />
         ) : (
-          <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 text-sm text-slate-600 shadow-soft">Your materials list is still being prepared. The estimate and contractor brief are ready to use in the meantime.</div>
+          <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 text-sm text-ink-600 shadow-soft">Your materials list is being finalized. The estimate and contractor brief are ready to use while this completes.</div>
         )}
       </section>
 
       <section className="mt-10 sm:p-8">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 print:hidden sm:text-3xl">Project handoff brief</h2>
-            <p className="mt-1 text-sm text-slate-500 print:hidden">Share or print this version when you want a cleaner contractor walk-through.</p>
+            <h2 className="font-display text-2xl tracking-tight text-ink print:hidden sm:text-3xl">Project handoff brief</h2>
+            <p className="mt-1 text-sm text-ink-500 print:hidden">Share or print this version when you want a cleaner contractor walk-through.</p>
           </div>
           <div className="flex flex-col gap-3 print:hidden sm:flex-row">
             <Button className="border-0 bg-ink text-canvas-50 shadow-soft hover:opacity-95" onClick={() => window.print()}>
@@ -486,29 +486,29 @@ export default function VisionResultsView({
 
       <section className="mt-10 print:hidden">
         <div className="mb-4">
-          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">What to do next</h2>
-          <p className="mt-1 text-sm text-slate-500">Keep the project controlled before any deposit is paid.</p>
+          <h2 className="font-display text-2xl tracking-tight text-ink sm:text-3xl">What to do next</h2>
+          <p className="mt-1 text-sm text-ink-500">Keep the project controlled before any deposit is paid.</p>
         </div>
         <div className="grid gap-4 lg:grid-cols-4">
           <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
             <ShieldCheck className="h-5 w-5 text-sand-dark" />
-            <h3 className="mt-3 font-semibold text-slate-900">Before you hire</h3>
-            <p className="mt-2 text-sm text-slate-600">Run a shield check before you sign anything, especially if the quote or payment schedule feels rushed.</p>
+            <h3 className="mt-3 font-semibold text-ink">Before you hire</h3>
+            <p className="mt-2 text-sm text-ink-600">Run a shield check before you sign anything, especially if the quote or payment schedule feels rushed.</p>
           </div>
           <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
             <Wrench className="h-5 w-5 text-sand-dark" />
-            <h3 className="mt-3 font-semibold text-slate-900">Homeowners also add</h3>
-            <p className="mt-2 text-sm text-slate-600">{relatedProjectLabel(project.project_category)}</p>
+            <h3 className="mt-3 font-semibold text-ink">Homeowners also add</h3>
+            <p className="mt-2 text-sm text-ink-600">{relatedProjectLabel(project.project_category)}</p>
           </div>
           <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
             <CalendarClock className="h-5 w-5 text-mint" />
-            <h3 className="mt-3 font-semibold text-slate-900">Best time to book</h3>
-            <p className="mt-2 text-sm text-slate-600">{seasonalRecommendation(project.project_category)}</p>
+            <h3 className="mt-3 font-semibold text-ink">Best time to book</h3>
+            <p className="mt-2 text-sm text-ink-600">{seasonalRecommendation(project.project_category)}</p>
           </div>
           <div className="rounded-[1.5rem] border border-hairline bg-canvas-50 p-5 shadow-soft">
             <TrendingUp className="h-5 w-5 text-sand-dark" />
-            <h3 className="mt-3 font-semibold text-slate-900">Trending in your area</h3>
-            <p className="mt-2 text-sm text-slate-600">Projects with clear scope and a shareable brief usually get cleaner, faster bid comparisons.</p>
+            <h3 className="mt-3 font-semibold text-ink">Trending in your area</h3>
+            <p className="mt-2 text-sm text-ink-600">Projects with clear scope and a shareable brief usually get cleaner, faster bid comparisons.</p>
           </div>
         </div>
       </section>

@@ -2,8 +2,17 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, X, CheckCircle, AlertCircle } from "lucide-react";
-import Button from "@/components/ui/Button";
+import {
+  Upload,
+  X,
+  CheckCircle,
+  AlertCircle,
+  MapPin,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  Loader2,
+} from "lucide-react";
 
 export default function BulletproofUploadFlow() {
   const router = useRouter();
@@ -15,7 +24,6 @@ export default function BulletproofUploadFlow() {
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<"zip" | "upload" | "processing">("zip");
 
-  // Clean up object URLs on unmount
   useEffect(() => {
     return () => {
       if (uploadPreview) {
@@ -28,14 +36,12 @@ export default function BulletproofUploadFlow() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!validTypes.includes(file.type)) {
       setError("Please upload a JPG, PNG, or WEBP image.");
       return;
     }
 
-    // Validate file size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       setError("Image too large. Maximum size is 10MB.");
       return;
@@ -43,8 +49,6 @@ export default function BulletproofUploadFlow() {
 
     setError(null);
     setUploadedFile(file);
-
-    // Create preview
     const previewUrl = URL.createObjectURL(file);
     setUploadPreview(previewUrl);
     setStep("upload");
@@ -78,7 +82,6 @@ export default function BulletproofUploadFlow() {
     setStep("processing");
 
     try {
-      // STEP 1: Create project
       const projectResponse = await fetch("/api/projects/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,7 +96,6 @@ export default function BulletproofUploadFlow() {
       const projectData = await projectResponse.json();
       const projectId = projectData.id;
 
-      // STEP 2: Upload image
       const formData = new FormData();
       formData.append("file", uploadedFile);
       formData.append("project_id", projectId);
@@ -108,31 +110,44 @@ export default function BulletproofUploadFlow() {
         throw new Error(`Upload failed: ${errText}`);
       }
 
-      const uploadData = await uploadResponse.json();
-
-      // STEP 3: Redirect to vision start
-      router.push(`/vision/start?from=${projectId}&zip=${encodeURIComponent(zipCode)}`);
-
+      router.push(
+        `/vision/start?from=${projectId}&zip=${encodeURIComponent(zipCode)}`
+      );
     } catch (err) {
       console.error("Upload error:", err);
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
       setIsUploading(false);
       setStep("upload");
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Start your project</h2>
-          <p className="text-gray-600">Upload a photo and get an AI-powered plan in minutes</p>
+    <div className="mx-auto max-w-2xl">
+      <div className="rounded-3xl border border-hairline bg-canvas-50 p-6 shadow-soft md:p-8">
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-panel bg-canvas/80 px-4 py-2 mb-4">
+            <Sparkles className="h-4 w-4 text-sand-dark" />
+            <span className="text-sm font-semibold text-ink-600">
+              Start your project
+            </span>
+          </div>
+          <h2 className="font-display text-2xl tracking-tight text-ink md:text-3xl">
+            Upload a photo, get a complete plan
+          </h2>
+          <p className="mt-2 text-ink-600">
+            Our AI will analyze your space and create a renovation plan with
+            estimates, materials, and visual concepts.
+          </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-            <p className="text-red-700 text-sm">{error}</p>
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50/80 p-4">
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500" />
+            <p className="text-sm text-red-700">{error}</p>
           </div>
         )}
 
@@ -140,53 +155,32 @@ export default function BulletproofUploadFlow() {
         {step === "zip" && (
           <div className="space-y-6">
             <div>
-              <label htmlFor="zip" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="zip"
+                className="mb-2 flex items-center gap-2 text-sm font-medium text-ink"
+              >
+                <MapPin className="h-4 w-4 text-ink-500" />
                 Your ZIP code
+                <span className="text-ink-500 font-normal">(for local pricing)</span>
               </label>
               <input
                 id="zip"
                 type="text"
                 value={zipCode}
-                onChange={(e) => setZipCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 5))}
+                onChange={(e) =>
+                  setZipCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 5))
+                }
                 placeholder="e.g., 10001"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sand focus:border-sand outline-none transition"
+                className="w-full rounded-2xl border border-hairline bg-canvas px-4 py-3.5 text-ink placeholder:text-ink-400 outline-none transition focus:border-sand focus:ring-2 focus:ring-sand/20"
                 maxLength={5}
               />
-              <p className="mt-2 text-sm text-gray-500">
-                Used for accurate local pricing and contractor matching
-              </p>
-            </div>
-
-            <Button
-              onClick={() => setStep("upload")}
-              disabled={zipCode.length !== 5}
-              className="w-full"
-            >
-              Continue
-            </Button>
-          </div>
-        )}
-
-        {/* Upload Step */}
-        {step === "upload" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium text-gray-900">ZIP code: {zipCode}</h3>
-                <button
-                  onClick={() => setStep("zip")}
-                  className="text-sm text-sand-dark hover:text-sand-darker mt-1"
-                >
-                  Change
-                </button>
-              </div>
             </div>
 
             <div
-              className={`border-2 border-dashed rounded-xl p-8 text-center transition ${
+              className={`cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center transition-all ${
                 uploadPreview
-                  ? "border-green-300 bg-green-50"
-                  : "border-gray-300 hover:border-gray-400 bg-gray-50"
+                  ? "border-mint bg-mint/5"
+                  : "border-canvas-300 bg-canvas hover:border-sand/40 hover:bg-sand/5"
               }`}
               onClick={() => fileInputRef.current?.click()}
             >
@@ -201,66 +195,161 @@ export default function BulletproofUploadFlow() {
               {uploadPreview ? (
                 <div className="space-y-4">
                   <div className="relative mx-auto max-w-xs">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={uploadPreview}
                       alt="Preview"
-                      className="w-full h-auto rounded-lg shadow"
+                      className="w-full rounded-2xl shadow-soft"
                     />
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleClear();
                       }}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                      className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-ink text-canvas-50 shadow-soft transition hover:opacity-90"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
-                  <div className="flex items-center justify-center gap-2 text-green-600">
-                    <CheckCircle className="w-5 h-5" />
-                    <span className="font-medium">Image selected</span>
+                  <div className="flex items-center justify-center gap-2 text-mint">
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-medium text-ink">Image selected</span>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <div className="w-16 h-16 bg-sand/20 rounded-full flex items-center justify-center mx-auto">
-                    <Upload className="w-8 h-8 text-sand-dark" />
+                <div className="space-y-3">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sand/15">
+                    <Upload className="h-7 w-7 text-sand-dark" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Click to upload a photo</p>
-                    <p className="text-sm text-gray-500 mt-1">
-                      JPG, PNG, or WEBP • Max 10MB
+                    <p className="font-medium text-ink">
+                      Drag & drop a photo
+                    </p>
+                    <p className="mt-1 text-sm text-ink-500">
+                      or click to browse
                     </p>
                   </div>
+                  <p className="text-xs text-ink-400">
+                    JPG, PNG, or WEBP &middot; Max 10MB
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Button
+            <button
+              onClick={() => {
+                if (zipCode.length === 5 && uploadedFile) {
+                  handleSubmit();
+                } else if (zipCode.length === 5) {
+                  fileInputRef.current?.click();
+                } else {
+                  setError("Please enter a valid 5-digit ZIP code.");
+                }
+              }}
+              disabled={zipCode.length !== 5 || !uploadedFile}
+              className="btn-primary w-full justify-center !py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none"
+            >
+              Start AI Analysis
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </button>
+
+            <p className="text-center text-xs text-ink-400">
+              By continuing, you agree to our Terms and Privacy Policy. Your
+              photo is used only for analysis.
+            </p>
+          </div>
+        )}
+
+        {/* Upload Step (with ZIP already entered) */}
+        {step === "upload" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between rounded-2xl border border-hairline bg-canvas p-4">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-sand-dark" />
+                <span className="text-sm font-medium text-ink">
+                  ZIP: {zipCode}
+                </span>
+              </div>
+              <button
                 onClick={() => setStep("zip")}
-                variant="outline"
-                className="w-full"
+                className="text-sm font-medium text-sand-dark hover:text-sand transition"
               >
+                Change
+              </button>
+            </div>
+
+            <div
+              className="cursor-pointer rounded-2xl border-2 border-dashed border-mint bg-mint/5 p-8 text-center transition-all"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+
+              <div className="space-y-4">
+                <div className="relative mx-auto max-w-xs">
+                  {uploadPreview && (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={uploadPreview}
+                        alt="Preview"
+                        className="w-full rounded-2xl shadow-soft"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClear();
+                        }}
+                        className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-ink text-canvas-50 shadow-soft transition hover:opacity-90"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
+                <div className="flex items-center justify-center gap-2 text-mint">
+                  <CheckCircle className="h-5 w-5" />
+                  <span className="font-medium text-ink">
+                    Image ready — start analysis below
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => setStep("zip")}
+                className="btn-ghost w-full justify-center"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
-              </Button>
-              <Button
+              </button>
+              <button
                 onClick={handleSubmit}
                 disabled={!uploadedFile}
-                className="w-full"
+                className="btn-primary w-full justify-center disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Start AI Analysis
-              </Button>
+              </button>
             </div>
           </div>
         )}
 
         {/* Processing Step */}
         {step === "processing" && (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 border-4 border-sand border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Creating your project...</h3>
-            <p className="text-gray-600">This will just take a moment</p>
+          <div className="py-12 text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-sand/15">
+              <Loader2 className="h-8 w-8 animate-spin text-sand-dark" />
+            </div>
+            <h3 className="font-display text-xl tracking-tight text-ink mb-2">
+              Creating your project...
+            </h3>
+            <p className="text-ink-600">This will just take a moment</p>
           </div>
         )}
       </div>

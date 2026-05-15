@@ -25,8 +25,8 @@ function cleanList(items: unknown): string[] {
 export async function generateMetadata({ params }: PageProps) {
   const { project_id } = await params;
   return {
-    title: 'Here’s your naili plan',
-    description: `Review your Naili project plan for ${project_id}.`,
+    title: 'Your Project Plan — Naili',
+    description: 'Review your AI-powered project plan with cost estimates, design concepts, and contractor brief.',
     robots: {
       index: false,
       follow: false,
@@ -50,7 +50,18 @@ export default async function VisionResultsPage({ params }: PageProps) {
   const estimate = estimateRes.data as Estimate | null;
   const materials = materialsRes.data as MaterialList | null;
   const brief = briefRes.data as ProjectBrief | null;
-  const categoryLabel = project.project_category === 'custom_project' ? 'Custom Project' : toTitleCase(project.project_category);
+  const categoryMap: Record<string, string> = {
+    custom_project: 'Home Project',
+    bathroom: 'Bathroom',
+    kitchen: 'Kitchen',
+    roofing: 'Roofing',
+    deck_patio: 'Deck & Patio',
+    landscaping: 'Landscaping',
+    exterior_paint: 'Exterior Paint',
+    flooring: 'Flooring',
+    general_repair: 'General Repair',
+  };
+  const categoryLabel = categoryMap[project.project_category] || toTitleCase(project.project_category);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.naili.ai';
   const shareUrl = `${appUrl}/vision/results/${project_id}`;
   const estimateAssumptions = cleanList(estimate?.assumptions);
