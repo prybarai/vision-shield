@@ -46,7 +46,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is logged in and visits auth pages, redirect to my-projects
+  // If user is logged in and visits auth pages, redirect to home
+  // (not /my-projects to avoid issues if user_id column doesn't exist yet)
   const authPaths = ['/auth/login', '/auth/signup'];
   const isAuthPage = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
@@ -54,7 +55,7 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthPage && user) {
     const url = request.nextUrl.clone();
-    url.pathname = '/my-projects';
+    url.pathname = '/';
     return NextResponse.redirect(url);
   }
 

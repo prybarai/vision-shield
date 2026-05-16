@@ -9,11 +9,15 @@ import {
  ShieldCheck,
  Sparkles,
  Users,
- FileText,
  Zap,
+ TrendingUp,
+ Clock,
+ FileText,
+ ExternalLink,
 } from "lucide-react";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import ContractorSignupForm from "@/components/ContractorSignupForm";
 import { absoluteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -33,23 +37,47 @@ const BENEFITS = [
   title: "Better project context",
   desc: "Every request arrives with the homeowner brief, photo history, estimate context, and walk-through questions — so you start ahead.",
   icon: MessageSquareText,
+  color: "bg-blue-50 text-blue-600",
  },
  {
   title: "Selective matching",
   desc: "Naili uses ZIP code and trade fit to narrow the shortlist instead of blasting requests widely. Fewer leads, better fit.",
   icon: MapPinned,
+  color: "bg-emerald-50 text-emerald-600",
  },
  {
   title: "Trust before contact",
   desc: "Homeowners compare from the same written scope instead of starting every call from zero. Cleaner conversations from day one.",
   icon: ShieldCheck,
+  color: "bg-amber-50 text-amber-600",
  },
 ];
 
+const STATS = [
+ { value: "3x", label: "Better close rate", desc: "vs. traditional lead gen" },
+ { value: "0", label: "Lead fees", desc: "Free during early access" },
+ { value: "24hr", label: "Response time", desc: "Homeowners expect fast" },
+];
+
 const STEPS = [
- "A homeowner completes their Naili project brief and requests local contractor options.",
- "Naili matches by ZIP code and trade fit — narrowing to a short list, not a blast.",
- "Matched pros receive the same project packet the homeowner uses to compare bids.",
+ {
+  num: "01",
+  title: "Homeowner creates a brief",
+  desc: "A homeowner completes their Naili project brief and requests local contractor options.",
+  icon: FileText,
+ },
+ {
+  num: "02",
+  title: "Smart matching by ZIP & trade",
+  desc: "Naili matches by ZIP code and trade fit — narrowing to a short list, not a blast.",
+  icon: MapPinned,
+ },
+ {
+  num: "03",
+  title: "You get the full project packet",
+  desc: "Matched pros receive the same project packet the homeowner uses to compare bids.",
+  icon: Zap,
+ },
 ];
 
 const CONTRACTOR_FAQS = [
@@ -71,7 +99,7 @@ const CONTRACTOR_FAQS = [
  {
   question: "How do I get started?",
   answer:
-   "Request early access below. We'll review your trade coverage and service area, then add you to the directory as we grow the network in your region.",
+   "Fill out the signup form below. We'll review your trade coverage and service area, then add you to the directory as we grow the network in your region.",
  },
 ];
 
@@ -90,77 +118,111 @@ export default function ProPage() {
  };
 
  return (
-  <main className="relative z-10 bg-canvas">
+  <main className="relative z-10 bg-stone-50">
    <script
     type="application/ld+json"
     dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
    />
    <Nav />
 
-   {/* Hero */}
-   <section className="relative overflow-hidden px-6 pb-20 pt-32 md:px-10 md:pt-40">
-    <div className="absolute inset-0 -z-10">
-     <div className="absolute left-1/2 top-0 h-full w-[120%] -translate-x-1/2 bg-radial-warm opacity-60" />
-    </div>
-    <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-20">
-     <div>
-      <div className="mb-6 flex items-center gap-2.5">
-       <div className="ai-pulse" />
-       <span className="mono-label">for contractors</span>
-      </div>
-      <h1 className="font-display text-5xl leading-[1.02] tracking-tight text-ink md:text-6xl">
-       Better leads start with{" "}
-       <span className="italic bg-gradient-to-r from-sand-dark to-sand bg-clip-text text-transparent">
-        better briefs.
-       </span>
-      </h1>
-      <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-600 md:text-xl">
-       Naili helps homeowners get clear before they contact you. That means tighter scope, realistic expectations, and fewer wasted site visits.
-      </p>
-      <div className="mt-8 flex flex-wrap items-center gap-3">
-       <Link
-        href="#access"
-        className="btn-primary bg-gradient-to-r from-sand-dark to-sand border-0 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all"
-       >
-        Request early access
-        <ArrowRight className="ml-2 h-5 w-5" />
-       </Link>
-       <span className="text-sm text-ink-500">Free during launch — no lead fees.</span>
-      </div>
-     </div>
+   {/* Hero — mobile-first */}
+   <section className="relative overflow-hidden px-4 pb-12 pt-20 sm:px-6 sm:pb-20 sm:pt-28 md:px-10 md:pt-36">
+    {/* Subtle gradient background */}
+    <div className="absolute inset-0 -z-10 bg-gradient-to-b from-stone-100 via-stone-50 to-white" />
 
-     <div className="relative">
-      <div className="pointer-events-none absolute -inset-10 rounded-full bg-sand/15 blur-3xl" />
-      <div className="relative overflow-hidden rounded-3xl border border-hairline shadow-lift">
-       <Image
-        src="/imagery/contractors-hero.webp"
-        alt="Contractor checking project details on phone between jobs"
-        width={1600}
-        height={1200}
-        className="h-full w-full object-cover"
-        priority
-       />
+    <div className="mx-auto max-w-7xl">
+     <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-16">
+      {/* Text */}
+      <div>
+       <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 shadow-sm">
+        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">For contractors</span>
+       </div>
+
+       <h1 className="text-3xl font-bold leading-tight tracking-tight text-stone-800 sm:text-4xl md:text-5xl lg:text-[3.25rem]">
+        Better leads start with{" "}
+        <span className="bg-gradient-to-r from-amber-600 to-amber-500 bg-clip-text text-transparent">
+         better briefs.
+        </span>
+       </h1>
+
+       <p className="mt-4 sm:mt-6 text-base sm:text-lg leading-relaxed text-stone-500 max-w-xl">
+        Naili helps homeowners get clear before they contact you. That means tighter scope, realistic expectations, and fewer wasted site visits.
+       </p>
+
+       <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <Link
+         href="#access"
+         className="flex items-center justify-center gap-2 rounded-xl bg-stone-800 px-6 py-3.5 text-base font-semibold text-white shadow-lg transition hover:bg-stone-900 hover:shadow-xl active:scale-95"
+        >
+         Request early access
+         <ArrowRight className="h-4 w-4" />
+        </Link>
+        <span className="text-sm text-stone-400 text-center sm:text-left">Free during launch — no lead fees.</span>
+       </div>
+
+       {/* Stats row */}
+       <div className="mt-8 sm:mt-10 grid grid-cols-3 gap-3 sm:gap-4">
+        {STATS.map((stat) => (
+         <div key={stat.label} className="rounded-xl border border-stone-200 bg-white p-3 sm:p-4 text-center shadow-sm">
+          <p className="text-xl sm:text-2xl font-bold text-stone-800">{stat.value}</p>
+          <p className="mt-0.5 text-xs sm:text-sm font-medium text-stone-600">{stat.label}</p>
+          <p className="text-[10px] sm:text-xs text-stone-400">{stat.desc}</p>
+         </div>
+        ))}
+       </div>
+      </div>
+
+      {/* Hero image */}
+      <div className="relative order-first lg:order-last">
+       <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-stone-200 shadow-xl">
+        <Image
+         src="/imagery/contractors-hero-new.jpg"
+         alt="Professional contractors reviewing project details on a tablet at a modern home"
+         width={1536}
+         height={1024}
+         className="h-full w-full object-cover"
+         priority
+        />
+        {/* Overlay badge */}
+        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 flex items-center gap-2 rounded-xl bg-white/90 backdrop-blur-sm px-3 py-2 shadow-lg">
+         <TrendingUp className="h-4 w-4 text-emerald-600" />
+         <div>
+          <p className="text-xs font-semibold text-stone-800">Growing network</p>
+          <p className="text-[10px] text-stone-500">Expanding region by region</p>
+         </div>
+        </div>
+       </div>
       </div>
      </div>
     </div>
    </section>
 
    {/* Benefits */}
-   <section className="relative z-10 border-y border-hairline bg-canvas-50 px-6 py-16 md:px-10 sm:py-20">
+   <section className="px-4 py-12 sm:px-6 sm:py-16 md:px-10 md:py-20">
     <div className="mx-auto max-w-7xl">
-     <div className="grid gap-5 lg:grid-cols-3">
+     <div className="mb-8 sm:mb-10 text-center">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-stone-800">
+       Why pros choose Naili
+      </h2>
+      <p className="mt-2 sm:mt-3 text-sm sm:text-base text-stone-500 max-w-2xl mx-auto">
+       Stop chasing cold leads. Get matched with homeowners who already know what they want.
+      </p>
+     </div>
+
+     <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
       {BENEFITS.map((item) => (
        <div
         key={item.title}
-        className="rounded-3xl border border-hairline bg-canvas p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+        className="rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
        >
-        <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sand/15">
-         <item.icon className="h-6 w-6 text-sand-dark" />
+        <div className={`inline-flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-xl ${item.color}`}>
+         <item.icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </div>
-        <h2 className="mt-4 font-display text-xl tracking-tight text-ink">
+        <h3 className="mt-3 sm:mt-4 text-lg font-bold text-stone-800">
          {item.title}
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed text-ink-600">{item.desc}</p>
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-stone-500">{item.desc}</p>
        </div>
       ))}
      </div>
@@ -168,65 +230,71 @@ export default function ProPage() {
    </section>
 
    {/* How it works */}
-   <section className="px-6 py-16 md:px-10 sm:py-20">
-    <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-     <div>
-      <span className="mono-label">how the network works</span>
-      <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
+   <section className="px-4 py-12 sm:px-6 sm:py-16 md:px-10 md:py-20 bg-white">
+    <div className="mx-auto max-w-7xl">
+     <div className="mb-8 sm:mb-10">
+      <div className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-3 py-1.5 mb-3 sm:mb-4">
+       <Clock className="h-3.5 w-3.5 text-stone-400" />
+       <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">How the network works</span>
+      </div>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-stone-800">
        Homeowner first, contractor-ready when it matters.
       </h2>
-      <p className="mt-4 text-lg leading-relaxed text-ink-600">
+      <p className="mt-2 sm:mt-3 text-sm sm:text-base text-stone-500 max-w-2xl">
        Naili helps homeowners get clear first. The directory exists so the right pro can step in later — without losing the scope work.
       </p>
      </div>
-     <div className="rounded-3xl border border-hairline bg-canvas-50 p-8 shadow-soft">
-      <ul className="space-y-5">
-       {STEPS.map((step, i) => (
-        <li key={step} className="flex gap-4">
-         <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-sand/15">
-          <span className="text-sm font-bold text-sand-dark">{i + 1}</span>
+
+     <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
+      {STEPS.map((step) => (
+       <div key={step.num} className="relative rounded-2xl border border-stone-200 bg-stone-50 p-5 sm:p-6">
+        <div className="flex items-center gap-3 mb-3">
+         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-stone-800 text-white">
+          <step.icon className="h-5 w-5" />
          </div>
-         <span className="text-sm leading-relaxed text-ink-600 pt-1">{step}</span>
-        </li>
-       ))}
-      </ul>
+         <span className="text-xs font-bold uppercase tracking-wider text-stone-400">{step.num}</span>
+        </div>
+        <h3 className="text-base sm:text-lg font-bold text-stone-800">{step.title}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-stone-500">{step.desc}</p>
+       </div>
+      ))}
      </div>
     </div>
    </section>
 
    {/* Current promise */}
-   <section className="px-6 py-16 md:px-10 sm:py-20">
+   <section className="px-4 py-12 sm:px-6 sm:py-16 md:px-10 md:py-20">
     <div className="mx-auto max-w-7xl">
-     <div className="rounded-3xl border border-hairline bg-canvas-50 p-8 shadow-soft lg:p-10">
-      <span className="mono-label">live now</span>
-      <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
+     <div className="rounded-2xl sm:rounded-3xl border border-stone-200 bg-white p-5 sm:p-8 md:p-10 shadow-sm">
+      <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 mb-3 sm:mb-4">
+       <div className="h-2 w-2 rounded-full bg-emerald-500" />
+       <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Live now</span>
+      </div>
+      <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-800">
        The current promise is deliberately modest.
       </h2>
-      <p className="mt-4 max-w-3xl text-lg leading-relaxed text-ink-600">
+      <p className="mt-2 sm:mt-3 text-sm sm:text-base text-stone-500 max-w-3xl">
        Free early access, better homeowner context, and a quieter matching model while the directory is still small.
       </p>
-      <div className="mt-8 grid gap-5 md:grid-cols-2">
-       <div className="rounded-2xl border border-hairline bg-canvas p-6">
-        <div className="flex items-center gap-2 mb-3">
-         <Zap className="h-4 w-4 text-sand-dark" />
-         <span className="mono-label">what we avoid</span>
+
+      <div className="mt-6 sm:mt-8 grid gap-4 sm:grid-cols-2">
+       <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-2">
+         <Zap className="h-4 w-4 text-red-500" />
+         <span className="text-xs font-bold uppercase tracking-wider text-stone-400">What we avoid</span>
         </div>
-        <h3 className="font-display text-lg tracking-tight text-ink">
-         Marketplace spam
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-ink-600">
+        <h3 className="text-base sm:text-lg font-bold text-stone-800">Marketplace spam</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-stone-500">
          No anonymous junk leads or broad quote blasts. The network should feel tighter and more useful than that.
         </p>
        </div>
-       <div className="rounded-2xl border border-hairline bg-canvas p-6">
-        <div className="flex items-center gap-2 mb-3">
-         <Users className="h-4 w-4 text-mint" />
-         <span className="mono-label">what homeowners feel</span>
+       <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-2">
+         <Users className="h-4 w-4 text-blue-500" />
+         <span className="text-xs font-bold uppercase tracking-wider text-stone-400">What homeowners feel</span>
         </div>
-        <h3 className="font-display text-lg tracking-tight text-ink">
-         Clear before contact
-        </h3>
-        <p className="mt-2 text-sm leading-relaxed text-ink-600">
+        <h3 className="text-base sm:text-lg font-bold text-stone-800">Clear before contact</h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-stone-500">
          Homeowners arrive with a cleaner brief, which usually means better first conversations for everyone.
         </p>
        </div>
@@ -235,25 +303,68 @@ export default function ProPage() {
     </div>
    </section>
 
-   {/* FAQ */}
-   <section className="px-6 py-16 md:px-10 sm:py-20">
+   {/* Prybar.ai callout */}
+   <section className="px-4 py-12 sm:px-6 sm:py-16 md:px-10 md:py-20 bg-white">
     <div className="mx-auto max-w-7xl">
-     <div className="mb-10 max-w-3xl">
-      <span className="mono-label">contractor FAQ</span>
-      <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
-       Questions worth asking early.
+     <div className="rounded-2xl sm:rounded-3xl bg-gradient-to-br from-stone-800 to-stone-900 p-6 sm:p-8 md:p-10 text-white">
+      <div className="grid items-center gap-6 lg:grid-cols-[1.2fr_1fr]">
+       <div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 mb-3 sm:mb-4">
+         <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+         <span className="text-xs font-semibold uppercase tracking-wider text-white/80">Contractor tools</span>
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+         Manage your business with Prybar.ai
+        </h2>
+        <p className="mt-2 sm:mt-3 text-sm sm:text-base text-white/70 max-w-xl">
+         Our companion platform for contractors. Manage bids, track projects, communicate with clients, and grow your business — all in one place.
+        </p>
+        <a
+         href="https://www.prybar.ai"
+         target="_blank"
+         rel="noopener noreferrer"
+         className="mt-5 sm:mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-base font-semibold text-stone-800 shadow-lg transition hover:bg-stone-100 active:scale-95"
+        >
+         Explore Prybar.ai
+         <ExternalLink className="h-4 w-4" />
+        </a>
+       </div>
+       <div className="grid grid-cols-2 gap-3">
+        {[
+         { label: "Bid Management", desc: "Track & send bids" },
+         { label: "Client Portal", desc: "Share updates easily" },
+         { label: "Project Tracking", desc: "Stay organized" },
+         { label: "Invoicing", desc: "Get paid faster" },
+        ].map((feature) => (
+         <div key={feature.label} className="rounded-xl bg-white/10 border border-white/10 p-3 sm:p-4">
+          <p className="text-sm font-semibold text-white">{feature.label}</p>
+          <p className="mt-0.5 text-xs text-white/60">{feature.desc}</p>
+         </div>
+        ))}
+       </div>
+      </div>
+     </div>
+    </div>
+   </section>
+
+   {/* FAQ */}
+   <section className="px-4 py-12 sm:px-6 sm:py-16 md:px-10 md:py-20">
+    <div className="mx-auto max-w-7xl">
+     <div className="mb-8 sm:mb-10">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-stone-800">
+       Questions worth asking early
       </h2>
      </div>
-     <div className="grid gap-5 lg:grid-cols-2">
+     <div className="grid gap-4 sm:gap-5 md:grid-cols-2">
       {CONTRACTOR_FAQS.map((faq) => (
        <div
         key={faq.question}
-        className="rounded-2xl border border-hairline bg-canvas-50 p-6 shadow-soft"
+        className="rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 shadow-sm"
        >
-        <h3 className="font-display text-lg tracking-tight text-ink">
+        <h3 className="text-base sm:text-lg font-bold text-stone-800">
          {faq.question}
         </h3>
-        <p className="mt-3 text-sm leading-relaxed text-ink-600">
+        <p className="mt-2 text-sm leading-relaxed text-stone-500">
          {faq.answer}
         </p>
        </div>
@@ -262,28 +373,41 @@ export default function ProPage() {
     </div>
    </section>
 
-   {/* CTA */}
-   <section id="access" className="px-6 py-16 md:px-10 sm:py-20">
+   {/* CTA — Signup Form */}
+   <section id="access" className="px-4 py-12 sm:px-6 sm:py-16 md:px-10 md:py-20 bg-white">
     <div className="mx-auto max-w-7xl">
-     <div className="rounded-3xl border border-sand/20 bg-gradient-to-br from-sand/10 to-mint/10 p-8 text-center shadow-soft lg:p-12">
-      <Sparkles className="mx-auto h-8 w-8 text-sand-dark mb-4" />
-      <h2 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
-       Ready to join the network?
-      </h2>
-      <p className="mx-auto mt-4 max-w-2xl text-lg text-ink-600">
-       We're building the directory region by region. Request early access and we'll reach out when we're active in your area.
-      </p>
-      <div className="mt-8">
-       <Link
-        href="mailto:pros@naili.ai?subject=Contractor%20early%20access%20request"
-        className="btn-primary bg-gradient-to-r from-sand-dark to-sand border-0 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all text-lg px-8 py-4"
-       >
-        Request early access
-        <ArrowRight className="ml-2 h-5 w-5" />
-       </Link>
-       <p className="mt-4 text-sm text-ink-500">
-        No fees during launch. We'll confirm your trade and service area first.
+     <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-start">
+      {/* Left — messaging */}
+      <div className="lg:sticky lg:top-28">
+       <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 mb-3 sm:mb-4">
+        <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+        <span className="text-xs font-semibold uppercase tracking-wider text-amber-600">Early access</span>
+       </div>
+       <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-stone-800">
+        Ready to join the network?
+       </h2>
+       <p className="mt-2 sm:mt-3 text-sm sm:text-base text-stone-500 max-w-lg">
+        We&apos;re building the directory region by region. Fill out the form and we&apos;ll reach out when we&apos;re active in your area.
        </p>
+
+       <div className="mt-6 space-y-3">
+        {[
+         "No fees during early access",
+         "We review trade & service area first",
+         "Better-scoped leads from day one",
+         "Access to Prybar.ai contractor tools",
+        ].map((item) => (
+         <div key={item} className="flex items-center gap-2.5">
+          <CheckCircle2 className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+          <span className="text-sm text-stone-600">{item}</span>
+         </div>
+        ))}
+       </div>
+      </div>
+
+      {/* Right — form */}
+      <div className="rounded-2xl sm:rounded-3xl border border-stone-200 bg-stone-50 p-5 sm:p-6 md:p-8 shadow-sm">
+       <ContractorSignupForm />
       </div>
      </div>
     </div>
