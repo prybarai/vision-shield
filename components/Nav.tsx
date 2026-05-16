@@ -66,6 +66,7 @@ export default function Nav() {
       <>
        <NavLink href="/#how-it-works">How it works</NavLink>
        <NavLink href="/my-projects">Vision Board</NavLink>
+       <NavLink href="/get-quotes">Get Quotes</NavLink>
        <NavLink href="/pro">For Pros</NavLink>
        <Link
         href="/#upload"
@@ -150,6 +151,12 @@ export default function Nav() {
           onClick={() => setMobileOpen(false)}
          >
           Vision Board
+         </MobileNavLink>
+         <MobileNavLink
+          href="/get-quotes"
+          onClick={() => setMobileOpen(false)}
+         >
+          Get Quotes
          </MobileNavLink>
          <MobileNavLink
           href="/pro"

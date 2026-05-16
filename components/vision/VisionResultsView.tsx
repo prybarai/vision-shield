@@ -229,7 +229,7 @@ export default function VisionResultsView({
   const materialsMid = estimate?.estimate_breakdown?.materials_mid ?? (estimate ? Math.round(estimate.mid_estimate * 0.3) : 0);
   const permitsMid = estimate ? Math.round(estimate.mid_estimate * 0.05) : 0;
   const contingencyMid = estimate ? Math.round(estimate.mid_estimate * 0.12) : 0;
-  const matchHref = `/pro?zip=${encodeURIComponent(project.zip_code)}`;
+  const matchHref = `/get-quotes?project=${encodeURIComponent(projectId)}&zip=${encodeURIComponent(project.zip_code)}&category=${encodeURIComponent(project.project_category)}&estimate=${encodeURIComponent(String(estimate?.mid_estimate || ''))}`;
   const reviseHref = `/vision/start?${new URLSearchParams({
     from: projectId,
     category: project.project_category,

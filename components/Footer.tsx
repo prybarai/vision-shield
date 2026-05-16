@@ -29,6 +29,9 @@ export default function Footer() {
           <Link href="/my-projects" className="transition hover:text-white">
             My Projects
           </Link>
+          <Link href="/get-quotes" className="transition hover:text-white">
+            Get Quotes
+          </Link>
           <Link href="/pro" className="transition hover:text-white">
             For Pros
           </Link>
