@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDropzone, type FileRejection } from 'react-dropzone';
 import {
@@ -364,63 +364,75 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
   const [error, setError] = useState<string | null>(null);
   const [prefillStatus, setPrefillStatus] = useState<'idle' | 'loading' | 'loaded' | 'error' | 'dismissed'>('idle');
   const prefillProjectId = initialPrefill?.from?.trim() || '';
+  const prefillStartedRef = useRef(false);
 
+  // Effect 1: Apply simple prefill values (zip, category, style, etc.) — runs once
   useEffect(() => {
     const nextZip = initialPrefill?.zip?.trim();
     const nextCategory = initialPrefill?.category?.trim();
     const nextStyle = initialPrefill?.style?.trim();
     const nextQuality = initialPrefill?.quality?.trim();
     const nextNotes = initialPrefill?.notes?.trim();
-    let nextImage = initialPrefill?.image?.trim();
 
-    if (nextZip && !zipCode) setZipCode(nextZip);
-    if (nextCategory && !category && nextCategory in PROJECT_CATEGORIES) setCategory(nextCategory as ProjectCategory);
-    if (nextStyle && style === 'modern' && nextStyle in STYLE_OPTIONS) setStyle(nextStyle as StylePreference);
-    if (nextQuality && qualityTier === 'mid' && QUALITY_TIERS.some((tier) => tier.value === nextQuality)) {
+    if (nextZip) setZipCode(nextZip);
+    if (nextCategory && nextCategory in PROJECT_CATEGORIES) setCategory(nextCategory as ProjectCategory);
+    if (nextStyle && nextStyle in STYLE_OPTIONS) setStyle(nextStyle as StylePreference);
+    if (nextQuality && QUALITY_TIERS.some((tier) => tier.value === nextQuality)) {
       setQualityTier(nextQuality as QualityTier);
     }
-    if (nextNotes && !notes) setNotes(nextNotes);
+    if (nextNotes) setNotes(nextNotes);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // If we have a project ID but no image URL, fetch the project to get the image
-    if (prefillProjectId && !nextImage && prefillStatus === 'idle' && !uploadedFile && !uploadPreview) {
-      let cancelled = false;
-      setPrefillStatus('loading');
+  // Effect 2: Fetch image from project ID — isolated to prevent cancelled-flag race condition
+  useEffect(() => {
+    if (!prefillProjectId || prefillStartedRef.current) return;
+    const directImage = initialPrefill?.image?.trim();
+    if (directImage) return; // handled by Effect 3
 
-      void fetch(`/api/projects/get?id=${encodeURIComponent(prefillProjectId)}`)
-        .then(async (res) => {
-          if (!res.ok) throw new Error('Failed to fetch project');
-          const data = await res.json();
-          const imageUrl = data.project?.image_url;
-          if (!imageUrl) throw new Error('No image URL in project');
-          if (cancelled) return;
+    prefillStartedRef.current = true;
+    let cancelled = false;
+    setPrefillStatus('loading');
 
-          // Now fetch the actual image to create a File object
-          const imgRes = await fetch(imageUrl);
-          if (!imgRes.ok) throw new Error(`Image fetch failed with ${imgRes.status}`);
-          const blob = await imgRes.blob();
-          const fileType = SUPPORTED_IMAGE_TYPES.includes(blob.type) ? blob.type : 'image/jpeg';
-          const extension = fileType === 'image/jpeg' ? 'jpg' : fileType.split('/')[1] || 'jpg';
-          const file = new File([blob], `naili-source.${extension}`, { type: fileType });
+    void fetch(`/api/projects/get?id=${encodeURIComponent(prefillProjectId)}`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Failed to fetch project');
+        const data = await res.json();
+        const imageUrl = data.project?.image_url;
+        if (!imageUrl) throw new Error('No image URL in project');
+        if (cancelled) return;
 
-          if (cancelled) return;
-          setUploadedFile(file);
-          setUploadPreview(imageUrl);
-          setPrefillStatus('loaded');
-          // Auto-advance past entry step since photo is already uploaded
-          setStep('category');
-        })
-        .catch((err) => {
-          console.error('failed to prefill from project', err);
-          if (cancelled) return;
-          setPrefillStatus('error');
-        });
+        // Now fetch the actual image to create a File object
+        const imgRes = await fetch(imageUrl);
+        if (!imgRes.ok) throw new Error(`Image fetch failed with ${imgRes.status}`);
+        const blob = await imgRes.blob();
+        const fileType = SUPPORTED_IMAGE_TYPES.includes(blob.type) ? blob.type : 'image/jpeg';
+        const extension = fileType === 'image/jpeg' ? 'jpg' : fileType.split('/')[1] || 'jpg';
+        const file = new File([blob], `naili-source.${extension}`, { type: fileType });
 
-      return () => { cancelled = true; };
-    }
+        if (cancelled) return;
+        setUploadedFile(file);
+        setUploadPreview(imageUrl);
+        setPrefillStatus('loaded');
+        // Auto-advance past entry step since photo is already uploaded
+        setStep('category');
+      })
+      .catch((err) => {
+        console.error('failed to prefill from project', err);
+        if (cancelled) return;
+        setPrefillStatus('error');
+      });
 
-    // If we have a direct image URL, fetch it
-    if (!nextImage || uploadedFile || uploadPreview || prefillStatus !== 'idle') return;
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefillProjectId]);
 
+  // Effect 3: Fetch direct image URL (when ?image= is in the URL)
+  useEffect(() => {
+    const nextImage = initialPrefill?.image?.trim();
+    if (!nextImage || prefillStartedRef.current) return;
+
+    prefillStartedRef.current = true;
     let cancelled = false;
     setPrefillStatus('loading');
 
@@ -434,7 +446,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
         if (cancelled) return;
         setUploadedFile(file);
-        setUploadPreview(nextImage!);
+        setUploadPreview(nextImage);
         setPrefillStatus('loaded');
       })
       .catch((prefillError) => {
@@ -446,7 +458,8 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
     return () => {
       cancelled = true;
     };
-  }, [category, initialPrefill, notes, prefillProjectId, prefillStatus, qualityTier, style, uploadPreview, uploadedFile, zipCode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
