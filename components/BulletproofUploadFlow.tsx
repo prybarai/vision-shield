@@ -12,6 +12,7 @@ import {
   Loader2,
   Camera,
   ImagePlus,
+  RotateCcw,
 } from 'lucide-react';
 
 export default function BulletproofUploadFlow() {
@@ -23,6 +24,7 @@ export default function BulletproofUploadFlow() {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Creating your project...');
 
   useEffect(() => {
     return () => {
@@ -76,18 +78,30 @@ export default function BulletproofUploadFlow() {
 
     setIsUploading(true);
     setError(null);
+    setLoadingMessage('Creating your project...');
 
     try {
+      // Step 1: Create the project
       const projectResponse = await fetch('/api/projects/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ zip_code: zipCode }),
       });
-      if (!projectResponse.ok) throw new Error('Failed to create project');
+
+      if (!projectResponse.ok) {
+        const errData = await projectResponse.json().catch(() => ({}));
+        throw new Error(errData.error || 'Could not create your project. Please try again.');
+      }
 
       const projectData = await projectResponse.json();
-      const projectId = projectData.id;
+      const projectId = projectData.project?.id || projectData.id;
 
+      if (!projectId) {
+        throw new Error('Project was created but we could not get the project ID. Please try again.');
+      }
+
+      // Step 2: Upload the image
+      setLoadingMessage('Uploading your photo...');
       const formData = new FormData();
       formData.append('file', uploadedFile);
       formData.append('project_id', projectId);
@@ -96,8 +110,14 @@ export default function BulletproofUploadFlow() {
         method: 'POST',
         body: formData,
       });
-      if (!uploadResponse.ok) throw new Error('Upload failed');
 
+      if (!uploadResponse.ok) {
+        const errData = await uploadResponse.json().catch(() => ({}));
+        throw new Error(errData.error || 'Photo upload failed. Please try again.');
+      }
+
+      // Step 3: Navigate to the flow
+      setLoadingMessage('Opening your project...');
       router.push(`/vision/start?from=${projectId}&zip=${encodeURIComponent(zipCode)}`);
     } catch (err) {
       console.error('Upload error:', err);
@@ -123,7 +143,15 @@ export default function BulletproofUploadFlow() {
           {error && (
             <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50/80 p-3">
               <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
-              <p className="text-sm text-red-700">{error}</p>
+              <div className="flex-1">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+              <button
+                onClick={() => { setError(null); handleSubmit(); }}
+                className="flex items-center gap-1 rounded-lg bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-200"
+              >
+                <RotateCcw className="h-3 w-3" /> Retry
+              </button>
             </div>
           )}
 
@@ -132,7 +160,7 @@ export default function BulletproofUploadFlow() {
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-sand/20 to-mint/20">
                 <Loader2 className="h-7 w-7 animate-spin text-sand-dark" />
               </div>
-              <h3 className="text-lg font-semibold text-ink">Creating your project...</h3>
+              <h3 className="text-lg font-semibold text-ink">{loadingMessage}</h3>
               <p className="mt-1 text-sm text-ink-500">This will just take a moment</p>
             </div>
           ) : (
@@ -196,6 +224,7 @@ export default function BulletproofUploadFlow() {
                 <MapPin className="h-4 w-4 flex-shrink-0 text-ink-400" />
                 <input
                   type="text"
+                  inputMode="numeric"
                   value={zipCode}
                   onChange={(e) => setZipCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 5))}
                   placeholder="ZIP code for local pricing"

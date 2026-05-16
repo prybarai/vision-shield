@@ -30,6 +30,7 @@ import MaterialsAccordion from '@/components/vision/MaterialsAccordion';
 import ConceptsLoader from '@/components/vision/ConceptsLoader';
 import BeforeAfterSlider from '@/components/vision/BeforeAfterSlider';
 import ProjectBriefDocument from '@/components/vision/ProjectBriefDocument';
+import { RefreshCw } from 'lucide-react';
 import type { Estimate, MaterialList, Project, ProjectBrief } from '@/types';
 
 /* ─── Props ─── */
@@ -238,6 +239,40 @@ export default function VisionResultsView({
     notes: project.notes || '',
     image: originalImage || '',
   }).toString()}`;
+
+  /* ─── Regenerate materials ─── */
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [regenError, setRegenError] = useState<string | null>(null);
+
+  const handleRegenerateMaterials = async () => {
+    setIsRegenerating(true);
+    setRegenError(null);
+    try {
+      const res = await fetch('/api/vision/materials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: projectId,
+          category: project.project_category,
+          style: project.style_preference || 'modern',
+          quality_tier: project.quality_tier,
+          estimate_mid: estimate?.mid_estimate || 20000,
+          generated_image_url: conceptImages[0] || undefined,
+          analysis: (project as any).analysis || undefined,
+          notes: project.notes || undefined,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to regenerate');
+      const { materials: newMaterials } = await res.json();
+      setMaterials(newMaterials);
+      posthog.capture('naili_materials_regenerated', { project_id: projectId });
+    } catch (err) {
+      setRegenError('Could not refresh materials. Please try again.');
+      console.error('Regenerate materials error:', err);
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   const readySections = [estimate, materials, brief, hasAnyConcepts ? true : null].filter(Boolean);
   const readyCount = readySections.length;
@@ -514,10 +549,26 @@ export default function VisionResultsView({
             <h2 className="font-display text-2xl tracking-tight text-ink sm:text-3xl">Materials &amp; shopping list</h2>
             <p className="mt-1 text-sm text-ink-500">Real products with prices and links. Ready to shop or hand to a contractor.</p>
           </div>
-          {materials && (
-            <Badge variant="green">{materials.line_items.length} items</Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {materials && (
+              <Badge variant="green">{materials.line_items.length} items</Badge>
+            )}
+            {materials && (
+              <button
+                type="button"
+                onClick={handleRegenerateMaterials}
+                disabled={isRegenerating}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-hairline bg-white px-3 py-1.5 text-xs font-semibold text-ink-600 shadow-soft transition-all hover:bg-canvas-50 hover:shadow-md disabled:opacity-50"
+              >
+                <RefreshCw className={cn('h-3.5 w-3.5', isRegenerating && 'animate-spin')} />
+                {isRegenerating ? 'Refreshing...' : 'Refresh'}
+              </button>
+            )}
+          </div>
         </div>
+        {regenError && (
+          <div className="mb-4 rounded-xl bg-red-50 px-4 py-2 text-sm text-red-700">{regenError}</div>
+        )}
         {materials ? (
           <MaterialsAccordion materials={materials} />
         ) : (

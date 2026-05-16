@@ -123,22 +123,84 @@ function fallbackSiteData(category: string, analysis?: VisionAnalysis, notes?: s
   }
 }
 
+function humanBucket(bucket: string | undefined | null): string {
+  if (!bucket) return '';
+  const b = bucket.toLowerCase();
+  if (b === 'small' || b === 'compact') return 'compact';
+  if (b === 'medium' || b === 'standard' || b === 'moderate') return 'average-sized';
+  if (b === 'large' || b === 'spacious') return 'spacious';
+  if (b === 'very_large' || b === 'extra_large') return 'very spacious';
+  return b.replace(/_/g, ' ');
+}
+
 function sizeSignalSummary(analysis?: VisionAnalysis) {
   if (!analysis) return '';
-  const parts = [
-    analysis.area_signals.wall_area_bucket ? `${analysis.area_signals.wall_area_bucket} visible wall area` : null,
-    analysis.area_signals.floor_area_bucket ? `${analysis.area_signals.floor_area_bucket} visible floor area` : null,
-    analysis.area_signals.roof_area_bucket ? `${analysis.area_signals.roof_area_bucket} visible roof area` : null,
-    analysis.area_signals.yard_area_bucket ? `${analysis.area_signals.yard_area_bucket} visible yard area` : null,
-    analysis.estimated_dimensions.width_bucket ? `${analysis.estimated_dimensions.width_bucket} width` : null,
-    analysis.estimated_dimensions.depth_bucket ? `${analysis.estimated_dimensions.depth_bucket} depth` : null,
-  ].filter(Boolean);
 
-  return parts.length ? parts.join(', ') : '';
+  // Build a single natural-language sentence instead of raw tokens
+  const areaDescriptions: string[] = [];
+  if (analysis.area_signals.wall_area_bucket) {
+    areaDescriptions.push(`${humanBucket(analysis.area_signals.wall_area_bucket)} wall area`);
+  }
+  if (analysis.area_signals.floor_area_bucket) {
+    areaDescriptions.push(`${humanBucket(analysis.area_signals.floor_area_bucket)} floor area`);
+  }
+  if (analysis.area_signals.roof_area_bucket) {
+    areaDescriptions.push(`${humanBucket(analysis.area_signals.roof_area_bucket)} roof area`);
+  }
+  if (analysis.area_signals.yard_area_bucket) {
+    areaDescriptions.push(`${humanBucket(analysis.area_signals.yard_area_bucket)} yard`);
+  }
+
+  const dimParts: string[] = [];
+  if (analysis.estimated_dimensions.width_bucket) {
+    dimParts.push(`${humanBucket(analysis.estimated_dimensions.width_bucket)} width`);
+  }
+  if (analysis.estimated_dimensions.depth_bucket) {
+    dimParts.push(`${humanBucket(analysis.estimated_dimensions.depth_bucket)} depth`);
+  }
+
+  const sqft = typeof analysis.estimated_sqft === 'number' ? analysis.estimated_sqft : Number(analysis.estimated_sqft) || 0;
+  const sqftNote = sqft > 0 ? ` (approximately ${sqft.toLocaleString()} sq ft)` : '';
+
+  if (areaDescriptions.length === 0 && dimParts.length === 0) return '';
+
+  let result = 'The space appears to have ';
+  if (areaDescriptions.length > 0) {
+    result += areaDescriptions.join(' and ');
+  }
+  if (dimParts.length > 0) {
+    result += (areaDescriptions.length > 0 ? ', with ' : '') + dimParts.join(' and ');
+  }
+  result += sqftNote;
+
+  return result;
+}
+
+function humanizeStyle(style: string): string {
+  const map: Record<string, string> = {
+    modern: 'modern',
+    contemporary: 'contemporary',
+    traditional: 'traditional',
+    farmhouse: 'farmhouse',
+    industrial: 'industrial',
+    minimalist: 'minimalist',
+    coastal: 'coastal',
+    mid_century: 'mid-century modern',
+    scandinavian: 'Scandinavian',
+    warm_natural: 'warm and natural',
+    warm_modern: 'warm modern',
+    bold_dramatic: 'bold and dramatic',
+    classic_elegant: 'classic and elegant',
+    rustic: 'rustic',
+    transitional: 'transitional',
+    bohemian: 'bohemian',
+  };
+  return map[style] || style.replace(/_/g, ' ');
 }
 
 function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis): BriefResult {
   const category = params.category.replace(/_/g, ' ');
+  const style = humanizeStyle(params.style);
   const facts = describeAnalysisFacts(analysis).slice(0, 3).join(', ');
   const sizeSignals = sizeSignalSummary(analysis);
   const siteData = fallbackSiteData(params.category, analysis, params.notes);
@@ -149,9 +211,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
       : 'mixed residential improvement scope';
 
     return {
-      summary: `Homeowner wants help scoping a custom project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}. Requested change: ${params.notes || 'Homeowner description pending.'}${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Size cues suggest ${sizeSignals}.` : ''}`,
+      summary: `Homeowner wants help scoping a custom project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}. Requested change: ${params.notes || 'Homeowner description pending.'}${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Clarify the desired update, repair, redesign, or addition and turn it into a contractor-ready scope.',
-      contractor_notes: `Likely trade focus is ${likelyTrade}. Convert the homeowner request into a clear field-ready scope, separate must-have work from optional upgrades, and tighten the biggest pricing unknowns before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      contractor_notes: `Likely trade focus is ${likelyTrade}. Convert the homeowner request into a clear field-ready scope, separate must-have work from optional upgrades, and tighten the biggest pricing unknowns before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact work is included versus excluded in this custom scope?',
         'Which trades are actually required to complete the project properly?',
@@ -166,9 +228,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
 
   if (params.category === 'roofing') {
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} roofing project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} roofing project with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Replace or upgrade the roof with a durable system, clean finish details, and a quote that clearly separates tear-off, materials, and accessory work.',
-      contractor_notes: `Build a field visit around roof size confirmation, tear-off scope, flashing details, ventilation needs, and access constraints.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      contractor_notes: `Build a field visit around roof size confirmation, tear-off scope, flashing details, ventilation needs, and access constraints.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What is the exact roof measurement, and how does it compare to the photo-based roof area assumption?',
         'How many roofing layers need to be removed, and is any section planned as overlay only?',
@@ -184,9 +246,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
   if (params.category === 'interior_paint' || params.category === 'exterior_paint') {
     const isExterior = params.category === 'exterior_paint';
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || `Refresh the ${isExterior ? 'outside appearance' : 'interior painted space'} with a clean, cohesive finish and a quote that clearly defines prep, surfaces included, and final coats.`,
-      contractor_notes: `Clarify exactly which wall, ceiling, trim, door, siding, fascia, or accent surfaces are included, then tighten prep assumptions before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      contractor_notes: `Clarify exactly which wall, ceiling, trim, door, siding, fascia, or accent surfaces are included, then tighten prep assumptions before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact wall, ceiling, trim, door, siding, or accent surfaces are included versus excluded?',
         'What is the true surface-prep condition, including peeling paint, cracks, patching, sanding, or caulking needs?',
@@ -201,9 +263,10 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
 
   if (params.category === 'flooring') {
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} flooring project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} flooring project in a ${style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
+
       homeowner_goals: params.notes || 'Install updated flooring that looks cohesive, wears well, and includes clear allowances for demo, prep, transitions, and trim reset.',
-      contractor_notes: `Confirm exact square footage, selected product, substrate readiness, and whether transitions and base work are included.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      contractor_notes: `Confirm exact square footage, selected product, substrate readiness, and whether transitions and base work are included.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact square footage, closets, and adjacent areas are included?',
         'How does the measured floor area compare to the photo-based flooring size assumption?',
@@ -218,9 +281,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
 
   if (params.category === 'landscaping') {
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} landscaping project in a ${params.style} direction with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} landscaping project in a ${style} direction with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Improve curb appeal with cleaner planting areas, a more intentional yard plan, and a quote that separates planting, bed work, irrigation, lighting, and any hardscape changes.',
-      contractor_notes: `Treat visible hardscape like driveway, walks, patio, or steps as keep-in-place unless the homeowner explicitly wants them changed. Confirm bed area, lawn area, drainage, irrigation, lighting, plant count, and exact preserve-versus-change boundaries before quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      contractor_notes: `Treat visible hardscape like driveway, walks, patio, or steps as keep-in-place unless the homeowner explicitly wants them changed. Confirm bed area, lawn area, drainage, irrigation, lighting, plant count, and exact preserve-versus-change boundaries before quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'Which visible areas are in scope for planting or lawn work, and which hardscape areas must stay exactly as they are?',
         'What exact planting-bed square footage, lawn area, and edging lengths should replace the photo-based assumption?',
@@ -235,9 +298,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
 
   if (params.category === 'deck_patio') {
     return {
-      summary: `Homeowner is planning a ${params.quality_tier} deck patio project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      summary: `Homeowner is planning a ${params.quality_tier} deck/patio project in a ${style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       homeowner_goals: params.notes || 'Build or refresh an outdoor living area with a footprint and features that fit the yard and budget.',
-      contractor_notes: `Confirm exact outdoor footprint, railing needs, footing requirements, grade changes, and access before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+      contractor_notes: `Confirm exact outdoor footprint, railing needs, footing requirements, grade changes, and access before final quoting.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
       site_verification_questions: [
         'What exact deck or patio footprint should be measured onsite?',
         'Do grade changes, drainage, or soil conditions affect footing or base requirements?',
@@ -251,9 +314,9 @@ function fallbackBrief(params: z.infer<typeof schema>, analysis?: VisionAnalysis
   }
 
   return {
-    summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${params.style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+    summary: `Homeowner is planning a ${params.quality_tier} ${category} project in a ${style} style with a planning budget of $${params.estimate_low.toLocaleString()}–$${params.estimate_high.toLocaleString()}.${facts ? ` Visible photo signals suggest ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
     homeowner_goals: params.notes || `Wants a clean, practical ${category} upgrade that feels cohesive and ready for contractor pricing.`,
-    contractor_notes: `Use this as a planning-grade field brief, not a final scope. Confirm measurements, existing conditions, code requirements, demolition scope, finish selections, and lead times before issuing a final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` Visible size cues suggest ${sizeSignals}.` : ''}`,
+    contractor_notes: `Use this as a planning-grade field brief, not a final scope. Confirm measurements, existing conditions, code requirements, demolition scope, finish selections, and lead times before issuing a final quote.${facts ? ` Uploaded photo suggests ${facts}.` : ''}${sizeSignals ? ` ${sizeSignals}.` : ''}`,
     site_verification_questions: [
       'What exact measurements need to be confirmed onsite before pricing?',
       'What existing conditions or hidden issues could affect the scope?',

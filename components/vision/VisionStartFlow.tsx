@@ -371,7 +371,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
     const nextStyle = initialPrefill?.style?.trim();
     const nextQuality = initialPrefill?.quality?.trim();
     const nextNotes = initialPrefill?.notes?.trim();
-    const nextImage = initialPrefill?.image?.trim();
+    let nextImage = initialPrefill?.image?.trim();
 
     if (nextZip && !zipCode) setZipCode(nextZip);
     if (nextCategory && !category && nextCategory in PROJECT_CATEGORIES) setCategory(nextCategory as ProjectCategory);
@@ -381,6 +381,42 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
     }
     if (nextNotes && !notes) setNotes(nextNotes);
 
+    // If we have a project ID but no image URL, fetch the project to get the image
+    if (prefillProjectId && !nextImage && prefillStatus === 'idle' && !uploadedFile && !uploadPreview) {
+      let cancelled = false;
+      setPrefillStatus('loading');
+
+      void fetch(`/api/projects/get?id=${encodeURIComponent(prefillProjectId)}`)
+        .then(async (res) => {
+          if (!res.ok) throw new Error('Failed to fetch project');
+          const data = await res.json();
+          const imageUrl = data.project?.image_url;
+          if (!imageUrl) throw new Error('No image URL in project');
+          if (cancelled) return;
+
+          // Now fetch the actual image to create a File object
+          const imgRes = await fetch(imageUrl);
+          if (!imgRes.ok) throw new Error(`Image fetch failed with ${imgRes.status}`);
+          const blob = await imgRes.blob();
+          const fileType = SUPPORTED_IMAGE_TYPES.includes(blob.type) ? blob.type : 'image/jpeg';
+          const extension = fileType === 'image/jpeg' ? 'jpg' : fileType.split('/')[1] || 'jpg';
+          const file = new File([blob], `naili-source.${extension}`, { type: fileType });
+
+          if (cancelled) return;
+          setUploadedFile(file);
+          setUploadPreview(imageUrl);
+          setPrefillStatus('loaded');
+        })
+        .catch((err) => {
+          console.error('failed to prefill from project', err);
+          if (cancelled) return;
+          setPrefillStatus('error');
+        });
+
+      return () => { cancelled = true; };
+    }
+
+    // If we have a direct image URL, fetch it
     if (!nextImage || uploadedFile || uploadPreview || prefillStatus !== 'idle') return;
 
     let cancelled = false;
@@ -396,7 +432,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
 
         if (cancelled) return;
         setUploadedFile(file);
-        setUploadPreview(nextImage);
+        setUploadPreview(nextImage!);
         setPrefillStatus('loaded');
       })
       .catch((prefillError) => {
@@ -408,7 +444,7 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
     return () => {
       cancelled = true;
     };
-  }, [category, initialPrefill, notes, prefillStatus, qualityTier, style, uploadPreview, uploadedFile, zipCode]);
+  }, [category, initialPrefill, notes, prefillProjectId, prefillStatus, qualityTier, style, uploadPreview, uploadedFile, zipCode]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -546,36 +582,79 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
       });
 
       setProgressStep(0);
-      const projectRes = await fetch('/api/projects/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location_type: PROJECT_CATEGORIES[category].type,
-          project_category: category,
-          zip_code: zipCode.trim(),
-          style_preference: style,
-          quality_tier: qualityTier,
-          notes: notesWithScope,
-          session_id: sessionId,
-        }),
-      });
 
-      if (!projectRes.ok) throw new Error(await readApiError(projectRes, 'We could not set up your project. Please try again.'));
-      recoveryStep = 'entry';
-      const { project } = await projectRes.json() as { project: { id: string } };
-      const projectId = project.id;
+      let projectId: string;
+      let referenceImageUrl: string;
 
-      const formData = new FormData();
-      formData.append('file', uploadedFile);
-      formData.append('project_id', projectId);
+      // If we came from BulletproofUploadFlow with an existing project, reuse it
+      if (prefillProjectId && prefillStatus === 'loaded') {
+        projectId = prefillProjectId;
 
-      const uploadRes = await fetch('/api/projects/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
+        // Update the existing project with the user's selections
+        await fetch('/api/projects/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            project_id: projectId,
+            project_category: category,
+            style_preference: style,
+            quality_tier: qualityTier,
+            notes: notesWithScope,
+          }),
+        });
 
-      if (!uploadRes.ok) throw new Error(await readApiError(uploadRes, `We could not upload that photo. Please use ${SUPPORTED_IMAGE_LABEL}.`));
-      const { url: referenceImageUrl } = await uploadRes.json() as { url: string };
+        // Get the existing image URL from the project
+        const projRes = await fetch(`/api/projects/get?id=${encodeURIComponent(projectId)}`);
+        if (!projRes.ok) throw new Error('Could not load your project. Please try again.');
+        const projData = await projRes.json();
+        referenceImageUrl = projData.project?.image_url || '';
+
+        // If no image URL exists, re-upload
+        if (!referenceImageUrl) {
+          const formData = new FormData();
+          formData.append('file', uploadedFile);
+          formData.append('project_id', projectId);
+          const uploadRes = await fetch('/api/projects/upload-image', { method: 'POST', body: formData });
+          if (!uploadRes.ok) throw new Error(await readApiError(uploadRes, `We could not upload that photo. Please use ${SUPPORTED_IMAGE_LABEL}.`));
+          const uploadData = await uploadRes.json() as { url: string };
+          referenceImageUrl = uploadData.url;
+        }
+
+        recoveryStep = 'entry';
+      } else {
+        // Create a new project
+        const projectRes = await fetch('/api/projects/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            location_type: PROJECT_CATEGORIES[category].type,
+            project_category: category,
+            zip_code: zipCode.trim(),
+            style_preference: style,
+            quality_tier: qualityTier,
+            notes: notesWithScope,
+            session_id: sessionId,
+          }),
+        });
+
+        if (!projectRes.ok) throw new Error(await readApiError(projectRes, 'We could not set up your project. Please try again.'));
+        recoveryStep = 'entry';
+        const { project } = await projectRes.json() as { project: { id: string } };
+        projectId = project.id;
+
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        formData.append('project_id', projectId);
+
+        const uploadRes = await fetch('/api/projects/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadRes.ok) throw new Error(await readApiError(uploadRes, `We could not upload that photo. Please use ${SUPPORTED_IMAGE_LABEL}.`));
+        const uploadData = await uploadRes.json() as { url: string };
+        referenceImageUrl = uploadData.url;
+      }
 
       let analysis: VisionAnalysis = FALLBACK_VISION_ANALYSIS;
       try {
@@ -834,18 +913,14 @@ export default function VisionStartFlow({ initialPrefill }: { initialPrefill?: V
               </p>
             </div>
 
-            {(prefillProjectId || (prefillStatus !== 'idle' && prefillStatus !== 'dismissed')) && (
+            {prefillStatus === 'loading' && (
               <div className="mt-4 rounded-2xl border border-panel bg-canvas-50 p-4 text-sm text-ink">
-                <div className="font-semibold">
-                  {prefillStatus === 'loading'
-                    ? 'Loading the saved project photo...'
-                    : prefillStatus === 'loaded'
-                    ? 'Saved project details loaded. You can adjust anything before generating again.'
-                    : prefillStatus === 'error'
-                    ? 'We loaded the project settings, but could not reuse the saved photo automatically. Please re-upload if needed.'
-                    : 'Editing from a saved project.'}
-                </div>
-                {prefillProjectId && <div className="mt-1 text-xs text-ink-600">Project source: {prefillProjectId}</div>}
+                <div className="font-semibold">Loading your photo...</div>
+              </div>
+            )}
+            {prefillStatus === 'error' && (
+              <div className="mt-4 rounded-2xl border border-red-200 bg-red-50/80 p-4 text-sm text-red-700">
+                <div className="font-semibold">Could not load the saved photo. Please re-upload below.</div>
               </div>
             )}
 
