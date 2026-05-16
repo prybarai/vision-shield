@@ -124,7 +124,9 @@ export default function LeadCaptureForm({ projectId, zip, category, estimate }: 
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || "Something went wrong. Please try again.");
+        const msg = data.error || "Something went wrong. Please try again.";
+        const detail = data.detail ? ` (${data.detail})` : "";
+        throw new Error(msg + detail);
       }
 
       const data = await res.json();
